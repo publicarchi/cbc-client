@@ -9,13 +9,13 @@
 //     console.log(document.getElementById('value').value)
 // }
 
-    const paginationOnChange = (e) => {
-        console.log(e.target)
-    }
+const paginationOnChange = (e) => {
+  console.log(e.target.value)
+}
 
 </script>
 
-<select id="pagination" onChange={paginationOnChange}>
+<select id="pagination" on:change={paginationOnChange}>
   <option value="20" selected>20</option>
   <option value="200">200</option>
   <option value="2000">2000</option>

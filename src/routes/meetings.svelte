@@ -21,8 +21,8 @@
 </script>
 
 <script lang="ts">
-  import Pagination from "../lib/composants/Pagination.svelte"
-  export let meetings
+  import Pagination from "$lib/composants/Pagination.svelte" ;
+  export let meetings ;
 </script>
 
 
