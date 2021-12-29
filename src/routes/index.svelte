@@ -1,2 +1,16 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	
+</script>
+
+<svelte:head>
+  <title>Bienvenue</title>
+</svelte:head>
+
+<div>
+  <h1>Bienvenue sur CBC</h1>
+  <p>CBC est un prototype d’application de consultation de la base de données Conbavil...</p>
+  <div>
+    <h2>Posts de blogs</h2>
+    
+  </div>
+</div>
