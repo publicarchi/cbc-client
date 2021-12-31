@@ -1,8 +1,17 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	// import { page } from '$app/stores';
+	import { Header, HeaderNav, HeaderNavItem } from 'carbon-components-svelte'
 </script>
 
-<header>	
+<Header aria-label="CBC Project" company="[DH] CBC" href="/">
+	<HeaderNav>
+	  <HeaderNavItem href="/" text="Home" />
+	  <HeaderNavItem href="/meetings" text="Séances"/>
+	  <HeaderNavItem href="/a-propos" text="À propos"/>
+	</HeaderNav>
+  </Header>
+
+<!-- <header>
 	<nav>
 		<ul>
 			<li class:active={$page.path === '/'}><a sveltekit:prefetch href="/">Home</a></li>
@@ -12,10 +21,11 @@
 			<li class:active={$page.path === '/a-propos'}><a sveltekit:prefetch href="/a-propos">À propos</a></li>
 		</ul>
 	</nav>
-</header>
+</header> -->
 
+<!--
 <style>
-	header {
+	 header {
 		display: flex;
 		justify-content: space-between;
 	}
@@ -103,3 +113,4 @@
 		color: var(--accent-color);
 	}
 </style>
+-->
