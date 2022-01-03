@@ -51,18 +51,19 @@ const config = {
 		adapter: adapter(),
 
 		// hydrate the <div id="svelte"> element in src/app.html
-		target: '#svelte'
+		target: '#svelte',
 
 		// This is the node adapter
 		//adapter: node(),
 
-		// vite: {
-		// 	resolve: {
-		// 		alias: {
-		// 			$carbone: path.resolve('./node_modules/carbon-components-svelte/css')
-		// 		}
-		// 	}
-		// }
+		vite: {
+		 	resolve: {
+		 		alias: {
+		 			// $carbone: path.resolve('./node_modules/carbon-components-svelte/css')
+				  $posts: path.resolve('./src/posts')
+		 		}
+		 	}
+		}
 	}
 };
 

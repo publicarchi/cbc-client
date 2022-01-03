@@ -1,23 +1,25 @@
-import { process } from '$lib/markdown';
-import fs from 'fs';
-// import dayjs from 'dayjs';
+export const get = async () => {
+  // @todo use a global param for the path $xxx, csq on line 9
+  const allPostFiles = import.meta.glob('../../posts/*.md')
+  const iterablePostFiles = Object.entries(allPostFiles)
 
-export function get() {
-  const posts = fs.readdirSync(`src/posts`)
-      .filter(fileName => /.+\.md$/.test(fileName))
-      .map(fileName => {
-        const { metadata } = process(`src/posts/${fileName}`);
-        return {
-          metadata,
-          slug: fileName.slice(0, -3)
-        };
-      });
-  // sort the posts by create date.
-  // posts.sort((a, b) => (dayjs(a.metadata.date, "MMM D, YYYY") -
-  //                      dayjs(b.metadata.date, "MMM D, YYYY")));
-  const body = JSON.stringify(posts);
+  const allPosts = await Promise.all(
+    iterablePostFiles.map(async ([path, resolver]) => {
+      const { metadata } = await resolver()
+      const postPath = path.slice(5,-3)
 
+      return {
+        meta: metadata,
+        path: postPath,
+      }
+    })
+  )
+
+
+  const sortedPosts = allPosts.sort((a, b) =>  new Date(b.meta.date) - new Date(a.meta.date))
+
+  // @todo add an error msg
   return {
-    body
+    body: sortedPosts
   }
-}
+};

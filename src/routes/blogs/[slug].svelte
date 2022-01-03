@@ -11,14 +11,14 @@
 
 <script>
   // post will have metadata and content
-  export let post;
+  export let posts;
   import {
     Content
   } from 'carbon-components-svelte'
 </script>
 
 <svelte:head>
-	<title>{post.metadata.title}</title>
+	<title>{posts.metadata.title}</title>
 </svelte:head>
 
 <Content>
