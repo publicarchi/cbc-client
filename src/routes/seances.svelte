@@ -21,8 +21,8 @@
 </script>
 
 <script lang="ts">
-  	import Pagination from "$lib/composants/Pagination.svelte" ;
-	import { Content, OrderedList, ListItem } from 'carbon-components-svelte'
+  import Pagination from "$lib/composants/Pagination.svelte" ;
+	import { Accordion, AccordionItem, Content, ListItem, OrderedList } from 'carbon-components-svelte'
   export let meetings ;
 </script>
 
@@ -33,11 +33,24 @@
 
 <Content>
 	<h1>Séances du Conseil des bâtiments civils</h1>
-
 	<Pagination />
 
+<Accordion>
+{#each meetings as meeting}
+	<AccordionItem title="{meeting.title}">
+		<OrderedList nested>
+		{#each meeting.deliberations as deliberation}
+			<ListItem>
+				<a href={'deliberations/' + deliberation.id}>{deliberation.id}</a> - {deliberation.title} - {deliberation.commune}
+			</ListItem>
+		{/each}
+		</OrderedList>
+	</AccordionItem>
+{/each}
+</Accordion>
+</Content>
 
-	<OrderedList>
+	<!-- <OrderedList>
 		{#each meetings as meeting}
 		<ListItem>{meeting.title} - {meeting.date}</ListItem>
 		<ListItem>
@@ -51,7 +64,7 @@
 			</OrderedList>
 		</ListItem>
 		{/each}
-	</OrderedList>
+	</OrderedList> -->
 
 
 
@@ -69,7 +82,7 @@
 			</ul>
 		</div>
 	{/each} -->
-</Content>
+
 
 
 <!-- {#await}

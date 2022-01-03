@@ -3,10 +3,12 @@
 	import { Header, HeaderNav, HeaderNavItem } from 'carbon-components-svelte'
 </script>
 
-<Header aria-label="CBC Project" company="[DH] CBC" href="/">
+<Header aria-label="CBC Project" company="cbc@publicarchi" href="/">
 	<HeaderNav>
-	  <HeaderNavItem href="/" text="Home" />
-	  <HeaderNavItem href="/meetings" text="Séances"/>
+	  <HeaderNavItem href="/seances" text="Séances"/>
+		<HeaderNavItem href="/deliberations" text="Délibérations" />
+		<HeaderNavItem href="/blogs" text="Blog" />
+
 	  <HeaderNavItem href="/a-propos" text="À propos"/>
 	</HeaderNav>
   </Header>

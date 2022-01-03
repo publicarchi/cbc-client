@@ -1,28 +1,12 @@
-import { slugFromPath } from 'src/utils/slugFromPath';
+import { process } from '$lib/markdown';
 
-/**
- * @type {import('@sveltejs/kit').RequestHandler}
- */
-export async function get({ params }) {
-	const modules = import.meta.glob(`./*.{md,svx,svelte.md}`);
+export function get({ params }) {
+  const { slug } = params;
 
-	let match: any[];
-	for (const [path, resolver] of Object.entries(modules)) {
-		if (slugFromPath(path) === params.slug) {
-			match = [path, resolver];
-			break;
-		}
-	}
+  const { metadata, content } = process(`src/posts/${slug}.md`);
+  const body = JSON.stringify({ metadata, content });
 
-	if (!match) {
-		return {
-			status: 404
-		};
-	}
-
-	const post = await match[1]();
-
-	return {
-		body: post.metadata
-	};
+  return {
+    body
+  }
 }

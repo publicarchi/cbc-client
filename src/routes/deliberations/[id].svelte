@@ -14,6 +14,8 @@
 </script>
 
 <script lang="ts">
+	import {Content} from 'carbon-components-svelte'
+
 	export let deliberation;
 	$: console.log(deliberation)
 
@@ -50,6 +52,7 @@
 	<title>Délibération</title>
 </svelte:head>
 
+<Content>
 <div>
 	<h1>Délibération {deliberation.id}</h1>
 	<ul>
@@ -78,4 +81,4 @@
 		<input type="submit" value="submit"/>
 </form>
 </div>
-  
+</Content>

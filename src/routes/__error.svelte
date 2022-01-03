@@ -11,10 +11,12 @@
 
 <script>
 	export let title;
+	import {Content} from 'carbon-components-svelte'
 </script>
 
-<h1>{title}</h1>
-
+<Content>
+	<h1>{title}</h1>
+</Content>
 
 <style>
 	h2 {

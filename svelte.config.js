@@ -1,7 +1,15 @@
 import path from 'path';
 import preprocess from 'svelte-preprocess';
 // import { sveltePreprocess } from 'svelte-preprocess/dist/autoProcess';
-// import { optimizeImports } from 'carbon-preprocess-svelte';
+
+import { optimizeImports } from 'carbon-preprocess-svelte';
+// export default {
+//  preprocess: [optimizeImports()],
+// };
+import { elements } from "carbon-preprocess-svelte";
+import { icons } from "carbon-preprocess-svelte";
+import { pictograms } from "carbon-preprocess-svelte";
+
 import adapter from '@sveltejs/adapter-auto';
 // import adapter from '@sveltejs/adapter-static';
 
@@ -10,11 +18,12 @@ const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
 	preprocess: [
+		optimizeImports(), elements(), icons(), pictograms(),
 		// Auto-preprocess mode - no need for specifying standlone SCSS preprocesors, etc.
 		// https://github.com/sveltejs/svelte-preprocess/blob/main/docs/preprocessing.md#auto-preprocessing
 		// sveltePreprocess()
 		preprocess({
-			scss: {
+ 			scss: {
 				// We can use a path relative to the root because svelte-preprocess automatically adds
 				// it to `includePaths` if none is defined.
 				// This allows us to use the variables in our components - don't turn on unless really need it
