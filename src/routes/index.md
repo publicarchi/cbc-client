@@ -8,8 +8,9 @@
 
 <Content>
 
-  <h1>Bienvenue sur CBC</h1>
-  <p>CBC est un prototype d’application de consultation de la base de données Conbavil...</p>
+## Test
+
+CBC est un prototype d’application de consultation de la base de données Conbavil...
   
   <Button>Add me</Button>
 </Content>

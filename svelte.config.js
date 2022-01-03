@@ -2,10 +2,9 @@ import path from 'path';
 import preprocess from 'svelte-preprocess';
 // import { sveltePreprocess } from 'svelte-preprocess/dist/autoProcess';
 
+import { mdsvex } from 'mdsvex';
+
 import { optimizeImports } from 'carbon-preprocess-svelte';
-// export default {
-//  preprocess: [optimizeImports()],
-// };
 import { elements } from "carbon-preprocess-svelte";
 import { icons } from "carbon-preprocess-svelte";
 import { pictograms } from "carbon-preprocess-svelte";
@@ -17,7 +16,11 @@ import adapter from '@sveltejs/adapter-auto';
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
+	extensions: ['.svelte', '.md'],
 	preprocess: [
+		mdsvex({
+      extensions: ['.md']
+    }),
 		optimizeImports(), elements(), icons(), pictograms(),
 		// Auto-preprocess mode - no need for specifying standlone SCSS preprocesors, etc.
 		// https://github.com/sveltejs/svelte-preprocess/blob/main/docs/preprocessing.md#auto-preprocessing
