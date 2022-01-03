@@ -1,14 +1,24 @@
 <script context="module" lang="ts">
   // import { fetchMeetings } from './calls';
   /** @type {import('@sveltejs/kit').Load} */
+
 	export async function load({ page, fetch, session, stuff }) {
-		const url = `http://127.0.0.1:8984/cbc/meetings`;
-		const res = await fetch(url);
+		var params = {nb: 100}
+		var query = Object
+			.keys(params)
+			.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+			.join('&');
+		let url = `http://127.0.0.1:8984/cbc/meetings?` + query;
+		const res = await fetch(url, {
+			method: 'GET',
+			body: JSON.stringify()
+		});
 
 		if (res.ok) {
 			return {
 				props: {
-					meetings: await res.json()
+					meetings: await res.json(),
+					params
 				}
 			};
 		}
@@ -22,8 +32,14 @@
 
 <script lang="ts">
   import Pagination from "$lib/composants/Pagination.svelte" ;
-	import { Accordion, AccordionItem, Content, ListItem, OrderedList } from 'carbon-components-svelte'
+	import { 
+		Accordion, 
+		AccordionItem, 
+		Content, 
+		ListItem, 
+		OrderedList } from 'carbon-components-svelte'
   export let meetings ;
+  export let params
 </script>
 
 
@@ -33,21 +49,20 @@
 
 <Content>
 	<h1>Séances du Conseil des bâtiments civils</h1>
-	<Pagination />
-
-<Accordion>
-{#each meetings as meeting}
-	<AccordionItem title="{meeting.title}">
-		<OrderedList nested>
-		{#each meeting.deliberations as deliberation}
-			<ListItem>
-				<a href={'deliberations/' + deliberation.id}>{deliberation.id}</a> - {deliberation.title} - {deliberation.commune}
-			</ListItem>
-		{/each}
-		</OrderedList>
-	</AccordionItem>
-{/each}
-</Accordion>
+	<Pagination bind:params={params}/>
+	<Accordion>
+	{#each meetings as meeting}
+		<AccordionItem title="{meeting.title}">
+			<OrderedList nested>
+			{#each meeting.deliberations as deliberation}
+				<ListItem>
+					<a href={'deliberations/' + deliberation.id}>{deliberation.id}</a> - {deliberation.title} - {deliberation.commune}
+				</ListItem>
+			{/each}
+			</OrderedList>
+		</AccordionItem>
+	{/each}
+	</Accordion>
 </Content>
 
 	<!-- <OrderedList>

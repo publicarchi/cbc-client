@@ -9,8 +9,11 @@
 //     console.log(document.getElementById('value').value)
 // }
 
+export let params
+
 const paginationOnChange = (e) => {
   console.log(e.target.value)
+  params.nb = e.target.value
 }
 
 </script>

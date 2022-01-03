@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Header from '$lib/header/Header.svelte';
+	import Header from '$lib/components/Header.svelte';
 	import "carbon-components-svelte/css/g10.css";
 </script>
 
