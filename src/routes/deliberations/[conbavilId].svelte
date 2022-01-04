@@ -1,4 +1,3 @@
-
 <script context="module" lang="ts">
 	/** @type {import('@sveltejs/kit').Load} */
 	export async function load({ fetch, page }) {
@@ -6,7 +5,11 @@
 		const id = page.params.conbavilId;
 		const res = await fetch(`http://127.0.0.1:8984/cbc/deliberations/${id}`);
 		
-		if (res.ok) return { props: { deliberation: await res.json() } };
+		if (res.ok) return { 
+			props: { 
+				deliberation: await res.json()
+			} 
+		};
 		return {
 			status: res.status,
 			error: new Error()
