@@ -31,7 +31,7 @@
 </script>
 
 <script lang="ts">
-  import Pagination from "$lib/composants/Pagination.svelte" ;
+  import Pagination from "$lib/components/Pagination.svelte" ;
 	import { 
 		Accordion, 
 		AccordionItem, 
