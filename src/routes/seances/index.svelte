@@ -31,12 +31,12 @@
 </script>
 
 <script lang="ts">
-  import Pagination from "$lib/components/Pagination.svelte" ;
-	import { 
-		Accordion, 
-		AccordionItem, 
-		Content, 
-		ListItem, 
+  import Pagination from "$components/Pagination.svelte" ;
+	import {
+		Accordion,
+		AccordionItem,
+		Content,
+		ListItem,
 		OrderedList } from 'carbon-components-svelte'
   export let meetings ;
   export let params
