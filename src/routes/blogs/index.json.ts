@@ -1,4 +1,4 @@
-export const get = async () => {
+export async function get() {
   // @todo use a global param for the path $xxx, csq on line 9
   const allPostFiles = import.meta.glob('../../posts/*.md')
   const iterablePostFiles = Object.entries(allPostFiles)
@@ -14,7 +14,6 @@ export const get = async () => {
       }
     })
   )
-
 
   const sortedPosts = allPosts.sort((a, b) =>  new Date(b.meta.date) - new Date(a.meta.date))
 
