@@ -7,7 +7,7 @@
 </script>
 
 <script>
-	import { 
+	import {
 		Content,
 		InlineNotification
 	} from 'carbon-components-svelte';
