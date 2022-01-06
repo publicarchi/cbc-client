@@ -4,10 +4,7 @@ import preprocess from 'svelte-preprocess';
 
 import { mdsvex } from 'mdsvex';
 
-import { optimizeImports } from 'carbon-preprocess-svelte';
-import { elements } from "carbon-preprocess-svelte";
-import { icons } from "carbon-preprocess-svelte";
-import { pictograms } from "carbon-preprocess-svelte";
+import { optimizeImports, elements, icons, pictograms } from 'carbon-preprocess-svelte';
 
 import adapter from '@sveltejs/adapter-auto';
 // import adapter from '@sveltejs/adapter-static';
@@ -19,14 +16,17 @@ const config = {
 	extensions: ['.svelte', '.md'],
 	preprocess: [
 		mdsvex({
-      extensions: ['.md']
-    }),
-		optimizeImports(), elements(), icons(), pictograms(),
+			extensions: ['.md']
+		}),
+		optimizeImports(),
+		elements(),
+		icons(),
+		pictograms(),
 		// Auto-preprocess mode - no need for specifying standlone SCSS preprocesors, etc.
 		// https://github.com/sveltejs/svelte-preprocess/blob/main/docs/preprocessing.md#auto-preprocessing
 		// sveltePreprocess()
 		preprocess({
- 			scss: {
+			scss: {
 				// We can use a path relative to the root because svelte-preprocess automatically adds
 				// it to `includePaths` if none is defined.
 				// This allows us to use the variables in our components - don't turn on unless really need it
@@ -57,12 +57,12 @@ const config = {
 		//adapter: node(),
 
 		vite: {
-		 	resolve: {
-		 		alias: {
-		 			// $carbone: path.resolve('./node_modules/carbon-components-svelte/css')
-				  $posts: path.resolve('./src/posts')
-		 		}
-		 	}
+			resolve: {
+				alias: {
+					// $carbone: path.resolve('./node_modules/carbon-components-svelte/css')
+					$posts: path.resolve('./src/posts')
+				}
+			}
 		}
 	}
 };

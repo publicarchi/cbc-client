@@ -29,7 +29,7 @@
 	} from 'carbon-components-svelte'
 
 	import { validateForm } from '$lib/helpers/deliberationFormValidator'
-import { text } from 'svelte/internal';
+	import { text } from 'svelte/internal';
 
 	export let deliberation
 	// $: console.log(deliberation)
