@@ -1,4 +1,5 @@
 <script context="module">
+	/** @type {import('@sveltejs/kit').Load} */
 	export async function load({ fetch }) {
 		const posts = await fetch('blogs.json')
   	const allPosts = await posts.json()
@@ -13,8 +14,9 @@
 
 <script lang="ts">
   import {Content} from "carbon-components-svelte";
-	const titre = "Liste des blogs";
+	// @todo comment passer des params au layout ?
 	export let posts;
+	export let pageTitle = "Liste des blogs";
 </script>
 
 
