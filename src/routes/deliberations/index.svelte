@@ -45,7 +45,7 @@
 </script> -->
 
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import {
 		Content,
     	DataTable,
@@ -55,8 +55,12 @@
 		ToolbarSearch,
 		ToolbarMenu,
 		ToolbarMenuItem,
+		Link,
 		Button,
+Loading,
   	} from "carbon-components-svelte";
+
+	import Launch16 from "carbon-icons-svelte/lib/Launch16";
 
 	let deliberations
 	let meta = {start: 1, count: 20, totalItems: 0}
@@ -69,7 +73,7 @@
 		Object.keys(queryParams).forEach(k => {
 			url.searchParams.append(k, queryParams[k])
 		})
-		console.log(url.toString())
+		// console.log(url.toString())
 
 		// This uses the sveltekit's fetch function?
 		// Function doesnt allow URL object as parameter -> needs type string
@@ -89,24 +93,31 @@
 	}
 
   	// https://svelte.dev/tutorial/onmount
+	// Richard Harris on updating components :
+	// https://stackoverflow.com/questions/56891190/how-to-trigger-force-update-a-svelte-component
 	//onMount(() => fetchData(queryParams))
+	onMount(() => console.log('component onMount()'))
+	onDestroy(() => console.log('component onDestroy()'))
 
 	// Updates queryParams everytime view has changed
 	$: {
-		queryParams.start = count * currentPage
-		queryParams.count = count
-		console.log('queryParams has changed')
+		// todo: check if count is Int
+		console.log('queryParams has changed', queryParams)
+		queryParams.start = count * (currentPage -1)
+		// queryParams.count = count
 	}
 
+	// When view changes count changes 2 times...
+	$: console.log('count has changed to', count)
+
 	// fetchData called everytime queryParams has changed
-	// !!! Call is made 2 times !!!
 	$: fetchData(queryParams)
 
 </script>
 
 
 <svelte:head>
-	<title>Délibération</title>
+	<title>Délibérations</title>
 </svelte:head>
 
 <Content>
@@ -119,15 +130,37 @@
 			{ key: 'item', value: 'Item' },
 			{ key: 'pages', value: 'Pages' },
 			{ key: 'commune', value: 'Commune' },
-			{ key: 'recommendation', value: 'Recommandation' }
+			{
+				key: 'recommendation',
+				value: 'Recommandation',
+				sort: (a, b) => {
+					//todo: trigger an onChangeFilterKey
+					console.log('Recommandation est focus !')
+					return a.localeCompare(b)
+				},
+			},
+			{ key: 'id', empty: true}
 		]}
 		rows={
 			deliberations
 		}
 	>
+		<svelte:fragment slot="cell" let:cell>
+			{#if cell.key === "id"}
+			<!-- target='_blank' permet d'ouvrir un nouvel quand on clic sur le lien -->
+			<Link
+				icon={Launch16}
+				href="/deliberations/{cell.value}"
+				target="_blank"
+			>
+				{cell.value}
+			</Link>
+			{:else}{cell.value}{/if}
+		</svelte:fragment>
+
 		<Toolbar>
 			<ToolbarContent>
-				<ToolbarSearch />
+				<ToolbarSearch expanded={true} persistent={true}/>
 				<ToolbarMenu>
 					<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
 					<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
@@ -143,10 +176,14 @@
 			forwardText="Next page"
 			itemsPerPageText="Items per page:"
 			bind:page={currentPage}
-			bind:pageSize={count}
-			pageSizes={[10, 20, 30, 40, 50]}
+			bind:pageSize={queryParams.count}
+			pageSizes={[50, 100, 250, 500]}
 			totalItems={meta.totalItems}
 		/>
+
+		<!-- {#if !deliberations}
+			<Loading />
+		{/if} -->
 
 	</DataTable>
 </Content>
