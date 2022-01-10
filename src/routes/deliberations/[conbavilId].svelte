@@ -26,13 +26,15 @@
 		FormGroup,
 		TextInput,
 		InlineNotification,
+		FormItem,
+		FormLabel,
 	} from 'carbon-components-svelte'
-
 	import { validateForm } from '$lib/helpers/deliberationFormValidator'
-	import { text } from 'svelte/internal';
+	import { onMount } from 'svelte';
+
 
 	export let deliberation
-	// $: console.log(deliberation)
+	$: console.log(deliberation)
 
 	let formIsToggled = false
 	let postResponse = {}
@@ -44,6 +46,23 @@
 		date: false,
 		item: false,
 		pages: false
+	}
+
+	let types = []
+	let categories = []
+
+	onMount(() => {
+		fetchTypes()
+		fetchCategories()
+	})
+
+	const fetchTypes = async () => {
+		const res = await fetch('http://127.0.0.1:8984/cbc/types')
+		types = await res.json()
+	}
+	const fetchCategories = async () => {
+		const res = await fetch('http://127.0.0.1:8984/cbc/categories')
+		categories = await res.json()
 	}
 
 	const toggleForm = () => formIsToggled = !formIsToggled
@@ -77,6 +96,8 @@
 			console.log('Validity not ok for ', node.id, node)
 			invalidStates[node.id] = true
 
+			console.log(node)
+
 			// Enlève la notification si la 2e tentative ne passe pas la validation
 			submited = false
 		}
@@ -100,6 +121,29 @@
 		setCustomMessage(item, 'Ce champ doit comporter un nombre entier supérieur ou égal 0')
 		setCustomMessage(pages, 'Ce champ doit comporter un nombre entier supérieur ou égal 0')
 	}
+
+	// const formGroups = [
+	// 	{
+	// 		keys: ['id', 'cote', 'seance', 'title'],
+	// 		name: "Identification de la fiche"
+	// 	},
+	// 	{
+	// 		keys: ['item', 'pages'],
+	// 		name: 'Contenu de la fiche'
+	// 	},
+	// 	{
+	// 		keys: ['localisation'],
+	// 		name: 'Localisation'
+	// 	},
+	// 	{
+	// 		keys: ['types', 'categories'],
+	// 		name: 'Caractéristiques des batiments concernés'
+	// 	},
+	// 	{
+	// 		keys: ['report', 'recommandation', 'conseil'],
+	// 		name: 'Avis et décisions'
+	// 	}
+	// ]
 </script>
 
 
@@ -108,14 +152,13 @@
 </svelte:head>
 
 <Content>
-<div>
 	<h1>Délibération {deliberation.id}</h1>
 	<ul>
 		<li>Titre : {deliberation.title ? deliberation.title : "- –"}</li>
 		<li>Date : {deliberation.date ? deliberation.date : "- –"}</li>
 		<li>Item : {deliberation.item ? deliberation.item : "- –"}</li>
 		<li>Pages : {deliberation.pages ? deliberation.pages : "- –"}</li>
-  </ul>
+	</ul>
 
   <Button on:click={toggleForm}>Modifier la fiche</Button>
 
@@ -133,15 +176,19 @@
 	  >
   		<Form on:submit={handleSubmit} method='post'>
 			<FormGroup>
-				<TextInput
-					required
-					name="id"
-					id='id'
-					labelText="Identifiant"
-					value={deliberation.id ? deliberation.id : ""}
-					bind:warn={invalidStates.id}
-					warnText="Un identifiant est requis"
-				/>
+				<FormItem>
+					<FormLabel>Identifiant</FormLabel>
+					<TextInput
+						required
+						name="id"
+						id='id'
+						value={deliberation.id ? deliberation.id : ""}
+						bind:warn={invalidStates.id}
+						warnText="Un identifiant est requis"
+						invalid={false}
+						invalidText="test"
+					/>
+				</FormItem>
 				<TextInput
 					name="title"
 					id="title"
@@ -179,11 +226,33 @@
 					warnText="Ce champs doit comporter un nombre entier positif"
 					pattern="[0-20]"
 				/>
+
+				<FormLabel>Types</FormLabel>
+				{#each deliberation.types as t}
+					<TextInput name="type" value={t} list="types"/>
+				{/each}
+				<FormLabel>Categories</FormLabel>
+				{#each deliberation.categories as c}
+					<TextInput name="categorie" value={c} list="categories"/>
+				{/each}
+
+				<datalist id="types">
+					{#each types as t}
+						<option value={t}/>
+					{/each}
+				</datalist>
+				<datalist id="categories">
+					{#each categories as c}
+						<option value={c}/>
+					{/each}
+				</datalist>
 			</FormGroup>
 			<ButtonSet>
 				<Button kind="secondary">Annuler</Button>
 				<Button on:click={checkValidity} type='submit'>Modifier la fiche</Button>
 			</ButtonSet>
+
+
 		</Form>
 
 		{#if submited}
@@ -201,27 +270,7 @@
 				/>
 			{/if}
 		{/if}
-
 	</Modal>
   	{/if}
-	<!-- <form on:submit|preventDefault={onSubmit}>
-		<div>
-			<label for="titre">Titre :</label>
-			<input name="title" type="text" bind:value={deliberation.title} />
-		</div>
-		<div>
-			<label for="date">Date :</label>
-			<input name="date" type="text" bind:value={deliberation.date} />
-		</div>
-		<div>
-			<label for="item">Item :</label>
-			<input name="item" type="text" bind:value={deliberation.item} />
-		</div>
-		<div>
-			<label for="pages">Pages :</label>
-			<input name="pages" type="text" bind:value={deliberation.pages} />
-		</div>
-		<input type="submit" value="submit"/>
-</form> -->
-</div>
+
 </Content>
