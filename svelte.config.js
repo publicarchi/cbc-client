@@ -61,7 +61,8 @@ const config = {
 				alias: {
 					// $carbone: path.resolve('./node_modules/carbon-components-svelte/css')
 					$posts: path.resolve('./src/posts'),
-					$components: path.resolve('./src/components')
+					$components: path.resolve('./src/components'),
+					$stores: path.resolve('./src/stores')
 				}
 			}
 		}

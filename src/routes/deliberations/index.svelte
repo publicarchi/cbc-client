@@ -1,49 +1,3 @@
-<!-- <script context="module" lang="ts">
-	// Load function shouldn't be used here : no need to do SSR
-	// since the data is fetched every time the view has changed.
-	// https://svelte.dev/docs#component-format-script-context-module
-
-	/** @type {import('@sveltejs/kit').Load} */
-	export async function load({ fetch, page }) {
-		const { id } = page.params;
-
-		let count = 20
-		let nbPages = 0
-		let currentPage = 1
-		const queryParms = { start: 1, count: 20 }
-
-		let url = new URL('http://127.0.0.1:8984/cbc/deliberations')
-
-		for(let k in Object.keys(queryParms)) {
-			url.searchParams.append(k, queryParms[k])
-		}
-		console.log(url)
-
-		const res = await fetch(url, {
-			method: 'GET',
-			headers: {
-				"Content-Type": 'application/json'
-			},
-		});
-
-		if (res.ok) {
-			const data = await res.json()
-			const meta = data.meta
-			const deliberations = data.content
-			return {
-				 props: {
-					meta,
-					deliberations
-				  }
-			};
-		}
-		return {
-			status: res.status,
-			error: new Error()
-		};
-	}
-</script> -->
-
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import {
@@ -55,18 +9,34 @@
 		ToolbarSearch,
 		ToolbarMenu,
 		ToolbarMenuItem,
+		ToolbarBatchActions,
 		Link,
 		Button,
-Loading,
+		ButtonSet,
+		Loading,
+		Modal,
+		Form,
+UnorderedList,
+ListItem,
   	} from "carbon-components-svelte";
+	import { DocumentAdd16, Edit16, Launch16, Save16} from 'carbon-icons-svelte';
+	import DeliberationExpandedRow from '$components/DeliberationExpandedRow.svelte'
+	import { userConnected } from '$stores/auth'
 
-	import Launch16 from "carbon-icons-svelte/lib/Launch16";
-
-	let deliberations
+	let deliberations = []
 	let meta = {start: 1, count: 20, totalItems: 0}
 	let queryParams = { start: 1, count: 20 }
 	let count = 20
 	let currentPage = 1
+	let selectedRowIds = []
+
+	let toggleNewDocumentModal = false
+	let toggleLoginModal = false
+
+	let searchQuery = ''
+	let factets = []
+	let filtered = []
+
 
 	const fetchData = async (queryParams) => {
 		let url = new URL('http://127.0.0.1:8984/cbc/deliberations')
@@ -92,12 +62,51 @@ Loading,
 		}
 	}
 
+	const getDeliberationById = (id) => {
+		if (deliberations)
+			return deliberations.find((d) => d.id === id)
+		return null
+	}
+
+	const onClickModify = (e) => {
+		if (!$userConnected) toggleLoginModal = true
+	}
+
+	const onClickNewDocument = (e) => toggleNewDocumentModal = true
+
+	// const containsSearchQuery = (deliberation) => {
+	// 	console.log('containsSearchQuery', searchQuery)
+	// 	return Object.keys(deliberation).some(k => {
+	// 		deliberation[k].toString().includes(searchQuery)})
+	// }
+
+	const filterDeliberations = (searchQuery, facets, deliberations) => {
+
+		if (deliberations) {
+			let filtered = deliberations
+
+			// Filter searchQuery
+			filtered = filtered.filter(d => {
+				return Object.keys(d).some(k => d[k].toString().toLowerCase().includes(searchQuery.toLowerCase()))
+			})
+
+			// Facets
+
+			console.log(filtered)
+
+			return filtered
+		}
+		else {
+			return []
+		}
+	}
+
   	// https://svelte.dev/tutorial/onmount
 	// Richard Harris on updating components :
 	// https://stackoverflow.com/questions/56891190/how-to-trigger-force-update-a-svelte-component
-	//onMount(() => fetchData(queryParams))
-	onMount(() => console.log('component onMount()'))
-	onDestroy(() => console.log('component onDestroy()'))
+	// onMount(() => fetchData(queryParams))
+	// onMount(() => console.log('component onMount()'))
+	// onDestroy(() => console.log('component onDestroy()'))
 
 	// Updates queryParams everytime view has changed
 	$: {
@@ -113,6 +122,9 @@ Loading,
 	// fetchData called everytime queryParams has changed
 	$: fetchData(queryParams)
 
+	$: filtered = filterDeliberations(searchQuery, factets, deliberations)
+
+	$: console.log(selectedRowIds)
 </script>
 
 
@@ -123,6 +135,9 @@ Loading,
 <Content>
 	<DataTable
 		sortable
+		expandable
+		selectable={$userConnected ? true : false}
+		bind:selectedRowIds
 		title="Liste des délibérations"
 		description="Ensemble des délibérations du Conseil des bâtiments civils."
 		headers={[
@@ -141,13 +156,10 @@ Loading,
 			},
 			{ key: 'id', empty: true}
 		]}
-		rows={
-			deliberations
-		}
+		rows={ filtered }
 	>
 		<svelte:fragment slot="cell" let:cell>
 			{#if cell.key === "id"}
-			<!-- target='_blank' permet d'ouvrir un nouvel quand on clic sur le lien -->
 			<Link
 				icon={Launch16}
 				href="/deliberations/{cell.value}"
@@ -158,9 +170,23 @@ Loading,
 			{:else}{cell.value}{/if}
 		</svelte:fragment>
 
+		<svelte:fragment slot="expanded-row" let:row>
+			<DeliberationExpandedRow deliberation={getDeliberationById(row.id)}/>
+		</svelte:fragment>
+
 		<Toolbar>
+			<ToolbarBatchActions>
+				<Button icon={DocumentAdd16} on:click={onClickNewDocument}>Nouvelle fiche</Button>
+				<Button icon={Save16}>Exporter les fiches</Button>
+			</ToolbarBatchActions>
 			<ToolbarContent>
-				<ToolbarSearch expanded={true} persistent={true}/>
+				<ToolbarSearch expanded={true} persistent={true} bind:value={searchQuery}/>
+				<Button
+					kind="ghost"
+					iconDescription="Modify"
+					icon={Edit16}
+					on:click={onClickModify}
+				/>
 				<ToolbarMenu>
 					<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
 					<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
@@ -171,6 +197,7 @@ Loading,
 				<Button>Create balancer</Button>
 			</ToolbarContent>
 		</Toolbar>
+
 		<Pagination
 			backwardText="Previous page"
 			forwardText="Next page"
@@ -181,9 +208,50 @@ Loading,
 			totalItems={meta.totalItems}
 		/>
 
-		<!-- {#if !deliberations}
+
+		{#if !deliberations}
 			<Loading />
-		{/if} -->
+		{/if}
 
 	</DataTable>
+
+	{#if toggleLoginModal}
+		<Modal
+			open
+			size="sm"
+			modalHeading="Connexion"
+  			primaryButtonText="Me connecter"
+  			secondaryButtonText="Annuler"
+			on:click:button--primary={() => $userConnected = true}
+		>
+			<p>Il est nécessaire de se connecter pour modifier les fiches.</p>
+		</Modal>
+	{/if}
+	{#if toggleNewDocumentModal}
+		<Modal
+			open
+			size="lg"
+			modalHeading="Nouvelle fiche"
+  			primaryButtonText="Créer une nouvelle fiche"
+  			secondaryButtonText="Annuler"
+			hasForm={true}
+			passiveModal={true}
+		>
+			<Form>
+				<span>à partir de :</span>
+				<UnorderedList>
+					{#each selectedRowIds as id}
+						<ListItem>
+							<Link href="/deliberations/{id}" target="_blank">{id}</Link>
+						</ListItem>
+					{/each}
+				</UnorderedList>
+				<ButtonSet>
+					<Button kind="secondary">Annuler</Button>
+					<Button type='submit'>Modifier la fiche</Button>
+				</ButtonSet>
+			</Form>
+		</Modal>
+	{/if}
+
 </Content>
