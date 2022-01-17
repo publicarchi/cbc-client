@@ -43,7 +43,7 @@ ListItem,
 		Object.keys(queryParams).forEach(k => {
 			url.searchParams.append(k, queryParams[k])
 		})
-		// console.log(url.toString())
+		console.log(url.toString())
 
 		// This uses the sveltekit's fetch function?
 		// Function doesnt allow URL object as parameter -> needs type string

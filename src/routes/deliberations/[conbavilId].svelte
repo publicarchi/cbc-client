@@ -1,18 +1,25 @@
 <script context="module" lang="ts">
-	/** @type {import('@sveltejs/kit').Load} */
 	export async function load({ fetch, page }) {
 		const id = page.params.conbavilId;
-		const res = await fetch(`http://127.0.0.1:8984/cbc/deliberations/${id}`);
 
-		if (res.ok) return {
-			props: {
-				deliberation: await res.json(),
-			}
-		};
-		return {
-			status: res.status,
-			error: new Error()
-		};
+		try {
+			const res = await Promise.all([
+				fetch(`http://127.0.0.1:8984/cbc/deliberations/${id}`),
+				fetch('http://127.0.0.1:8984/cbc/types'),
+				fetch('http://127.0.0.1:8984/cbc/categories')
+			]);
+			const data = await Promise.all(res.map((r) => r.json()));
+
+			return {
+				props: {
+					deliberation: data[0],
+					types: data[1],
+					categories: data[2]
+				}
+			};
+		} catch (err) {
+			console.log(err);
+		}
 	}
 </script>
 
@@ -23,52 +30,41 @@
 		Content,
 		Modal,
 		Form,
-		FormGroup,
 		TextInput,
 		InlineNotification,
 		FormItem,
 		FormLabel,
-	} from 'carbon-components-svelte'
-	import { validateForm } from '$lib/helpers/deliberationFormValidator'
-	import { onMount } from 'svelte';
+		Grid,
+		Row,
+		Column
+	} from 'carbon-components-svelte';
+	import { AddAlt16 } from 'carbon-icons-svelte';
+	import { validateForm } from '$lib/helpers/deliberationFormValidator';
+	import { form, formGroups, labelMap } from '$lib/models/form';
 
+	export let deliberation;
+	export let types;
+	export let categories;
+	$: console.log(deliberation);
+	// $: console.log(types);
+	// $: console.log(categories);
 
-	export let deliberation
-	$: console.log(deliberation)
-
-	let formIsToggled = false
-	let postResponse = {}
-	let postStatus = false
-	let submited = false
+	let formIsToggled = false;
+	let postResponse = {};
+	let postStatus = false;
+	let submited = false;
 	let invalidStates = {
 		id: false,
 		title: false,
 		date: false,
 		item: false,
 		pages: false
-	}
+	};
 
-	let types = []
-	let categories = []
-
-	onMount(() => {
-		fetchTypes()
-		fetchCategories()
-	})
-
-	const fetchTypes = async () => {
-		const res = await fetch('http://127.0.0.1:8984/cbc/types')
-		types = await res.json()
-	}
-	const fetchCategories = async () => {
-		const res = await fetch('http://127.0.0.1:8984/cbc/categories')
-		categories = await res.json()
-	}
-
-	const toggleForm = () => formIsToggled = !formIsToggled
+	const toggleForm = () => (formIsToggled = !formIsToggled);
 
 	const handleSubmit = async (e) => {
-		let formData = new FormData(e.target)
+		let formData = new FormData(e.target);
 
 		// todo : custom validation
 		// let validated = customValidation(formData)
@@ -85,192 +81,194 @@
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(data)
-		})
-		postStatus = res.ok
-		postResponse = await res.json()
-		submited = true
-	}
+		});
+		postStatus = res.ok;
+		postResponse = await res.json();
+		submited = true;
+	};
 
 	const setCustomMessage = (node, message) => {
 		if (node.validity.typeMismatch || node.validity.valueMissing || node.validity.patternMismatch) {
-			console.log('Validity not ok for ', node.id, node)
-			invalidStates[node.id] = true
+			console.log('Validity not ok for ', node.id, node);
+			invalidStates[node.id] = true;
 
-			console.log(node)
+			console.log(node);
 
 			// Enlève la notification si la 2e tentative ne passe pas la validation
-			submited = false
+			submited = false;
+		} else {
+			invalidStates[node.id] = false;
 		}
-		else {
-			invalidStates[node.id] = false
-		}
-	}
+	};
 
 	const checkValidity = (e) => {
 		// This functions sets custom messages for each form input
 
-		let cid = document.getElementById('id')
-		let title = document.getElementById('title')
-		let date = document.getElementById('date')
-		let item = document.getElementById('item')
-		let pages = document.getElementById('pages')
+		let cid = document.getElementById('id');
+		let title = document.getElementById('title');
+		let date = document.getElementById('date');
+		let item = document.getElementById('item');
+		let pages = document.getElementById('pages');
 
-		setCustomMessage(cid, 'Un identifiant est requis')
-		setCustomMessage(title, 'Un titre est requis')
-		setCustomMessage(date, 'La date doit être au format dd/mm/aaaa')
-		setCustomMessage(item, 'Ce champ doit comporter un nombre entier supérieur ou égal 0')
-		setCustomMessage(pages, 'Ce champ doit comporter un nombre entier supérieur ou égal 0')
-	}
+		setCustomMessage(cid, 'Un identifiant est requis');
+		setCustomMessage(title, 'Un titre est requis');
+		setCustomMessage(date, 'La date doit être au format dd/mm/aaaa');
+		setCustomMessage(item, 'Ce champ doit comporter un nombre entier supérieur ou égal 0');
+		setCustomMessage(pages, 'Ce champ doit comporter un nombre entier supérieur ou égal 0');
+	};
 
-	// const formGroups = [
-	// 	{
-	// 		keys: ['id', 'cote', 'seance', 'title'],
-	// 		name: "Identification de la fiche"
-	// 	},
-	// 	{
-	// 		keys: ['item', 'pages'],
-	// 		name: 'Contenu de la fiche'
-	// 	},
-	// 	{
-	// 		keys: ['localisation'],
-	// 		name: 'Localisation'
-	// 	},
-	// 	{
-	// 		keys: ['types', 'categories'],
-	// 		name: 'Caractéristiques des batiments concernés'
-	// 	},
-	// 	{
-	// 		keys: ['report', 'recommandation', 'conseil'],
-	// 		name: 'Avis et décisions'
-	// 	}
-	// ]
+	const getDeliberationTitle = () => {
+		if (deliberation.title !== '' && deliberation.title !== null) return deliberation.title;
+		else {
+			let title = 'Delibération du·de ';
+			title += deliberation.types.join('/');
+			title += ' de ' + deliberation.localisation.commune;
+			return title;
+		}
+	};
+
+	const addFormField = (attr) => {
+		// let formGroup = document.getElementById(parentId);
+		// let input = document.createElement('TextInput');
+		// formGroup.appendChild(input);
+		deliberation[attr].push('');
+	};
 </script>
-
 
 <svelte:head>
 	<title>Délibération</title>
 </svelte:head>
 
 <Content>
-	<h1>Délibération {deliberation.id}</h1>
-	<ul>
-		<li>Titre : {deliberation.title ? deliberation.title : "- –"}</li>
-		<li>Date : {deliberation.date ? deliberation.date : "- –"}</li>
-		<li>Item : {deliberation.item ? deliberation.item : "- –"}</li>
-		<li>Pages : {deliberation.pages ? deliberation.pages : "- –"}</li>
-	</ul>
+	<h1>{getDeliberationTitle()}</h1>
 
-  <Button on:click={toggleForm}>Modifier la fiche</Button>
-
-  	{#if formIsToggled}
-	  <Modal
-		size="lg"
-		open
-		modalHeading={deliberation.id}
-		primaryButtonText="Enregistrer les modifications"
-		secondaryButtonText="Annuler"
-		on:click:button--secondary={toggleForm}
-		on:close={toggleForm}
-		hasForm={true}
-		passiveModal={true}
-	  >
-  		<Form on:submit={handleSubmit} method='post'>
-			<FormGroup>
-				<FormItem>
-					<FormLabel>Identifiant</FormLabel>
-					<TextInput
-						required
-						name="id"
-						id='id'
-						value={deliberation.id ? deliberation.id : ""}
-						bind:warn={invalidStates.id}
-						warnText="Un identifiant est requis"
-						invalid={false}
-						invalidText="test"
-					/>
-				</FormItem>
-				<TextInput
-					name="title"
-					id="title"
-					labelText="Titre"
-					value={deliberation.title ? deliberation.title : ""}
-					bind:warn={invalidStates.title}
-					warnText="Un titre est requis"
-				/>
-				<TextInput
-					name="date"
-					id="date"
-					labelText="Date"
-					type="date"
-					value={deliberation.date ? deliberation.date : ""}
-					bind:warn={invalidStates.date}
-					warnText="La date doit être au format jj/mm/aaaa"
-				/>
-				<TextInput
-					name="item"
-					id="item"
-					labelText="Item"
-					type="number"
-					value={deliberation.item ? deliberation.item : ""}
-					bind:warn={invalidStates.item}
-					warnText="Ce champs doit comporter un nombre entier positif"
-					pattern="[0-20]"
-				/>
-				<TextInput
-					name="pages"
-					id="pages"
-					type="number"
-					labelText="Pages"
-					value={deliberation.pages ? deliberation.pages : ""}
-					bind:warn={invalidStates.pages}
-					warnText="Ce champs doit comporter un nombre entier positif"
-					pattern="[0-20]"
-				/>
-
-				<FormLabel>Types</FormLabel>
-				{#each deliberation.types as t}
-					<TextInput name="type" value={t} list="types"/>
+	{#each formGroups as g}
+		<h4>{g.name}</h4>
+		{#each g.keys as k}
+			{#if k === 'localisation'}
+				{#each g.subkeys as sk}
+					<div class="data-group">
+						<span class="data-group-label">{labelMap[sk]} :</span>
+						<span class="data-group-value">{deliberation[k][sk]}</span>
+					</div>
 				{/each}
-				<FormLabel>Categories</FormLabel>
-				{#each deliberation.categories as c}
-					<TextInput name="categorie" value={c} list="categories"/>
-				{/each}
-
-				<datalist id="types">
-					{#each types as t}
-						<option value={t}/>
-					{/each}
-				</datalist>
-				<datalist id="categories">
-					{#each categories as c}
-						<option value={c}/>
-					{/each}
-				</datalist>
-			</FormGroup>
-			<ButtonSet>
-				<Button kind="secondary">Annuler</Button>
-				<Button on:click={checkValidity} type='submit'>Modifier la fiche</Button>
-			</ButtonSet>
-
-
-		</Form>
-
-		{#if submited}
-			{#if postStatus}
-				<InlineNotification
-					title="Succès"
-					kind="success"
-					subtitle={postResponse.message}
-				/>
+			{:else if k === 'title'}
+				<div class="data-group">
+					<span class="data-group-label">{labelMap[k]} :</span>
+					<span class="data-group-value">{getDeliberationTitle()}</span>
+				</div>
 			{:else}
-				<InlineNotification
-					title="Erreur lors de l'envoi du formulaire"
-					kind="error"
-					subtitle={postResponse.message}
-				/>
+				<div class="data-group">
+					<span class="data-group-label">{labelMap[k]} :</span>
+					<span class="data-group-value">{deliberation[k]}</span>
+				</div>
 			{/if}
-		{/if}
-	</Modal>
-  	{/if}
+		{/each}
+	{/each}
 
+	<br />
+	<br />
+	<Button on:click={toggleForm}>Modifier la fiche</Button>
+
+	{#if formIsToggled}
+		<Modal
+			size="lg"
+			open
+			modalHeading={getDeliberationTitle()}
+			primaryButtonText="Enregistrer les modifications"
+			secondaryButtonText="Annuler"
+			on:click:button--secondary={toggleForm}
+			on:close={toggleForm}
+			hasForm={true}
+			passiveModal={true}
+		>
+			<Form {deliberation} on:submit={handleSubmit} method="post">
+				{#each formGroups as g}
+					<h4>{g.name}</h4>
+					{#each g.keys as k}
+						{#if k === 'localisation'}
+							{#each g.subkeys as sk}
+								<FormItem>
+									<FormLabel>{labelMap[sk]}</FormLabel>
+									<TextInput
+										name={k}
+										value={deliberation.localisation[sk]}
+										type={form[sk]?.type ? form[sk].type : 'text'}
+									/>
+								</FormItem>
+							{/each}
+						{:else}
+							<FormItem>
+								<FormLabel>{labelMap[k]}</FormLabel>
+								{#if k === 'types' || k === 'categories'}
+									{#each deliberation[k] as i}
+										<TextInput
+											name={k}
+											value={i}
+											type={form[k]?.type ? form[k].type : 'text'}
+											list={`${k}-datalist`}
+										/>
+									{/each}
+									<Button kind="ghost" icon={AddAlt16} on:click={() => addFormField(k)}>
+										Ajouter un champs
+									</Button>
+								{:else}
+									<TextInput
+										name={k}
+										value={deliberation[k]}
+										type={form[k]?.type ? form[k].type : 'text'}
+									/>
+								{/if}
+							</FormItem>
+						{/if}
+					{/each}
+				{/each}
+
+				<ButtonSet>
+					<Button kind="secondary">Annuler</Button>
+					<Button on:click={checkValidity} type="submit">Modifier la fiche</Button>
+				</ButtonSet>
+
+				<datalist id="types-datalist">
+					{#each types as t}
+						<option value={t} />
+					{/each}
+				</datalist>
+				<datalist id="categories-datalist">
+					{#each categories as c}
+						<option value={c} />
+					{/each}
+				</datalist>
+			</Form>
+
+			{#if submited}
+				{#if postStatus}
+					<InlineNotification title="Succès" kind="success" subtitle={postResponse.message} />
+				{:else}
+					<InlineNotification
+						title="Erreur lors de l'envoi du formulaire"
+						kind="error"
+						subtitle={postResponse.message}
+					/>
+				{/if}
+			{/if}
+		</Modal>
+	{/if}
 </Content>
+
+<style>
+	h4 {
+		margin-top: 1em;
+		font-weight: 300;
+	}
+	.data-group {
+		display: flex;
+		margin-top: 0.5em;
+	}
+	.data-group-label {
+		font-weight: bold;
+	}
+	.data-group-value {
+		margin-left: 1em;
+	}
+</style>
