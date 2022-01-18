@@ -50,7 +50,7 @@
 	// $: console.log(categories);
 
 	let formIsToggled = false;
-	let postResponse = {};
+	let postResponse = { message: '' };
 	let postStatus = false;
 	let submited = false;
 	let invalidStates = {
@@ -70,7 +70,7 @@
 		// let validated = customValidation(formData)
 
 		const data = {};
-		for (let field of formData) {
+		for (let field of formData.keys()) {
 			const [key, value] = field;
 			data[key] = value;
 		}
@@ -182,7 +182,7 @@
 			hasForm={true}
 			passiveModal={true}
 		>
-			<Form {deliberation} on:submit={handleSubmit} method="post">
+			<Form on:submit={handleSubmit} method="post">
 				{#each formGroups as g}
 					<h4>{g.name}</h4>
 					{#each g.keys as k}
