@@ -234,3 +234,25 @@ export const labelMap = {
 	item: "Nombre d'items",
 	pages: 'Numéros de pages'
 };
+
+export const labelMapAbbr = {
+	id: 'ID',
+	cote: 'Cote',
+	cotesDessins: 'Cote(s) dessin(s)',
+	seance: 'Date séance',
+	remarques: 'Remarques',
+	commune: 'Commune',
+	region: 'Région',
+	departement: 'Département',
+	departementDecimal: 'Code postal',
+	departementAncien: 'Département ancien',
+	adress: 'Adresse',
+	title: 'Titre',
+	types: 'Dénomination',
+	categories: 'Interventions',
+	rapporteur: 'Rapporteur',
+	recommandation: 'Recommandation',
+	advice: 'Recommandation',
+	item: 'Items',
+	pages: 'Pages'
+};

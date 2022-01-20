@@ -40,6 +40,7 @@
 	} from 'carbon-components-svelte';
 	import { AddAlt16, ValueVariable16, Delete16 } from 'carbon-icons-svelte';
 	import { validateForm } from '$lib/helpers/deliberationFormValidator';
+	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers';
 	import { form, formGroups, labelMap } from '$lib/models/form';
 	import { attr } from 'svelte/internal';
 
@@ -120,16 +121,6 @@
 		setCustomMessage(pages, 'Ce champ doit comporter un nombre entier supérieur ou égal 0');
 	};
 
-	const getDeliberationTitle = () => {
-		if (deliberation.title !== '' && deliberation.title !== null) return deliberation.title;
-		else {
-			let title = 'Delibération du·de ';
-			title += deliberation.types.join('/');
-			title += ' de ' + deliberation.localisation.commune;
-			return title;
-		}
-	};
-
 	const addFormField = (attr) => (formData[attr] = [...formData[attr], '']);
 
 	const removeFormField = (e, attr, index) => {
@@ -143,7 +134,7 @@
 </svelte:head>
 
 <Content>
-	<h1>{getDeliberationTitle()}</h1>
+	<h1>{getDeliberationTitle(deliberation)}</h1>
 
 	{#each formGroups as g}
 		<h4>{g.name}</h4>
@@ -158,7 +149,7 @@
 			{:else if k === 'title'}
 				<div class="data-group">
 					<span class="data-group-label">{labelMap[k]} :</span>
-					<span class="data-group-value">{getDeliberationTitle()}</span>
+					<span class="data-group-value">{getDeliberationTitle(deliberation)}</span>
 				</div>
 			{:else}
 				<div class="data-group">
@@ -177,7 +168,7 @@
 		<Modal
 			size="lg"
 			open
-			modalHeading={'Modifier la fiche :\n' + getDeliberationTitle()}
+			modalHeading={'Modifier la fiche :\n' + getDeliberationTitle(deliberation)}
 			primaryButtonText="Enregistrer les modifications"
 			secondaryButtonText="Annuler"
 			on:click:button--secondary={toggleForm}
