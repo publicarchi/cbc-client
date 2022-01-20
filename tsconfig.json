@@ -2,7 +2,15 @@
 	"compilerOptions": {
 		"moduleResolution": "node",
 		"module": "es2020",
-		"lib": ["es2020", "DOM", "dom.iterable"],
+		"lib": [
+			"es2020",
+			"DOM",
+			/**
+			dom.iterable added to fix use of FormData.keys()
+			https://stackoverflow.com/questions/50677868/error-ts2339-property-entries-does-not-exist-on-type-formdata#59377427
+			*/
+			"dom.iterable"
+		],
 		"target": "es2020",
 		/**
 			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript

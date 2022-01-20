@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Header from '$components/Header.svelte';
-	import "carbon-components-svelte/css/g10.css";
+	import 'carbon-components-svelte/css/g10.css';
 </script>
 
 <Header />
@@ -31,11 +31,5 @@
 		justify-content: center;
 		align-items: center;
 		padding: 40px;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 40px 0;
-		}
 	}
 </style>

@@ -38,14 +38,21 @@
 		Row,
 		Column
 	} from 'carbon-components-svelte';
-	import { AddAlt16 } from 'carbon-icons-svelte';
+	import { AddAlt16, ValueVariable16, Delete16 } from 'carbon-icons-svelte';
 	import { validateForm } from '$lib/helpers/deliberationFormValidator';
 	import { form, formGroups, labelMap } from '$lib/models/form';
+	import { attr } from 'svelte/internal';
 
 	export let deliberation;
 	export let types;
 	export let categories;
-	$: console.log(deliberation);
+
+	// Used as copy to display form.
+	// Values are binded to form inputs.
+	let formData = { ...deliberation };
+
+	// $: console.log(deliberation);
+	$: console.log(formData);
 	// $: console.log(types);
 	// $: console.log(categories);
 
@@ -64,23 +71,17 @@
 	const toggleForm = () => (formIsToggled = !formIsToggled);
 
 	const handleSubmit = async (e) => {
-		let formData = new FormData(e.target);
-
 		// todo : custom validation
 		// let validated = customValidation(formData)
 
-		const data = {};
-		for (let field of formData.keys()) {
-			const [key, value] = field;
-			data[key] = value;
-		}
+		console.log(formData);
 
 		let res = await fetch('http://127.0.0.1:8984/cbc/post', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(data)
+			body: JSON.stringify(formData)
 		});
 		postStatus = res.ok;
 		postResponse = await res.json();
@@ -102,6 +103,8 @@
 	};
 
 	const checkValidity = (e) => {
+		return;
+
 		// This functions sets custom messages for each form input
 
 		let cid = document.getElementById('id');
@@ -127,11 +130,11 @@
 		}
 	};
 
-	const addFormField = (attr) => {
-		// let formGroup = document.getElementById(parentId);
-		// let input = document.createElement('TextInput');
-		// formGroup.appendChild(input);
-		deliberation[attr].push('');
+	const addFormField = (attr) => (formData[attr] = [...formData[attr], '']);
+
+	const removeFormField = (e, attr, index) => {
+		formData[attr].splice(index, 1);
+		formData = formData;
 	};
 </script>
 
@@ -174,7 +177,7 @@
 		<Modal
 			size="lg"
 			open
-			modalHeading={getDeliberationTitle()}
+			modalHeading={'Modifier la fiche :\n' + getDeliberationTitle()}
 			primaryButtonText="Enregistrer les modifications"
 			secondaryButtonText="Annuler"
 			on:click:button--secondary={toggleForm}
@@ -187,13 +190,17 @@
 					<h4>{g.name}</h4>
 					{#each g.keys as k}
 						{#if k === 'localisation'}
-							{#each g.subkeys as sk}
+							{#each g.subkeys as sk, i}
 								<FormItem>
 									<FormLabel>{labelMap[sk]}</FormLabel>
 									<TextInput
-										name={k}
-										value={deliberation.localisation[sk]}
+										name={sk}
+										id={`${sk}-${i}`}
+										bind:value={formData.localisation[sk]}
 										type={form[sk]?.type ? form[sk].type : 'text'}
+										pattern={form[sk].pattern}
+										disabled={form[sk].disabled}
+										required={form[sk].required}
 									/>
 								</FormItem>
 							{/each}
@@ -201,13 +208,25 @@
 							<FormItem>
 								<FormLabel>{labelMap[k]}</FormLabel>
 								{#if k === 'types' || k === 'categories'}
-									{#each deliberation[k] as i}
-										<TextInput
-											name={k}
-											value={i}
-											type={form[k]?.type ? form[k].type : 'text'}
-											list={`${k}-datalist`}
-										/>
+									{#each formData[k] as _, i}
+										<div class="flex-input">
+											<TextInput
+												name={k}
+												id={`${k}-${i}`}
+												bind:value={formData[k][i]}
+												type={form[k]?.type ? form[k].type : 'text'}
+												pattern={form[k].pattern}
+												list={`${k}-datalist`}
+												disabled={form[k].disabled}
+												required={form[k].required}
+											/>
+											<Button
+												kind="ghost"
+												iconDescription="Delete"
+												icon={Delete16}
+												on:click={(e) => removeFormField(e, k, i)}
+											/>
+										</div>
 									{/each}
 									<Button kind="ghost" icon={AddAlt16} on:click={() => addFormField(k)}>
 										Ajouter un champs
@@ -215,8 +234,11 @@
 								{:else}
 									<TextInput
 										name={k}
-										value={deliberation[k]}
+										bind:value={formData[k]}
 										type={form[k]?.type ? form[k].type : 'text'}
+										pattern={form[k].pattern}
+										disabled={form[k].disabled}
+										required={form[k].required}
 									/>
 								{/if}
 							</FormItem>
@@ -270,5 +292,8 @@
 	}
 	.data-group-value {
 		margin-left: 1em;
+	}
+	.flex-input {
+		display: flex;
 	}
 </style>

@@ -8,153 +8,171 @@ export const form: formType = {
 	cote: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: false,
-		required: false
+		disabled: false,
+		required: true
 	},
 	cotesDessins: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: false,
+		disabled: false,
 		required: false
 	},
 	seance: {
 		validators: [],
 		type: 'date',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
-		required: false
+		disabled: false,
+		required: true
 	},
 	remarques: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: false,
+		disabled: false,
 		required: false
 	},
 	commune: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	region: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	departement: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	departementDecimal: {
 		validators: [],
 		type: 'number',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	adress: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	departementAncien: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	id: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: {
 			typeMismatch: 'Entrer une chaine de caractère',
 			valueMissing: 'Un identifiant est nécessaire',
 			patternMismatch: "Le format de l'identifiant est incorrect"
 		},
 		errors: [],
-		editable: false,
+		disabled: true,
 		required: false
 	},
 	title: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: {
 			typeMismatch: 'Entrer une chaine de caractère',
 			valueMissing: 'Entrer un titre',
 			patternMismatch: "Le format de l'identifiant est incorrect"
 		},
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	rapporteur: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	advice: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: true,
+		disabled: false,
 		required: false
 	},
 	item: {
 		validators: [],
-		type: 'text',
+		type: 'number',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: false,
+		disabled: false,
 		required: false
 	},
 	pages: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: false,
+		disabled: false,
 		required: false
 	},
 	types: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: false,
+		disabled: false,
 		required: false
 	},
 	categories: {
 		validators: [],
 		type: 'text',
+		pattern: null,
 		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
 		errors: [],
-		editable: false,
+		disabled: false,
 		required: false
 	}
 };
@@ -164,7 +182,7 @@ export const form: formType = {
 // categories = type d'intervention
 export const formGroups = [
 	{
-		keys: ['title', 'seance'],
+		keys: ['title', 'seance', 'id'],
 		name: "Identification de l'affaire"
 	},
 	{
@@ -196,6 +214,7 @@ export const formGroups = [
 // cf présentation détaillée Conbavil
 // https://www.inha.fr/fr/ressources/outils-documentaires/conseil-des-batiments-civils-conbavil.html
 export const labelMap = {
+	id: 'Identifiant dans la base',
 	cote: 'Cote du rapport',
 	cotesDessins: 'Cote(s) du (des) dessin(s)',
 	seance: 'Date de discussion du rapport',
