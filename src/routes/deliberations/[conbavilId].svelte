@@ -33,16 +33,12 @@
 		TextInput,
 		InlineNotification,
 		FormItem,
-		FormLabel,
-		Grid,
-		Row,
-		Column
+		FormLabel
 	} from 'carbon-components-svelte';
 	import { AddAlt16, ValueVariable16, Delete16 } from 'carbon-icons-svelte';
 	import { validateForm } from '$lib/helpers/deliberationFormValidator';
 	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers';
 	import { form, formGroups, labelMap } from '$lib/models/form';
-	import { attr } from 'svelte/internal';
 
 	export let deliberation;
 	export let types;
@@ -133,49 +129,49 @@
 	<title>Délibération</title>
 </svelte:head>
 
-<Content>
-	<h1>{getDeliberationTitle(deliberation)}</h1>
+<h1>{getDeliberationTitle(deliberation)}</h1>
 
-	{#each formGroups as g}
-		<h4>{g.name}</h4>
-		{#each g.keys as k}
-			{#if k === 'localisation'}
-				{#each g.subkeys as sk}
-					<div class="data-group">
-						<span class="data-group-label">{labelMap[sk]} :</span>
-						<span class="data-group-value">{deliberation[k][sk]}</span>
-					</div>
-				{/each}
-			{:else if k === 'title'}
+{#each formGroups as g}
+	<h4>{g.name}</h4>
+	{#each g.keys as k}
+		{#if k === 'localisation'}
+			{#each g.subkeys as sk}
 				<div class="data-group">
-					<span class="data-group-label">{labelMap[k]} :</span>
-					<span class="data-group-value">{getDeliberationTitle(deliberation)}</span>
+					<span class="data-group-label">{labelMap[sk]} :</span>
+					<span class="data-group-value">{deliberation[k][sk]}</span>
 				</div>
-			{:else}
-				<div class="data-group">
-					<span class="data-group-label">{labelMap[k]} :</span>
-					<span class="data-group-value">{deliberation[k]}</span>
-				</div>
-			{/if}
-		{/each}
+			{/each}
+		{:else if k === 'title'}
+			<div class="data-group">
+				<span class="data-group-label">{labelMap[k]} :</span>
+				<span class="data-group-value">{getDeliberationTitle(deliberation)}</span>
+			</div>
+		{:else}
+			<div class="data-group">
+				<span class="data-group-label">{labelMap[k]} :</span>
+				<span class="data-group-value">{deliberation[k]}</span>
+			</div>
+		{/if}
 	{/each}
+{/each}
 
-	<br />
-	<br />
-	<Button on:click={toggleForm}>Modifier la fiche</Button>
+<br />
+<br />
+<Button on:click={toggleForm}>Modifier la fiche</Button>
 
-	{#if formIsToggled}
-		<Modal
-			size="lg"
-			open
-			modalHeading={'Modifier la fiche :\n' + getDeliberationTitle(deliberation)}
-			primaryButtonText="Enregistrer les modifications"
-			secondaryButtonText="Annuler"
-			on:click:button--secondary={toggleForm}
-			on:close={toggleForm}
-			hasForm={true}
-			passiveModal={true}
-		>
+{#if formIsToggled}
+	<Modal
+		size="lg"
+		open
+		modalHeading={'Modifier la fiche :\n' + getDeliberationTitle(deliberation)}
+		primaryButtonText="Enregistrer les modifications"
+		secondaryButtonText="Annuler"
+		on:click:button--secondary={toggleForm}
+		on:close={toggleForm}
+		hasForm={true}
+		passiveModal={true}
+	>
+		<Content>
 			<Form on:submit={handleSubmit} method="post">
 				{#each formGroups as g}
 					<h4>{g.name}</h4>
@@ -253,21 +249,21 @@
 					{/each}
 				</datalist>
 			</Form>
+		</Content>
 
-			{#if submited}
-				{#if postStatus}
-					<InlineNotification title="Succès" kind="success" subtitle={postResponse.message} />
-				{:else}
-					<InlineNotification
-						title="Erreur lors de l'envoi du formulaire"
-						kind="error"
-						subtitle={postResponse.message}
-					/>
-				{/if}
+		{#if submited}
+			{#if postStatus}
+				<InlineNotification title="Succès" kind="success" subtitle={postResponse.message} />
+			{:else}
+				<InlineNotification
+					title="Erreur lors de l'envoi du formulaire"
+					kind="error"
+					subtitle={postResponse.message}
+				/>
 			{/if}
-		</Modal>
-	{/if}
-</Content>
+		{/if}
+	</Modal>
+{/if}
 
 <style>
 	h4 {
