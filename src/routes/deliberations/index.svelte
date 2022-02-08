@@ -10,12 +10,8 @@
 		ToolbarBatchActions,
 		Link,
 		Button,
-		ButtonSet,
 		Loading,
-		Modal,
-		Form,
-		UnorderedList,
-		ListItem
+		Modal
 	} from 'carbon-components-svelte';
 	import { DocumentAdd16, Launch16, Save16 } from 'carbon-icons-svelte';
 	import DeliberationFacets from '$components/DeliberationFacets.svelte';
@@ -31,6 +27,7 @@
 
 	let selectedRowIds = [];
 	let expandedRowIds = [];
+	let selectedDeliberations = [];
 
 	let userConnected = true;
 	let toggleLoginModal = false;
@@ -141,8 +138,10 @@
 
 	$: filtered = filterDeliberations(searchQuery, facets, deliberations);
 
-	// $: console.log('selected', selectedRowIds);
-	// $: console.log('expanded', expandedRowIds);
+	$: selectedDeliberations = deliberations.filter((d) => selectedRowIds.includes(d.id));
+
+	$: console.log('selected', selectedRowIds);
+	$: console.log('expanded', expandedRowIds);
 </script>
 
 <svelte:head>
@@ -220,7 +219,7 @@
 		totalItems={meta.totalItems}
 	/>
 
-	{#if !deliberations}
+	{#if deliberations.length === 0}
 		<Loading />
 	{/if}
 </DataTable>
@@ -241,4 +240,6 @@
 	</Modal>
 {/if}
 
-<AffaireModal deliberations={selectedRowIds} bind:modalOpened={affaireModalOpened} />
+{#if affaireModalOpened}
+	<AffaireModal deliberations={selectedDeliberations} bind:modalOpened={affaireModalOpened} />
+{/if}
