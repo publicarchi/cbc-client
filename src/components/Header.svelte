@@ -1,17 +1,34 @@
 <script lang="ts">
 	// import { page } from '$app/stores';
-	import { Header, HeaderNav, HeaderNavItem } from 'carbon-components-svelte'
+	import {
+		Header,
+		HeaderNav,
+		HeaderNavItem,
+		HeaderGlobalAction,
+		HeaderUtilities,
+		HeaderActionLink
+	} from 'carbon-components-svelte';
+	import UserAvatarFilledAlt20 from 'carbon-icons-svelte/lib/UserAvatarFilledAlt20';
 </script>
 
 <Header aria-label="CBC Project" company="cbc@publicarchi" href="/">
 	<HeaderNav>
-	  <HeaderNavItem href="/seances" text="Séances"/>
+		<HeaderNavItem href="/seances" text="Séances" />
 		<HeaderNavItem href="/deliberations" text="Délibérations" />
 		<HeaderNavItem href="/blogs" text="Blog" />
 
-	  <HeaderNavItem href="/a-propos" text="À propos"/>
+		<HeaderNavItem href="/a-propos" text="À propos" />
 	</HeaderNav>
-  </Header>
+	<HeaderUtilities>
+		<HeaderActionLink
+			aria-label="Se connecter"
+			icon={UserAvatarFilledAlt20}
+			href="/auth/github/login"
+		/>
+		<HeaderActionLink aria-label="Se déconnecter" href="/auth/github/logout" />
+		>
+	</HeaderUtilities>
+</Header>
 
 <!-- <header>
 	<nav>

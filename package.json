@@ -34,7 +34,11 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"cookie": "^0.4.2",
+		"passport-github2": "^0.1.12",
+		"passport-google-oauth20": "^2.0.0",
 		"sass": "^1.45.2",
-		"svelte-select": "^4.4.7"
+		"svelte-select": "^4.4.7",
+		"sveltekit-passport-oauth2": "^0.0.6"
 	}
 }
