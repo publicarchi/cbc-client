@@ -101,12 +101,9 @@
 		}
 	};
 
-	// https://svelte.dev/tutorial/onmount
-	// Richard Harris on updating components :
-	// https://stackoverflow.com/questions/56891190/how-to-trigger-force-update-a-svelte-component
-	// onMount(() => fetchData(queryParams))
-	// onMount(() => console.log('component onMount()'))
-	// onDestroy(() => console.log('component onDestroy()'))
+	const facetsOnChange = (e) => {
+		console.log(e.detail.data);
+	};
 
 	const rowOnClick = (row) => {
 		if (expandedRowIds.includes(row.detail.id)) {
@@ -116,10 +113,6 @@
 		}
 		//updates expandedRowIds
 		expandedRowIds = expandedRowIds;
-	};
-
-	const facetsOnChange = (e) => {
-		console.log(e.detail.data);
 	};
 
 	// Updates queryParams everytime view has changed
@@ -215,7 +208,7 @@
 		itemsPerPageText="Fiches par page :"
 		bind:page={currentPage}
 		bind:pageSize={queryParams.count}
-		pageSizes={[50, 100, 250, 500]}
+		pageSizes={[20, 50, 100, 250, 500]}
 		totalItems={meta.totalItems}
 	/>
 
