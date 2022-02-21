@@ -181,8 +181,7 @@
 		<Content>
 			<InlineNotification
 				kind="info"
-				title="Avant la création d'une nouvelle affaire,"
-				subtitle="merci de vérifier parmi les affaires existantes que celle-ci ne soit pas déjà créée."
+				title="Avant la création d'une nouvelle affaire, merci de vérifier parmi les affaires existantes que celle-ci ne soit pas déjà créée."
 			/>
 			<br />
 			<Search
@@ -202,15 +201,23 @@
 						{ key: 'localisation.commune', value: 'Commune' },
 						{ key: 'meta.dateCreated', value: 'Date de création' },
 						{ key: 'meta.creator', value: 'Responsable de la ressource' },
-						{ key: 'id', empty: true }
+						{ key: 'id', empty: true },
+						{ key: 'overflow', empty: true }
 					]}
 					rows={searchSuggestions}
 				>
 					<svelte:fragment slot="cell" let:cell>
 						{#if cell.key === 'id'}
 							<Link icon={Launch16} href="/deliberations/{cell.value}" target="_blank">
-								{cell.value}
+								Accéder
 							</Link>
+						{:else if cell.key === 'overflow'}
+							<Button
+								kind="ghost"
+								size="small"
+								icon={Edit16}
+								on:click={() => onClickAffId(cell.value)}>Modifier</Button
+							>
 						{:else}
 							{cell.value}
 						{/if}
@@ -230,22 +237,21 @@
 					{ key: 'localisation.commune', value: 'Commune' },
 					{ key: 'meta.dateCreated', value: 'Date de création' },
 					{ key: 'meta.creator', value: 'Responsable de la ressource' },
-					{ key: 'id', empty: true }
+					{ key: 'id', empty: true },
+					{ key: 'overflow', empty: true }
 				]}
 				rows={autoSuggestions}
 			>
 				<svelte:fragment slot="cell" let:cell>
 					{#if cell.key === 'id'}
+						<Link icon={Launch16} href="/deliberations/{cell.value}" target="_blank">Accéder</Link>
+					{:else if cell.key === 'overflow'}
 						<Button
 							kind="ghost"
 							size="small"
 							icon={Edit16}
-							on:click={() => onClickAffId(cell.value)}
+							on:click={() => onClickAffId(cell.value)}>Modifier</Button
 						>
-							{cell.value}
-						</Button>
-						<!-- {:else if cell.key === 'overflow'}
-						<Button kind="danger-ghost" icon={SubtractAlt32} /> -->
 					{:else}
 						{cell.value}
 					{/if}
@@ -345,14 +351,17 @@
 							</FormItem>
 						</Column>
 						<Column>
+							<br />
 							<p style="font-weight: bold;">
 								Les délibérations suivantes seront attachées à l'affaire
 							</p>
-							<ul>
-								{#each deliberations as d}
-									<li>{`${d.title} - ${d.localisation.commune}`}</li>
-								{/each}
-							</ul>
+							<AffaireModalDeliberations
+								deliberations={deliberations.filter((d) => d.affaireId === '')}
+							/>
+							<br />
+							<p style="font-weight: bold;">
+								Les délibérations suivantes ne pourront pas être attachées à l'affaire
+							</p>
 						</Column>
 					</Row>
 				</Grid>
@@ -363,7 +372,7 @@
 	<ButtonSet>
 		<Button kind="danger-tertiary">Annuler</Button>
 		{#if currentIndex === 0}
-			<Button kind="primary" on:click={onClickNext}>Page suivante</Button>
+			<Button kind="primary" on:click={onClickNext}>Nouvelle affaire</Button>
 		{:else if currentIndex === 1}
 			<Button kind="tertiary" on:click={onClickPrevious}>Page précédente</Button>
 			<Button kind="primary" on:click={onClickNext}>Enregister les modification</Button>
