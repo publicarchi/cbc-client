@@ -6,172 +6,135 @@ import type { formType } from '../types/form.type';
 
 export const form: formType = {
 	cote: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: true
 	},
 	cotesDessins: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	seance: {
-		validators: [],
 		type: 'date',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: true
 	},
 	remarques: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	commune: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	region: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	departement: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	departementDecimal: {
-		validators: [],
 		type: 'number',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	adress: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	departementAncien: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	id: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: {
-			typeMismatch: 'Entrer une chaine de caractère',
-			valueMissing: 'Un identifiant est nécessaire',
-			patternMismatch: "Le format de l'identifiant est incorrect"
-		},
-		errors: [],
+		validityMessage: '',
 		disabled: true,
 		required: false
 	},
 	title: {
-		validators: [],
 		type: 'text',
-		pattern: null,
-		validity: {
-			typeMismatch: 'Entrer une chaine de caractère',
-			valueMissing: 'Entrer un titre',
-			patternMismatch: "Le format de l'identifiant est incorrect"
-		},
-		errors: [],
+		pattern: '.{8,}',
+		validityMessage: 'Au moins 8 caractères',
 		disabled: false,
-		required: false
+		required: true
 	},
 	rapporteur: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
-	advice: {
-		validators: [],
+	recommendation: {
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	item: {
-		validators: [],
 		type: 'number',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	pages: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	types: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
 		disabled: false,
 		required: false
 	},
 	categories: {
-		validators: [],
 		type: 'text',
 		pattern: null,
-		validity: { typeMismatch: '', valueMissing: '', patternMismatch: '' },
-		errors: [],
+		validityMessage: '',
+		disabled: false,
+		required: false
+	},
+	report: {
+		type: 'text',
+		pattern: null,
+		validityMessage: '',
 		disabled: false,
 		required: false
 	}
@@ -206,7 +169,7 @@ export const formGroups = [
 		name: 'Références des sources aux Archives Nationales'
 	},
 	{
-		keys: ['rapporteur', 'advice'],
+		keys: ['rapporteur', 'recommendation', 'report'],
 		name: 'Avis et décision'
 	}
 ];
@@ -229,10 +192,10 @@ export const labelMap = {
 	types: 'Dénomination(s)',
 	categories: "Types d'intervention",
 	rapporteur: 'Auteur(s), données transcrite du rapport',
-	recommandation: 'Recommandation(s)',
-	advice: 'Recommandation(s)',
+	recommendation: 'Recommandation(s)',
 	item: "Nombre d'items",
-	pages: 'Numéros de pages'
+	pages: 'Numéros de pages',
+	report: 'Report'
 };
 
 export const labelMapAbbr = {
@@ -251,8 +214,8 @@ export const labelMapAbbr = {
 	types: 'Dénomination',
 	categories: 'Interventions',
 	rapporteur: 'Rapporteur',
-	recommandation: 'Recommandation',
-	advice: 'Recommandation',
+	recommendation: 'Recommandation',
 	item: 'Items',
-	pages: 'Pages'
+	pages: 'Pages',
+	report: 'Report'
 };

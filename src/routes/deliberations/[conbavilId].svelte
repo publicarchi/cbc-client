@@ -57,13 +57,23 @@
 	let postResponse = { message: '' };
 	let postStatus = false;
 	let submited = false;
-	let invalidStates = {
-		id: false,
-		title: false,
-		date: false,
-		item: false,
-		pages: false
-	};
+
+	let invalidStates = {};
+	Object.keys(formData).forEach((k) => {
+		if (k === 'localisation') {
+			Object.keys(formData[k]).forEach((sk) => {
+				invalidStates[sk] = false;
+			});
+		} else if (k === 'types' || k === 'categories') {
+			formData[k].forEach((elt, i) => {
+				invalidStates[`${k}-${i}`] = false;
+			});
+		} else {
+			invalidStates[k] = false;
+		}
+	});
+
+	console.log(invalidStates);
 
 	const toggleForm = () => (formIsToggled = !formIsToggled);
 
@@ -73,48 +83,39 @@
 
 		console.log(formData);
 
-		let res = await fetch('http://127.0.0.1:8984/cbc/post', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(formData)
-		});
-		postStatus = res.ok;
-		postResponse = await res.json();
-		submited = true;
-	};
-
-	const setCustomMessage = (node, message) => {
-		if (node.validity.typeMismatch || node.validity.valueMissing || node.validity.patternMismatch) {
-			console.log('Validity not ok for ', node.id, node);
-			invalidStates[node.id] = true;
-
-			console.log(node);
-
-			// Enlève la notification si la 2e tentative ne passe pas la validation
-			submited = false;
+		if (!checkValidity()) {
+			let res = await fetch('http://127.0.0.1:8984/cbc/post', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(formData)
+			});
+			postStatus = res.ok;
+			postResponse = await res.json();
+			submited = true;
 		} else {
-			invalidStates[node.id] = false;
+			submited = true;
+			postStatus = false;
 		}
 	};
 
-	const checkValidity = (e) => {
-		return;
+	const checkValidity = () => {
+		let hasInvalid = false;
+		Object.keys(invalidStates).forEach((id) => {
+			console.log('trying to get node with id', id);
+			let node = document.getElementById(id);
+			if (
+				node.validity.typeMismatch ||
+				node.validity.valueMissing ||
+				node.validity.patternMismatch
+			) {
+				invalidStates[id] = true;
+				hasInvalid = true;
+			}
+		});
 
-		// This functions sets custom messages for each form input
-
-		let cid = document.getElementById('id');
-		let title = document.getElementById('title');
-		let date = document.getElementById('date');
-		let item = document.getElementById('item');
-		let pages = document.getElementById('pages');
-
-		setCustomMessage(cid, 'Un identifiant est requis');
-		setCustomMessage(title, 'Un titre est requis');
-		setCustomMessage(date, 'La date doit être au format dd/mm/aaaa');
-		setCustomMessage(item, 'Ce champ doit comporter un nombre entier supérieur ou égal 0');
-		setCustomMessage(pages, 'Ce champ doit comporter un nombre entier supérieur ou égal 0');
+		return hasInvalid;
 	};
 
 	const addFormField = (attr) => (formData[attr] = [...formData[attr], '']);
@@ -172,22 +173,23 @@
 		passiveModal={true}
 	>
 		<Content>
-			<Form on:submit={handleSubmit} method="post">
+			<Form on:submit={handleSubmit} method="post" novalidate>
 				{#each formGroups as g}
 					<h4>{g.name}</h4>
 					{#each g.keys as k}
 						{#if k === 'localisation'}
-							{#each g.subkeys as sk, i}
+							{#each g.subkeys as sk}
 								<FormItem>
 									<FormLabel>{labelMap[sk]}</FormLabel>
 									<TextInput
 										name={sk}
-										id={`${sk}-${i}`}
+										id={sk}
 										bind:value={formData.localisation[sk]}
 										type={form[sk]?.type ? form[sk].type : 'text'}
 										pattern={form[sk].pattern}
 										disabled={form[sk].disabled}
-										required={form[sk].required}
+										invalidText={form[sk].validityMessage}
+										bind:invalid={invalidStates[sk]}
 									/>
 								</FormItem>
 							{/each}
@@ -206,6 +208,8 @@
 												list={`${k}-datalist`}
 												disabled={form[k].disabled}
 												required={form[k].required}
+												invalidText={form[k].validityMessage}
+												bind:invalid={invalidStates[`${k}-${i}`]}
 											/>
 											<Button
 												kind="ghost"
@@ -221,11 +225,15 @@
 								{:else}
 									<TextInput
 										name={k}
+										id={k}
 										bind:value={formData[k]}
 										type={form[k]?.type ? form[k].type : 'text'}
 										pattern={form[k].pattern}
 										disabled={form[k].disabled}
 										required={form[k].required}
+										invalidText={form[k].validityMessage}
+										title={form[k].validityMessage}
+										bind:invalid={invalidStates[k]}
 									/>
 								{/if}
 							</FormItem>
@@ -235,7 +243,7 @@
 
 				<ButtonSet>
 					<Button kind="secondary">Annuler</Button>
-					<Button on:click={checkValidity} type="submit">Modifier la fiche</Button>
+					<Button type="submit">Modifier la fiche</Button>
 				</ButtonSet>
 
 				<datalist id="types-datalist">
