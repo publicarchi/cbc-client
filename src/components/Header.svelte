@@ -9,6 +9,9 @@
 		HeaderActionLink
 	} from 'carbon-components-svelte';
 	import UserAvatarFilledAlt20 from 'carbon-icons-svelte/lib/UserAvatarFilledAlt20';
+	import LoginModal from './LoginModal.svelte';
+
+	let loginModalOpened = false;
 </script>
 
 <Header aria-label="CBC Project" company="cbc@publicarchi" href="/">
@@ -20,15 +23,17 @@
 		<HeaderNavItem href="/a-propos" text="À propos" />
 	</HeaderNav>
 	<HeaderUtilities>
+		<HeaderNavItem text="Connexion" on:click={() => (loginModalOpened = true)} />
+
+		<HeaderNavItem text="origin" href="http://127.0.0.1:3000/oauth/github/login" />
 		<HeaderActionLink
-			aria-label="Se connecter"
-			icon={UserAvatarFilledAlt20}
-			href="/auth/github/login"
+			aria-label="Se déconnecter"
+			href="http://127.0.0.1:3000/oauth/github/logout"
 		/>
-		<HeaderActionLink aria-label="Se déconnecter" href="/auth/github/logout" />
-		>
 	</HeaderUtilities>
 </Header>
+
+<LoginModal bind:open={loginModalOpened} />
 
 <!-- <header>
 	<nav>

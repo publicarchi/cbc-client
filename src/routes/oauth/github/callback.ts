@@ -4,7 +4,7 @@ const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
 const secret = import.meta.env.VITE_GITHUB_CLIENT_SECRET;
 const userURL = 'https://api.github.com/user';
 
-export async function get(req) {
+export async function get(req): Promise<{ status: number; headers: { location: string } }> {
 	const code = req.query.get('code');
 	const accessToken = await getAccessToken(code);
 	const user = await getUser(accessToken);

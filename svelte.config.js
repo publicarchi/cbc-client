@@ -39,7 +39,7 @@ const config = {
 				// Dart Sass recognizes 'expanded' and 'compressed'
 				outputStyle: 'expanded',
 
-				prependData: `@import './src/app.scss';`
+				prependData: `@import 'src/app.scss';`
 			}
 		})
 		// Standalone preprocessors go here for customized configurations.
@@ -59,7 +59,6 @@ const config = {
 		vite: {
 			resolve: {
 				alias: {
-					// $carbone: path.resolve('./node_modules/carbon-components-svelte/css')
 					$posts: path.resolve('./src/posts'),
 					$components: path.resolve('./src/components'),
 					$stores: path.resolve('./src/stores')
