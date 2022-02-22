@@ -1,11 +1,20 @@
 <script>
-	import { Modal, Form, FormItem, TextInput, ButtonSet, Button } from 'carbon-components-svelte';
-	import { LogoGithub16, LogoInstagram16 } from 'carbon-icons-svelte';
+	import {
+		Modal,
+		Form,
+		FormItem,
+		FormLabel,
+		TextInput,
+		ButtonSet,
+		Button
+	} from 'carbon-components-svelte';
+	import { LogoGithub32, LogoInstagram16 } from 'carbon-icons-svelte';
 	export let open = false;
 </script>
 
 <Modal
 	bind:open
+	size="sm"
 	modalHeading="Connexion"
 	passiveModal={true}
 	hasForm={true}
@@ -13,18 +22,20 @@
 >
 	<Form>
 		<FormItem>
-			<TextInput label="Identifiant" />
+			<FormLabel>Identifiant</FormLabel>
+			<TextInput name="userID" />
 		</FormItem>
 		<FormItem>
-			<TextInput kind="password" label="Mot de passe" />
+			<FormLabel>Mot de passe</FormLabel>
+			<TextInput kind="password" name="userPass" />
 		</FormItem>
 	</Form>
-
+	<br />
 	<p>Se connecter avec :</p>
+	<br />
 	<ButtonSet>
-		<Button size="small" icon={LogoGithub16} href="http://127.0.0.1:3000/oauth/github/login"
-			>Github</Button
-		>
-		<Button size="small" icon={LogoInstagram16}>Instagram</Button>
+		<a rel="external" href="/oauth/github/login">
+			<LogoGithub32 />
+		</a>
 	</ButtonSet>
 </Modal>

@@ -1,11 +1,10 @@
-import type { Handle } from '@sveltejs/kit';
 import cookie from 'cookie';
 
 export async function handle({ request, resolve }) {
 	const cookies = cookie.parse(request.headers.cookie || '');
 
 	console.log('\nGoing in hooks.ts');
-	console.log('request in hooks', request, '\n');
+	console.log('request in hooks', request.path, '\n');
 
 	// code here happends before the endpoint or page is called
 	request.locals.user = cookies.user;

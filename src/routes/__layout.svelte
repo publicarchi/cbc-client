@@ -1,10 +1,52 @@
-<script lang="ts">
-	import Header from '$components/Header.svelte';
-	import 'carbon-components-svelte/css/g10.css';
-	import { Content } from 'carbon-components-svelte';
+<script context="module">
+	export async function load({ session }) {
+		return {
+			props: {
+				user: session.user
+			}
+		};
+	}
 </script>
 
-<Header />
+<script lang="ts">
+	import LoginModal from '$components/LoginModal.svelte';
+	import 'carbon-components-svelte/css/g10.css';
+	import {
+		Content,
+		Header,
+		HeaderNav,
+		HeaderNavItem,
+		HeaderUtilities,
+		HeaderActionLink
+	} from 'carbon-components-svelte';
+
+	export let user;
+	console.log('YHello ', user, 'from layout :o');
+
+	let loginModalOpened = false;
+</script>
+
+<header>
+	<Header aria-label="CBC Project" company="cbc@publicarchi" href="/">
+		<HeaderNav>
+			<HeaderNavItem href="/seances" text="Séances" />
+			<HeaderNavItem href="/deliberations" text="Délibérations" />
+			<HeaderNavItem href="/blogs" text="Blog" />
+
+			<HeaderNavItem href="/a-propos" text="À propos" />
+		</HeaderNav>
+		<HeaderUtilities>
+			{#if user}
+				<HeaderNavItem text={user} />
+				<HeaderNavItem text="Deconnexion" href="/oauth/github/logout" rel="external" />
+			{:else}
+				<HeaderNavItem text="Connexion" on:click={() => (loginModalOpened = true)} />
+			{/if}
+		</HeaderUtilities>
+	</Header>
+
+	<LoginModal bind:open={loginModalOpened} />
+</header>
 
 <main>
 	<Content>

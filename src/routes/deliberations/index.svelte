@@ -1,3 +1,13 @@
+<script context="module">
+	export async function load({ session }) {
+		return {
+			props: {
+				user: session.user
+			}
+		};
+	}
+</script>
+
 <script lang="ts">
 	import {
 		DataTable,
@@ -18,6 +28,9 @@
 	import DeliberationExpandedRow from '$components/DeliberationExpandedRow.svelte';
 	import AffaireModal from '$components/AffaireModal.svelte';
 	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers';
+
+	export let user;
+	console.log('Yo', user, 'from deliberation');
 
 	let deliberations = [];
 	let meta = { start: 1, count: 20, totalItems: 0 };

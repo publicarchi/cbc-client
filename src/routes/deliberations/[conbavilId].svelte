@@ -33,7 +33,10 @@
 		TextInput,
 		InlineNotification,
 		FormItem,
-		FormLabel
+		FormLabel,
+		Grid,
+		Column,
+		Row
 	} from 'carbon-components-svelte';
 	import { AddAlt16, ValueVariable16, Delete16 } from 'carbon-icons-svelte';
 	import { validateForm } from '$lib/helpers/deliberationFormValidator';
@@ -103,7 +106,6 @@
 	const checkValidity = () => {
 		let hasInvalid = false;
 		Object.keys(invalidStates).forEach((id) => {
-			console.log('trying to get node with id', id);
 			let node = document.getElementById(id);
 			if (
 				node.validity.typeMismatch ||
@@ -112,9 +114,10 @@
 			) {
 				invalidStates[id] = true;
 				hasInvalid = true;
+			} else {
+				invalidStates[id] = false;
 			}
 		});
-
 		return hasInvalid;
 	};
 

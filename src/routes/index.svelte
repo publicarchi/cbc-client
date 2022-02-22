@@ -1,27 +1,5 @@
-<script context="module">
-	export async function load({ session }) {
-		return {
-			props: {
-				user: session.user
-			}
-		};
-	}
-</script>
-
 <script lang="ts">
 	import { Button } from 'carbon-components-svelte';
-
-	export let user;
-
-	console.log('Welcome', user);
-
-	const headers = {
-		method: 'GET',
-		headers: { 'Access-Control-Allow-Origin': '*', Accept: 'application/json' }
-	};
-	const connect = () => {
-		fetch('http://127.0.0.1/oauth/github/login', headers);
-	};
 </script>
 
 <svelte:head>
@@ -32,12 +10,17 @@
 
 <p>
 	Ce site est un un prototype d’application de consultation de la base de données Conbavil. Il est
-	conçu à partir d’un export de la base de données
-	[Conbavil](https://www.inha.fr/fr/ressources/outils-documentaires/conseil-des-batiments-civils-conbavil.html)
-	en XML, la base de données XML native [BaseX](https://basex.org/) avec le language
-	[XQuery](https://www.w3.org/TR/xquery-31/) et
-	[RESTXQ](http://exquery.github.io/exquery/exquery-restxq-specification/restxq-1.0-specification.html),
-	et un client développé en JavaScript avec [SvelteKit](https://kit.svelte.dev).
+	conçu à partir d’un export de la base de données <a
+		href="https://www.inha.fr/fr/ressources/outils-documentaires/conseil-des-batiments-civils-conbavil.html"
+		>Conbavil</a
+	>
+	en XML, la base de données XML native <a href="https://basex.org/">BaseX</a> avec le language
+	<a href="https://www.w3.org/TR/xquery-31/">XQuery</a> et
+	<a
+		href="http://exquery.github.io/exquery/exquery-restxq-specification/restxq-1.0-specification.html"
+		>RESTXQ</a
+	>
+	,et un client développé en JavaScript avec <a href="https://kit.svelte.dev">SvelteKit</a>.
 </p>
 
 <p>
@@ -49,5 +32,3 @@
 
 <Button href="seances">Consulter les séances</Button>
 <Button href="deliberations">Consulter les délibérations</Button>
-<Button on:click={connect}>Connect with Github</Button>
-<a href="/oauth/github/login">Connect with Github</a>
