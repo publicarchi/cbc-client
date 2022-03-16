@@ -19,8 +19,8 @@
 		InlineNotification
 	} from 'carbon-components-svelte';
 	import { Edit16, Launch16 } from 'carbon-icons-svelte';
-	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte';
 	import { onMount } from 'svelte';
+	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte';
 
 	export let deliberations;
 	export let modalOpened;
@@ -42,7 +42,6 @@
 		// autoSuggestions = await res.json();
 
 		console.log('AffaireModal is mounting');
-		console.log('selected deliberations:', deliberations);
 
 		autoSuggestions = [
 			{
@@ -93,7 +92,7 @@
 	});
 
 	const onClickNext = () => {
-		if (!affaire) affaire = initAffaire();
+		if (!affaire) affaire = null;
 		currentIndex += 1;
 	};
 	const onClickPrevious = () => {
@@ -147,18 +146,39 @@
 
 	const initAffaire = () => {
 		return {
-			title: '',
-			dates: '',
+			head: '',
+			id: '',
 			localisation: {
 				commune: '',
-				region: '',
-				departement: ''
+				departementDecimal: '',
+				departement: '',
+				departementAncien: '',
+				region: ''
 			},
-			typeAdministratif: '',
-			typologie: '',
-			notes: '',
-			bibliography: ''
+			types: '',
+			deliberations: []
 		};
+	};
+
+	const postAffaire = (e) => {
+		fetch('http://127.0.0.1:8984/cbc/postaffairs/post', {
+			method: 'POST',
+			body: JSON.stringify({
+				head: 'Test post affaire',
+				localisation: {
+					commune: 'Paris',
+					departementDecimal: '75',
+					departement: 'Paris',
+					departementAncien: '',
+					region: ''
+				},
+				types: '',
+				deliberations: ['1', '2', '3']
+			})
+		})
+			.then((res) => res.json())
+			.then((data) => console.log(data))
+			.catch((err) => console.log(err));
 	};
 </script>
 
@@ -167,6 +187,7 @@
 	size="lg"
 	modalHeading="Créer/Modifier une nouvelle affaire"
 	hasForm={true}
+	shouldSubmitOnEnter={false}
 	passiveModal={true}
 	preventCloseOnClickOutside={true}
 	iconDescription="Fermer le formulaire"
@@ -269,23 +290,7 @@
 				<Grid>
 					<Row>
 						<Column>
-							<h4>Identification de l'affaire</h4>
-							<FormItem>
-								<FormLabel>Identifiant de l'affaire</FormLabel>
-								<TextInput name="id" disabled={true} bind:value={affaire.id} />
-							</FormItem>
-							<FormItem>
-								<FormLabel>Titre de l'affaire</FormLabel>
-								<TextInput
-									name="title"
-									placeholder="Indiquez le nom de l'affaire"
-									bind:value={affaire.title}
-								/>
-							</FormItem>
-						</Column>
-						<Column>
 							<h4>Localisation de l'affaire</h4>
-
 							<FormItem>
 								<FormLabel>Commune</FormLabel>
 								<TextInput
@@ -311,8 +316,6 @@
 								/>
 							</FormItem>
 						</Column>
-					</Row>
-					<Row>
 						<Column>
 							<h4>Dates de l'affaire</h4>
 							<br />
@@ -350,6 +353,8 @@
 								/>
 							</FormItem>
 						</Column>
+					</Row>
+					<Row>
 						<Column>
 							<br />
 							<p style="font-weight: bold;">
@@ -375,7 +380,7 @@
 			<Button kind="primary" on:click={onClickNext}>Nouvelle affaire</Button>
 		{:else if currentIndex === 1}
 			<Button kind="tertiary" on:click={onClickPrevious}>Page précédente</Button>
-			<Button kind="primary" on:click={onClickNext}>Enregister les modification</Button>
+			<Button kind="primary" on:click={postAffaire}>Ajouter une nouvelle affaire</Button>
 		{/if}
 	</ButtonSet>
 </Modal>
