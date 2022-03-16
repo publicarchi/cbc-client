@@ -1,25 +1,30 @@
-import cookie from 'cookie';
+import cookie from 'cookie'
 
-export async function handle({ request, resolve }) {
-	const cookies = cookie.parse(request.headers.cookie || '');
+export async function handle({ event, resolve }) {
+	if (!event.url.pathname.includes('callback')) {
+		const response = await resolve(event)
+		return response
+	}
 
-	console.log('\nGoing in hooks.ts');
-	console.log('request in hooks', request.path, '\n');
+	const cookies = cookie.parse(event.request.headers.cookie || '')
+
+	console.log('\nGoing in hooks.ts')
+	console.log('request in hooks', event.url.pathname, '\n')
 
 	// code here happends before the endpoint or page is called
-	request.locals.user = cookies.user;
-	console.log({ user: request.locals.user });
+	event.request.locals.user = cookies.user
+	console.log({ user: event.request.locals.user })
 
-	const response = await resolve(request);
+	const response = await resolve(event)
 
 	// code here happens after the endpoint or page is called
-	response.headers['set-cookie'] = `user=${request.locals.user || ''}; Path=/; HttpOnly`;
+	response.headers['set-cookie'] = `user=${event.request.locals.user || ''}; Path=/; HttpOnly`
 
-	return response;
+	return response
 }
 
-export async function getSession(request) {
+export async function getSession(event) {
 	return {
-		user: request.locals.user
-	};
+		user: event.locals.user
+	}
 }

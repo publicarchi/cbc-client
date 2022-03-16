@@ -1,12 +1,12 @@
-import path from 'path';
-import preprocess from 'svelte-preprocess';
+import path from 'path'
+import preprocess from 'svelte-preprocess'
 // import { sveltePreprocess } from 'svelte-preprocess/dist/autoProcess';
 
-import { mdsvex } from 'mdsvex';
+import { mdsvex } from 'mdsvex'
 
-import { optimizeImports, elements, icons, pictograms } from 'carbon-preprocess-svelte';
+import { optimizeImports, elements, icons, pictograms } from 'carbon-preprocess-svelte'
 
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-auto'
 // import adapter from '@sveltejs/adapter-static';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -50,9 +50,6 @@ const config = {
 	kit: {
 		adapter: adapter(),
 
-		// hydrate the <div id="svelte"> element in src/app.html
-		target: '#svelte',
-
 		// This is the node adapter
 		//adapter: node(),
 
@@ -66,6 +63,6 @@ const config = {
 			}
 		}
 	}
-};
+}
 
-export default config;
+export default config
