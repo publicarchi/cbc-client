@@ -19,8 +19,11 @@
 		InlineNotification
 	} from 'carbon-components-svelte';
 	import { Edit16, Launch16 } from 'carbon-icons-svelte';
+
 	import { onMount } from 'svelte';
+
 	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte';
+	import type { AffaireType, MetaType } from '$lib/types/affaire';
 
 	export let deliberations;
 	export let modalOpened;
@@ -31,7 +34,6 @@
 	let searchValue = '';
 	let autoSuggestions = [];
 	let searchSuggestions = [];
-	let affaire = null;
 
 	onMount(async () => {
 		// const res = await fetch('http://127.0.0.1:8984/affaire/suggestions', {
@@ -87,17 +89,34 @@
 				adminstratif: ''
 			}
 		];
-
 		console.log('AffaireModale mounted');
 	});
 
+	const initEmptyAffaire = (): AffaireType => {
+		return {
+			head: '',
+			id: '',
+			localisation: {
+				commune: '',
+				departementDecimal: '',
+				departement: '',
+				departementAncien: '',
+				region: ''
+			},
+			types: '',
+			deliberations: [],
+			meta: []
+		};
+	};
+
 	const onClickNext = () => {
-		if (!affaire) affaire = null;
+		if (!affaire) affaire = initEmptyAffaire();
 		currentIndex += 1;
+		console.log(affaire);
 	};
 	const onClickPrevious = () => {
 		currentIndex = 0;
-		affaire = null;
+		affaire = initEmptyAffaire();
 	};
 	const onClickAffId = (id) => {
 		affaire = autoSuggestions.concat(searchSuggestions).find((aff) => aff.id === id);
@@ -144,22 +163,6 @@
 		}
 	};
 
-	const initAffaire = () => {
-		return {
-			head: '',
-			id: '',
-			localisation: {
-				commune: '',
-				departementDecimal: '',
-				departement: '',
-				departementAncien: '',
-				region: ''
-			},
-			types: '',
-			deliberations: []
-		};
-	};
-
 	const postAffaire = (e) => {
 		fetch('http://127.0.0.1:8984/cbc/postaffairs/post', {
 			method: 'POST',
@@ -180,6 +183,8 @@
 			.then((data) => console.log(data))
 			.catch((err) => console.log(err));
 	};
+
+	let affaire = initEmptyAffaire();
 </script>
 
 <Modal
@@ -290,71 +295,50 @@
 				<Grid>
 					<Row>
 						<Column>
+							<h4>Identification de l'affaire</h4>
+							<FormItem>
+								<FormLabel>ID de l'affaire</FormLabel>
+								<TextInput
+									placeholder="Identifiant de l'affaire"
+									bind:value={affaire.id}
+									disabled
+								/>
+							</FormItem>
+							<FormItem>
+								<FormLabel>Nom de l'affaire</FormLabel>
+								<TextInput placeholder="Titre de l'affaire" bind:value={affaire.head} />
+							</FormItem>
+							<br />
 							<h4>Localisation de l'affaire</h4>
 							<FormItem>
 								<FormLabel>Commune</FormLabel>
 								<TextInput
-									name="commune"
-									placeholder="Indiquez une commune"
+									placeholder="Indiquez un type administratif"
 									bind:value={affaire.localisation.commune}
+								/>
+							</FormItem>
+							<FormItem>
+								<FormLabel>Code du département</FormLabel>
+								<TextInput
+									placeholder="Indiquez le code du département"
+									bind:value={affaire.localisation.departementDecimal}
+								/>
+							</FormItem>
+							<FormItem>
+								<FormLabel>Département ancien</FormLabel>
+								<TextInput
+									placeholder="Indiquez le nom de l'ancien département"
+									bind:value={affaire.localisation.departementAncien}
 								/>
 							</FormItem>
 							<FormItem>
 								<FormLabel>Région</FormLabel>
 								<TextInput
-									name="region"
-									placeholder="Indiquez une région"
+									placeholder="Indiquez la région"
 									bind:value={affaire.localisation.region}
 								/>
 							</FormItem>
-							<FormItem>
-								<FormLabel>Département</FormLabel>
-								<TextInput
-									name="departement"
-									placeholder="Indiquez un département"
-									bind:value={affaire.localisation.departement}
-								/>
-							</FormItem>
 						</Column>
-						<Column>
-							<h4>Dates de l'affaire</h4>
-							<br />
-							<h4>Détails de l'affaire</h4>
-							<FormItem>
-								<FormLabel>Type administratif</FormLabel>
-								<TextInput
-									name="administratif"
-									placeholder="Indiquez un type administratif"
-									bind:value={affaire.administratif}
-								/>
-							</FormItem>
-							<FormItem>
-								<FormLabel>Typologie</FormLabel>
-								<TextInput
-									name="typology"
-									placeholder="Indiquez une typologie"
-									bind:value={affaire.typology}
-								/>
-							</FormItem>
-							<FormItem>
-								<FormLabel>Notes</FormLabel>
-								<TextInput
-									name="notes"
-									placeholder="Notes concernant l'affaire"
-									bind:value={affaire.notes}
-								/>
-							</FormItem>
-							<FormItem>
-								<FormLabel>Bibliographie</FormLabel>
-								<TextInput
-									name="bibliography"
-									placeholder="Indiquez une bibliographie"
-									bind:value={affaire.bibliography}
-								/>
-							</FormItem>
-						</Column>
-					</Row>
-					<Row>
 						<Column>
 							<br />
 							<p style="font-weight: bold;">

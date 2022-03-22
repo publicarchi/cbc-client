@@ -1,4 +1,12 @@
-import type { formType } from '../types/form.type';
+type formType = {
+	[inputName: string]: {
+		type: string;
+		pattern: string;
+		disabled: boolean;
+		required: boolean;
+		validityMessage: string;
+	};
+};
 
 // Messages d'erreur généraux
 // const STRING_FORMAT_ERROR = 'Entrer un chaine de caractère';

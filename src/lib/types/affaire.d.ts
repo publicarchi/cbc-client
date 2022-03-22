@@ -1,4 +1,4 @@
-export type Affaire = {
+export type AffaireType = {
 	head: string;
 	id: string;
 	localisation: {
@@ -13,7 +13,7 @@ export type Affaire = {
 	meta: Meta[];
 };
 
-type Meta = {
+export type MetaType = {
 	user: {
 		id: string;
 		name: string;

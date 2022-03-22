@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Grid, Row, Column } from 'carbon-components-svelte';
-	import { formGroups, labelMapAbbr } from '$lib/models/form';
+	import { formGroups, labelMapAbbr } from '$lib/types/form';
 	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers';
 
 	export let deliberation;

@@ -21,7 +21,7 @@
 	} from 'carbon-components-svelte';
 
 	export let user;
-	console.log('YHello ', user, 'from layout :o');
+	console.log('Hello ', user, 'from layout :o');
 
 	let loginModalOpened = false;
 </script>

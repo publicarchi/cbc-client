@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
-	export async function load({ fetch, page }) {
-		const id = page.params.conbavilId;
+	export async function load({ fetch, params }) {
+		const id = params.conbavilId;
 
 		try {
 			const res = await Promise.all([
@@ -41,7 +41,7 @@
 	import { AddAlt16, ValueVariable16, Delete16 } from 'carbon-icons-svelte';
 	import { validateForm } from '$lib/helpers/deliberationFormValidator';
 	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers';
-	import { form, formGroups, labelMap } from '$lib/models/form';
+	import { form, formGroups, labelMap } from '$lib/types/form';
 
 	export let deliberation;
 	export let types;
