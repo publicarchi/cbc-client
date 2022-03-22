@@ -1,30 +1,24 @@
-import cookie from 'cookie'
-
+/** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
-	if (!event.url.pathname.includes('callback')) {
-		const response = await resolve(event)
-		return response
-	}
+	// if (!event.url.pathname.includes('callback')) {
+	// 	const response = await resolve(event);
+	// 	return response;
+	// }
 
-	const cookies = cookie.parse(event.request.headers.cookie || '')
-
-	console.log('\nGoing in hooks.ts')
-	console.log('request in hooks', event.url.pathname, '\n')
+	console.log('[ + ] url in hooks', event.url.pathname);
+	console.log('[ + ] event from hooks', event);
 
 	// code here happends before the endpoint or page is called
-	event.request.locals.user = cookies.user
-	console.log({ user: event.request.locals.user })
+	// event.locals.user = eve;
+	console.log('[ + ] user from handle locals', event.locals);
 
-	const response = await resolve(event)
-
-	// code here happens after the endpoint or page is called
-	response.headers['set-cookie'] = `user=${event.request.locals.user || ''}; Path=/; HttpOnly`
-
-	return response
+	const response = await resolve(event);
+	return response;
 }
 
+/** @type {import('@sveltejs/kit').GetSession} */
 export async function getSession(event) {
 	return {
 		user: event.locals.user
-	}
+	};
 }
