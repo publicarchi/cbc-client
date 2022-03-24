@@ -28,15 +28,13 @@
 	import DeliberationExpandedRow from '$components/DeliberationExpandedRow.svelte';
 	import AffaireModal from '$components/AffaireModal.svelte';
 	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers';
+	import { onMount } from 'svelte';
 
 	export let user;
 	console.log('Yo', user, 'from deliberation');
 
 	let deliberations = [];
-	let meta = { start: 1, count: 20, totalItems: 0 };
-	let queryParams = { start: 1, count: 20 };
-	let count = 20;
-	let currentPage = 1;
+	let meta = { start: 1, count: 20, currentPage: 1, totalItems: 0 };
 
 	let selectedRowIds = [];
 	let expandedRowIds = [];
@@ -50,10 +48,12 @@
 	let filtered = [];
 	let facets = [];
 
-	const fetchData = async (queryParams) => {
+	onMount(() => fetchData());
+
+	const fetchData = async () => {
 		let url = new URL('http://127.0.0.1:8984/cbc/deliberations');
-		Object.keys(queryParams).forEach((k) => {
-			url.searchParams.append(k, queryParams[k]);
+		Object.keys(meta).forEach((k) => {
+			url.searchParams.append(k, meta[k]);
 		});
 		console.log(url.toString());
 
@@ -68,10 +68,26 @@
 
 		if (res.ok) {
 			const data = await res.json();
-			// console.log(data);
 			deliberations = data.content;
-			meta = data.meta;
+			meta = {
+				...meta,
+				start: parseInt(data.meta.start),
+				count: parseInt(data.meta.count),
+				totalItems: data.meta.totalItems
+			};
+
+			console.log('[ + ] received meta', meta);
 		}
+	};
+
+	const onPaginationUpdate = (e) => {
+		let { pageSize, page } = e.detail;
+
+		// Computes new start index
+		meta.start = meta.count * (meta.currentPage - 1);
+
+		// Fetch new data
+		fetchData();
 	};
 
 	const getDeliberationById = (id) => {
@@ -105,7 +121,6 @@
 			});
 
 			// Facets
-
 			console.log(filtered);
 
 			return filtered;
@@ -128,26 +143,9 @@
 		expandedRowIds = expandedRowIds;
 	};
 
-	// Updates queryParams everytime view has changed
-	$: {
-		// todo: check if count is Int
-		console.log('queryParams has changed', queryParams);
-		queryParams.start = count * (currentPage - 1);
-		// queryParams.count = count
-	}
-
-	// When view changes count changes 2 times...
-	$: console.log('count has changed to', count);
-
-	// fetchData called everytime queryParams has changed
-	$: fetchData(queryParams);
-
 	$: filtered = filterDeliberations(searchQuery, facets, deliberations);
 
 	$: selectedDeliberations = deliberations.filter((d) => selectedRowIds.includes(d.id));
-
-	$: console.log('selected', selectedRowIds);
-	$: console.log('expanded', expandedRowIds);
 </script>
 
 <svelte:head>
@@ -216,13 +214,14 @@
 	</Toolbar>
 
 	<Pagination
+		on:update={onPaginationUpdate}
 		backwardText="Page précédente"
 		forwardText="Page suivante"
 		itemsPerPageText="Fiches par page :"
-		bind:page={currentPage}
-		bind:pageSize={queryParams.count}
 		pageSizes={[20, 50, 100, 250, 500]}
-		totalItems={meta.totalItems}
+		bind:page={meta.currentPage}
+		bind:pageSize={meta.count}
+		bind:totalItems={meta.totalItems}
 	/>
 
 	{#if deliberations.length === 0}
