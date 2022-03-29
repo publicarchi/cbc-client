@@ -1,5 +1,21 @@
+<script context="module">
+	export async function load({ session }) {
+		console.log('session from index load', session);
+		const meta = 1000;
+		return {
+			props: {
+				meta: meta
+			}
+		};
+	}
+</script>
+
 <script lang="ts">
 	import { Button } from 'carbon-components-svelte';
+	import { session } from '$app/stores';
+	export let meta;
+	meta += 1;
+	console.log('this is session from index', $session);
 </script>
 
 <svelte:head>

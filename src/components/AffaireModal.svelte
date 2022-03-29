@@ -104,13 +104,14 @@
 				region: ''
 			},
 			types: '',
-			deliberations: [],
+			deliberations: deliberations.map((d) => d.id),
 			meta: []
 		};
 	};
 
 	const onClickNext = () => {
 		if (!affaire) affaire = initEmptyAffaire();
+
 		currentIndex += 1;
 		console.log(affaire);
 	};
@@ -164,20 +165,10 @@
 	};
 
 	const postAffaire = (e) => {
+		console.log('[ + ] Posting new affaire', affaire);
 		fetch('http://127.0.0.1:8984/cbc/postaffairs/post', {
 			method: 'POST',
-			body: JSON.stringify({
-				head: 'Test post affaire',
-				localisation: {
-					commune: 'Paris',
-					departementDecimal: '75',
-					departement: 'Paris',
-					departementAncien: '',
-					region: ''
-				},
-				types: '',
-				deliberations: ['1', '2', '3']
-			})
+			body: JSON.stringify(affaire)
 		})
 			.then((res) => res.json())
 			.then((data) => console.log(data))

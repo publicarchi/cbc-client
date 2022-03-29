@@ -31,6 +31,7 @@
 		<HeaderNav>
 			<HeaderNavItem href="/seances" text="Séances" />
 			<HeaderNavItem href="/deliberations" text="Délibérations" />
+			<HeaderNavItem href="/affairs" text="Affaires" />
 			<HeaderNavItem href="/blogs" text="Blog" />
 
 			<HeaderNavItem href="/a-propos" text="À propos" />
