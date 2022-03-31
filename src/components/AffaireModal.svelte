@@ -17,80 +17,36 @@
 		Row,
 		Column,
 		InlineNotification
-	} from 'carbon-components-svelte';
-	import { Edit16, Launch16 } from 'carbon-icons-svelte';
+	} from 'carbon-components-svelte'
+	import { Edit16, Launch16 } from 'carbon-icons-svelte'
 
-	import { onMount } from 'svelte';
+	import { onMount } from 'svelte'
 
-	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte';
-	import type { AffaireType, MetaType } from '$lib/types/affaire';
+	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte'
+	import type { AffaireType, MetaType } from '$lib/types/affaire'
 
-	export let deliberations;
-	export let modalOpened;
+	export let deliberations
+	export let modalOpened
 
-	deliberations[0].affaireId = 'aff100';
+	deliberations[0].affaireId = 'aff100'
 
-	let currentIndex = 0;
-	let searchValue = '';
-	let autoSuggestions = [];
-	let searchSuggestions = [];
+	let currentIndex = 0
+	let searchValue = ''
+	let suggestions = []
+	let searchSuggestions = []
 
-	onMount(async () => {
-		// const res = await fetch('http://127.0.0.1:8984/affaire/suggestions', {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify(deliberations)
-		// });
-		// autoSuggestions = await res.json();
-
-		console.log('AffaireModal is mounting');
-
-		autoSuggestions = [
-			{
-				id: 'aff001',
-				title: 'Affaire du couvent de Rouen',
-				localisation: { commune: 'Rouen', region: '', departement: '' },
-				deliberations: [
-					{ title: 'dépôt de mendicité de Rouen', id: 'conbavil00286' },
-					{
-						title: 'tribunal judiciaire du département ; tribunal de police correctionnelle',
-						id: 'conbavil00286'
-					}
-				],
-				meta: {
-					dateCreated: '2022/01/22',
-					modifiedLast: '2022/02/01',
-					creator: 'Emmanuel Chateau-Dutier'
-				},
-				notes: '',
-				bibliography: '',
-				typology: '',
-				adminstratif: ''
-			},
-			{
-				id: 'aff002',
-				title: 'Affaire du palais de justice de Rouen',
-				localisation: { commune: 'Rouen', region: '', departement: '' },
-				deliberations: [
-					{ title: 'dépôt de mendicité de Rouen', id: 'conbavil00286' },
-					{
-						title: 'tribunal judiciaire du département ; tribunal de police correctionnelle',
-						id: 'conbavil00286'
-					}
-				],
-				meta: {
-					dateCreated: '2022/01/22',
-					modifiedLast: '2022/02/01',
-					creator: 'William Diakité'
-				},
-				notes: '',
-				bibliography: '',
-				typology: '',
-				adminstratif: ''
-			}
-		];
-		console.log('AffaireModale mounted');
-	});
+	onMount(() => {
+		fetch('http://127.0.0.1:8984/cbc/affaires/fromDeliberations', {
+			method: 'POST',
+			body: JSON.stringify({ body: deliberations.map((d) => d.id) })
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				suggestions = data
+				console.log('received data', data)
+			})
+			.catch((err) => console.log(err))
+	})
 
 	const initEmptyAffaire = (): AffaireType => {
 		return {
@@ -106,27 +62,27 @@
 			types: '',
 			deliberations: deliberations.map((d) => d.id),
 			meta: []
-		};
-	};
+		}
+	}
 
 	const onClickNext = () => {
-		if (!affaire) affaire = initEmptyAffaire();
+		if (!affaire) affaire = initEmptyAffaire()
 
-		currentIndex += 1;
-		console.log(affaire);
-	};
+		currentIndex += 1
+		console.log(affaire)
+	}
 	const onClickPrevious = () => {
-		currentIndex = 0;
-		affaire = initEmptyAffaire();
-	};
+		currentIndex = 0
+		affaire = initEmptyAffaire()
+	}
 	const onClickAffId = (id) => {
-		affaire = autoSuggestions.concat(searchSuggestions).find((aff) => aff.id === id);
-		onClickNext();
-	};
+		affaire = suggestions.concat(searchSuggestions).find((aff) => aff.id === id)
+		onClickNext()
+	}
 
 	const submitSearch = (e) => {
 		if (e.key === 'Enter') {
-			console.log(searchValue);
+			console.log(searchValue)
 
 			// const res = await fetch('http://127.0.0.1:8984/affaire/search', {
 			// 	method: 'GET',
@@ -160,22 +116,22 @@
 					typology: '',
 					adminstratif: ''
 				}
-			];
+			]
 		}
-	};
+	}
 
 	const postAffaire = (e) => {
-		console.log('[ + ] Posting new affaire', affaire);
-		fetch('http://127.0.0.1:8984/cbc/postaffairs/post', {
+		console.log('[ + ] Posting new affaire', affaire)
+		fetch('http://127.0.0.1:8984/cbc/affaires/create', {
 			method: 'POST',
 			body: JSON.stringify(affaire)
 		})
 			.then((res) => res.json())
 			.then((data) => console.log(data))
-			.catch((err) => console.log(err));
-	};
+			.catch((err) => console.log(err))
+	}
 
-	let affaire = initEmptyAffaire();
+	let affaire = initEmptyAffaire()
 </script>
 
 <Modal
@@ -250,18 +206,18 @@
 				expandable
 				size="short"
 				headers={[
-					{ key: 'title', value: "Nom de l'affaire" },
+					{ key: 'head', value: "Nom de l'affaire" },
 					{ key: 'localisation.commune', value: 'Commune' },
 					{ key: 'meta.dateCreated', value: 'Date de création' },
 					{ key: 'meta.creator', value: 'Responsable de la ressource' },
 					{ key: 'id', empty: true },
 					{ key: 'overflow', empty: true }
 				]}
-				rows={autoSuggestions}
+				rows={suggestions}
 			>
 				<svelte:fragment slot="cell" let:cell>
 					{#if cell.key === 'id'}
-						<Link icon={Launch16} href="/deliberations/{cell.value}" target="_blank">Accéder</Link>
+						<Link icon={Launch16} href="/affaires/{cell.value}" target="_blank">Accéder</Link>
 					{:else if cell.key === 'overflow'}
 						<Button
 							kind="ghost"
@@ -304,7 +260,7 @@
 							<FormItem>
 								<FormLabel>Commune</FormLabel>
 								<TextInput
-									placeholder="Indiquez un type administratif"
+									placeholder="Indiquez la commune"
 									bind:value={affaire.localisation.commune}
 								/>
 							</FormItem>
