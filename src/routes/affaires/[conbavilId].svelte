@@ -9,9 +9,28 @@
 </script>
 
 <script lang="ts">
-	import { Link } from 'carbon-components-svelte'
+	import {
+		Button,
+		Link,
+		Modal,
+		Form,
+		TextInput,
+		FormItem,
+		FormLabel
+	} from 'carbon-components-svelte'
+
+	const submitForm = (e) => {
+		// Needs ressource to update affaire
+		fetch('http://127.0.0.1:8984/***', {
+			method: 'POST',
+			body: JSON.stringify({ body: affaireForm })
+		})
+	}
+
 	export let affaire
-	console.log(affaire)
+	let affaireForm = { ...affaire }
+
+	let modalOpened = false
 </script>
 
 <svelte:head>
@@ -55,6 +74,53 @@
 		</li>
 	{/each}
 </ul>
+
+<br />
+<br />
+
+<Button on:click={() => (modalOpened = true)}>Modifier la fiche</Button>
+<Modal
+	bind:open={modalOpened}
+	on:close={() => (modalOpened = false)}
+	on:click:button--primary={submitForm}
+	on:click:button--secondary={() => (modalOpened = false)}
+	bind:modalHeading={affaireForm.head}
+	size="sm"
+	hasForm={true}
+	primaryButtonText="Envoyer les modifications"
+	shouldSubmitOnEnter={false}
+	secondaryButtonText="Annuler"
+>
+	<Form>
+		<FormItem>
+			<FormLabel>Titre de l'affaire</FormLabel>
+			<TextInput placeholder="Indiquez le titre de l'affaire" bind:value={affaireForm.head} />
+		</FormItem>
+
+		<h4>Localisation de l'affaire</h4>
+		<FormItem>
+			<FormLabel>Commune</FormLabel>
+			<TextInput placeholder="Indiquez la commune" bind:value={affaireForm.localisation.commune} />
+		</FormItem>
+		<FormItem>
+			<FormLabel>Département</FormLabel>
+			<TextInput
+				placeholder="Indiquez le département"
+				bind:value={affaireForm.localisation.departement}
+			/>
+		</FormItem>
+		<FormItem>
+			<FormLabel>Département (décimal)</FormLabel>
+		</FormItem>
+		<FormItem>
+			<FormLabel>Département ancien</FormLabel>
+			<TextInput
+				placeholder="Indiquez le département ancien"
+				bind:value={affaireForm.localisation.departementAncien}
+			/>
+		</FormItem>
+	</Form>
+</Modal>
 
 <style>
 	h4 {
