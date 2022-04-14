@@ -7,33 +7,15 @@
 		SideNavMenuItem,
 		TextInput,
 		Button
-	} from 'carbon-components-svelte';
-	import RangeSlider from 'svelte-range-slider-pips';
-	import Select from 'svelte-select';
-	import { createEventDispatcher, onMount } from 'svelte';
+	} from 'carbon-components-svelte'
+	import RangeSlider from 'svelte-range-slider-pips'
+	import Select from 'svelte-select'
+	import { createEventDispatcher, onMount } from 'svelte'
 
-	onMount(async () => {
-		//Should be put in load function
+	const dispatch = createEventDispatcher()
 
-		const res = await Promise.all([
-			fetch('http://127.0.0.1:8984/cbc/types'),
-			fetch('http://127.0.0.1:8984/cbc/categories')
-		]);
-		const data = await Promise.all(res.map((r) => r.json()));
-
-		console.log('facets data', data);
-
-		types = data[0];
-		categories = data[1];
-	});
-
-	const dispatch = createEventDispatcher();
-
-	let types;
-	let categories;
-
-	console.log('types', types);
-	console.log('categories', categories);
+	export let types
+	export let categories
 
 	let facets = {
 		commune: null,
@@ -42,18 +24,18 @@
 		dates: [1810, 1840],
 		types: null,
 		categories: null
-	};
+	}
 
-	let prevFacets = { ...facets };
-	let btnDisabled = true;
+	let prevFacets = { ...facets }
+	let btnDisabled = true
 
-	$: if (JSON.stringify(prevFacets) !== JSON.stringify(facets)) btnDisabled = false;
+	$: if (JSON.stringify(prevFacets) !== JSON.stringify(facets)) btnDisabled = false
 
 	const dispatchChanges = () => {
-		dispatch('change', { data: facets });
-		btnDisabled = true;
-		prevFacets = { ...facets };
-	};
+		dispatch('change', { data: facets })
+		btnDisabled = true
+		prevFacets = { ...facets }
+	}
 </script>
 
 <SideNav style="width: 100rem;" isOpen={true} ariaLabel="Filtres">

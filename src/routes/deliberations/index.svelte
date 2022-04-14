@@ -1,10 +1,20 @@
-<script context="module">
-	export async function load({ session }) {
+<script context="module" lang="ts">
+	export async function load({ fetch }) {
+		const res = await Promise.all([
+			fetch('http://127.0.0.1:8984/cbc/deliberations'),
+			fetch('http://127.0.0.1:8984/cbc/types'),
+			fetch('http://127.0.0.1:8984/cbc/categories')
+		])
+		const data = await Promise.all(res.map((r) => r.json()))
+
 		return {
 			props: {
-				user: session.user
+				meta: data[0].meta,
+				deliberations: data[0].content,
+				types: data[1],
+				categories: data[2]
 			}
-		};
+		}
 	}
 </script>
 
@@ -22,86 +32,80 @@
 		Button,
 		Loading,
 		Modal
-	} from 'carbon-components-svelte';
-	import { DocumentAdd16, Launch16, Save16 } from 'carbon-icons-svelte';
-	import DeliberationFacets from '$components/DeliberationFacets.svelte';
-	import DeliberationExpandedRow from '$components/DeliberationExpandedRow.svelte';
-	import AffaireModal from '$components/AffaireModal.svelte';
-	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers';
-	import { onMount } from 'svelte';
+	} from 'carbon-components-svelte'
+	import { DocumentAdd16, Launch16, Save16 } from 'carbon-icons-svelte'
+	import DeliberationFacets from '$components/DeliberationFacets.svelte'
+	import DeliberationExpandedRow from '$components/DeliberationExpandedRow.svelte'
+	import AffaireModal from '$components/AffaireModal.svelte'
+	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers'
+	import { onMount } from 'svelte'
 
-	export let user;
-	console.log('Yo', user, 'from deliberation');
+	// export let user
+	export let deliberations
+	export let meta
+	export let types
+	export let categories
 
-	let deliberations = [];
-	let meta = { start: 1, count: 20, currentPage: 1, totalItems: 0 };
+	let selectedRowIds = []
+	let expandedRowIds = []
+	let selectedDeliberations = []
 
-	let selectedRowIds = [];
-	let expandedRowIds = [];
-	let selectedDeliberations = [];
+	let userConnected = true
+	let toggleLoginModal = false
+	let affaireModalOpened = false
 
-	let userConnected = true;
-	let toggleLoginModal = false;
-	let affaireModalOpened = false;
+	let searchQuery = ''
+	let filtered = []
+	let facets = []
 
-	let searchQuery = '';
-	let filtered = [];
-	let facets = [];
-
-	onMount(() => fetchData());
+	onMount(() => {
+		filtered = filterDeliberations(searchQuery, facets, deliberations)
+	})
 
 	const fetchData = async () => {
-		let url = new URL('http://127.0.0.1:8984/cbc/deliberations');
+		let url = new URL('http://127.0.0.1:8984/cbc/deliberations')
 		Object.keys(meta).forEach((k) => {
-			url.searchParams.append(k, meta[k]);
-		});
-		console.log(url.toString());
+			url.searchParams.append(k, meta[k])
+		})
 
 		// This uses the sveltekit's fetch function?
 		// Function doesnt allow URL object as parameter -> needs type string
-		const res = await fetch(url.toString(), {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
+		const res = await fetch(url.toString())
 
 		if (res.ok) {
-			const data = await res.json();
-			deliberations = data.content;
+			const data = await res.json()
+			deliberations = data.content
 			meta = {
 				...meta,
 				start: parseInt(data.meta.start),
 				count: parseInt(data.meta.count),
 				totalItems: data.meta.totalItems
-			};
-
-			console.log('[ + ] received meta', meta);
+			}
 		}
-	};
+	}
 
 	const onPaginationUpdate = (e) => {
-		let { pageSize, page } = e.detail;
+		let { pageSize, page } = e.detail
 
 		// Computes new start index
-		meta.start = meta.count * (meta.currentPage - 1);
+		meta.start = meta.count * (meta.currentPage - 1)
 
 		// Fetch new data
-		fetchData();
-	};
+		fetchData()
+	}
 
 	const getDeliberationById = (id) => {
-		if (deliberations) return deliberations.find((d) => d.id === id);
-		return null;
-	};
+		if (deliberations) return deliberations.find((d) => d.id === id)
+		return null
+	}
 
 	const onClickNewDocument = (e) => {
 		if (!userConnected) {
-			toggleLoginModal = true;
+			toggleLoginModal = true
 		} else {
-			affaireModalOpened = true;
+			affaireModalOpened = true
 		}
-	};
+	}
 
 	// const containsSearchQuery = (deliberation) => {
 	// 	console.log('containsSearchQuery', searchQuery)
@@ -111,48 +115,48 @@
 
 	const filterDeliberations = (searchQuery, facets, deliberations) => {
 		if (deliberations) {
-			let filtered = deliberations;
+			let filtered = deliberations
 
 			// Filter searchQuery
 			filtered = filtered.filter((d) => {
 				return Object.keys(d).some((k) =>
 					d[k].toString().toLowerCase().includes(searchQuery.toLowerCase())
-				);
-			});
+				)
+			})
 
 			// Facets
-			console.log(filtered);
+			// console.log(filtered)
 
-			return filtered;
+			return filtered
 		} else {
-			return [];
+			return []
 		}
-	};
+	}
 
 	const facetsOnChange = (e) => {
-		console.log(e.detail.data);
-	};
+		console.log(e.detail.data)
+	}
 
 	const rowOnClick = (row) => {
 		if (expandedRowIds.includes(row.detail.id)) {
-			expandedRowIds.splice(expandedRowIds.indexOf(row.detail.id), 1);
+			expandedRowIds.splice(expandedRowIds.indexOf(row.detail.id), 1)
 		} else {
-			expandedRowIds.push(row.detail.id);
+			expandedRowIds.push(row.detail.id)
 		}
 		//updates expandedRowIds
-		expandedRowIds = expandedRowIds;
-	};
+		expandedRowIds = expandedRowIds
+	}
 
-	$: filtered = filterDeliberations(searchQuery, facets, deliberations);
+	$: filtered = filterDeliberations(searchQuery, facets, deliberations)
 
-	$: selectedDeliberations = deliberations.filter((d) => selectedRowIds.includes(d.id));
+	$: selectedDeliberations = deliberations.filter((d) => selectedRowIds.includes(d.id))
 </script>
 
 <svelte:head>
 	<title>Délibérations</title>
 </svelte:head>
 
-<DeliberationFacets on:change={facetsOnChange} />
+<DeliberationFacets on:change={facetsOnChange} {types} {categories} />
 
 <DataTable
 	sortable
@@ -171,8 +175,8 @@
 			value: 'Recommandation',
 			sort: (a, b) => {
 				//todo: trigger an onChangeFilterKey
-				console.log('Recommandation est focus !');
-				return a.localeCompare(b);
+				console.log('Recommandation est focus !')
+				return a.localeCompare(b)
 			}
 		},
 		{ key: 'id', empty: true }
