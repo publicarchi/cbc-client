@@ -1,117 +1,166 @@
 <script context="module" lang="ts">
-  // import { fetchMeetings } from './calls';
-  /** @type {import('@sveltejs/kit').Load} */
+	export async function load({ fetch }) {
+		const response = await fetch('http://127.0.0.1:8984/cbc/meetings');		
+		const data = await response.json()
 
-	export async function load({ page, fetch, session, stuff }) {
-		var params = {nb: 100}
-		var query = Object
-			.keys(params)
-			.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-			.join('&');
-		let url = `http://127.0.0.1:8984/cbc/meetings?` + query;
-		const res = await fetch(url, {
-			method: 'GET',
-			body: JSON.stringify()
-		});
+		// create temporary ids
+		let content = data.content.map((d, i) => {
+			d['id'] = i
+			return d
+		})
 
-		if (res.ok) {
-			return {
-				props: {
-					meetings: await res.json(),
-					params
-				}
-			};
+		return { 
+			props: { meetings: content, meta: data.meta } 
 		}
-
-		return {
-			status: res.status,
-			error: new Error(`Could not load ${url}`)
-		};
 	}
 </script>
 
 <script lang="ts">
-  import Pagination from "$components/Pagination.svelte" ;
 	import {
-		Accordion,
-		AccordionItem,
-		Content,
-		ListItem,
-		OrderedList } from 'carbon-components-svelte'
-  export let meetings ;
-  export let params
-</script>
+		DataTable,
+		Button,
+		Loading,
+		Link,
+		Pagination,
+		Toolbar,
+		ToolbarContent,
+		ToolbarSearch,
+		ToolbarMenu,
+		ToolbarMenuItem,
+		ToolbarBatchActions
+	} from 'carbon-components-svelte'
+	import ExpandedRow from '$components/ExpandedRow.svelte'
+ 
+	export let meetings
+	export let meta
 
+	let selectedRowIds = []
+	let expandedRowIds = []
+
+	let expandedOptions = [
+		{ 
+			head: 'Identidication de la séance', 
+			type: 'meta',
+			content: [
+				{ key:'title', value: 'Titre' },
+				{ key:'date', value: 'Date' },
+				{ key:'cote', value: 'Cote' },
+				{ key:'id', value: 'ID' }
+			] 
+		},
+		{
+			head: "Édifices et types d'interventions",
+			type: 'meta',
+			content: [
+				{ key: 'types', value: 'Édifices'},
+				{ key: 'categories', value: 'Interventions' }
+			]
+		},
+		{
+			head: 'Liste des déliberations',
+			type: 'list',
+			content: 'deliberations',
+			link: '/deliberations',
+			slug: 'id',
+			linkText: 'title'
+		}
+	]
+
+	const fetchData = async () => {
+		let url = new URL('http://127.0.0.1:8984/cbc/meetings')
+		Object.keys(meta).forEach((k) => {
+			url.searchParams.append(k, meta[k])
+		})
+
+		// This uses the sveltekit's fetch function?
+		// Function doesnt allow URL object as parameter -> needs type string
+		const res = await fetch(url.toString())
+		const data = await res.json()
+		
+		// create temporary ids
+		meetings = data.content.map((d, i) => {
+			d['id'] = i
+			return d
+		})
+
+		meta = {
+			...meta,
+			start: parseInt(data.meta.start),
+			count: parseInt(data.meta.count),
+			totalItems: data.meta.totalItems
+		}
+	}
+
+	const onPaginationUpdate = (e) => {
+		// Computes new start index
+		meta.start = meta.count * (meta.currentPage - 1)
+
+		// Fetch new data
+		fetchData()
+	}
+
+	const rowOnClick = (row) => {
+		if (expandedRowIds.includes(row.detail.id)) {
+			expandedRowIds.splice(expandedRowIds.indexOf(row.detail.id), 1)
+		} else {
+			expandedRowIds.push(row.detail.id)
+		}
+		//updates expandedRowIds
+		expandedRowIds = expandedRowIds
+	}
+</script>
 
 <svelte:head>
 	<title>Séances</title>
 </svelte:head>
 
-<Content>
-	<h1>Séances du Conseil des bâtiments civils</h1>
-	<Pagination bind:params={params}/>
-	<Accordion>
-	{#each meetings as meeting}
-		<AccordionItem title="{meeting.title}">
-			<OrderedList nested>
-			{#each meeting.deliberations as deliberation}
-				<ListItem>
-					<a href={'deliberations/' + deliberation.id}>{deliberation.id}</a> - {deliberation.title} - {deliberation.commune}
-				</ListItem>
-			{/each}
-			</OrderedList>
-		</AccordionItem>
-	{/each}
-	</Accordion>
-</Content>
+<DataTable
+	title="Liste des séances"
+	bind:selectedRowIds
+	bind:expandedRowIds
+	on:click:row={rowOnClick}
+	expandable
+	rows={meetings}
+	headers={[
+		{ key: 'title', value: 'Titre' },
+		{ key: 'date', value: 'Date' },
+		{ key: 'cote', value: 'Cote' }
+	]}
+>
+	<svelte:fragment slot="cell" let:cell>
+		{#if Array.isArray(cell.value)}
+			{cell.value.join(', ')}
+		{:else}
+			{cell.value}
+		{/if}
+	</svelte:fragment>
 
-	<!-- <OrderedList>
-		{#each meetings as meeting}
-		<ListItem>{meeting.title} - {meeting.date}</ListItem>
-		<ListItem>
-			<OrderedList nested>
-				{#each meeting.deliberations as deliberation}
-				<ListItem>
-					<a href={'deliberations/' + deliberation.id}>{deliberation.id}</a> - {deliberation.title} -
-					{deliberation.commune}
-				</ListItem>
-				{/each}
-			</OrderedList>
-		</ListItem>
-		{/each}
-	</OrderedList> -->
+	<svelte:fragment slot="expanded-row" let:row>
+		<ExpandedRow  data={row} options={expandedOptions}/>
+	</svelte:fragment>
 
+	<Toolbar>
+		<ToolbarContent>
+			<ToolbarSearch expanded={true} persistent={true} placeholder="rechercher une séance"/>
+			<ToolbarMenu>
+				<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
+				<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
+					>API documentation</ToolbarMenuItem
+				>
+				<ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
+			</ToolbarMenu>
+			<Button>Rechercher</Button>
+		</ToolbarContent>
+	</Toolbar>
 
-
-	<!-- {#each meetings as meeting}
-		<div class="meeting">
-			<span>{meeting.title}</span>
-			<span>{meeting.date}</span>
-			<ul>
-				{#each meeting.deliberations as deliberation}
-					<li>
-						<a href={'deliberations/' + deliberation.id}>{deliberation.id}</a> - {deliberation.title} -
-						{deliberation.commune}
-					</li>
-				{/each}
-			</ul>
-		</div>
-	{/each} -->
-
-
-
-<!-- {#await}
-  <p>Chargement des données...</p>
-  {:then data}
-    {#each data as meeting}
-      <div class='meeting'>
-        <span>{meeting.title}</span>
-        <span>{meeting.date}</span>
-        <ul>
-            {#each meeting.deliberations as deliberation}
-                <li> <a href={"deliberations/" + deliberation.id}>{deliberation.id}</a> - {deliberation.title} - {deliberation.commune}</li>
-            {/each}
-        </ul>
-      </div>
-    {/each}
-{/await} -->
+	<Pagination
+			on:update={onPaginationUpdate}
+			backwardText="Page précédente"
+			forwardText="Page suivante"
+			itemsPerPageText="Fiches par page :"
+			pageSizes={[20, 50, 100, 250, 500]}
+			bind:page={meta.currentPage}
+			bind:pageSize={meta.count}
+			bind:totalItems={meta.totalItems}
+		/>
+</DataTable>
