@@ -16,21 +16,40 @@
 		Form,
 		TextInput,
 		FormItem,
-		FormLabel
+		FormLabel,
+		InlineNotification
 	} from 'carbon-components-svelte'
 
 	const submitForm = (e) => {
-		// Needs ressource to update affaire
-		fetch('http://127.0.0.1:8984/***', {
+		affaireForm.deliberations = affaireForm.deliberations.map((d) => d.id)
+
+		affaireForm.meta = {
+			user: { id: '1', name: 'William', email: 'will@gmail.com' },
+			action: 'modification',
+			date: new Date().toISOString()
+		}
+
+		fetch('http://127.0.0.1:8984/cbc/affair/update', {
 			method: 'POST',
-			body: JSON.stringify({ body: affaireForm })
+			body: JSON.stringify(affaireForm),
+			headers: { 'Content-Type': 'text/plain;charset=utf-8' }
 		})
+			.then((res) => res.json())
+			.then((data) => {
+				console.log(data)
+				modalOpened = false
+				updated = true
+			})
+			.catch((err) => console.log(err))
 	}
 
 	export let affaire
-	let affaireForm = { ...affaire }
 
+	console.log('original data', affaire)
+
+	let affaireForm = { ...affaire }
 	let modalOpened = false
+	let updated = false
 </script>
 
 <svelte:head>
@@ -38,6 +57,13 @@
 </svelte:head>
 
 <h1>{affaire.head}</h1>
+
+{#if updated}
+	<InlineNotification>
+		La fiche a bien été mise à jour. Merci de recharger la page pour que les modifications soient
+		apparentes.
+	</InlineNotification>
+{/if}
 
 <h4>Localisation</h4>
 <div class="data-group">
@@ -84,7 +110,7 @@
 	on:close={() => (modalOpened = false)}
 	on:click:button--primary={submitForm}
 	on:click:button--secondary={() => (modalOpened = false)}
-	bind:modalHeading={affaireForm.head}
+	bind:modalHeading={affaire.head}
 	size="sm"
 	hasForm={true}
 	primaryButtonText="Envoyer les modifications"
