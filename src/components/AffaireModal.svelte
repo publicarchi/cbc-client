@@ -23,10 +23,14 @@
 	import { onMount } from 'svelte'
 
 	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte'
-	import type { AffaireType, MetaType } from '$lib/types/affaire'
+	import type { AffaireType, MetaType } from '../lib/types/affaire'
 
 	export let deliberations
 	export let modalOpened
+	export let formPosted
+
+	let formError = false
+	let formErrorMsg = ''
 
 	deliberations[0].affaireId = 'aff100'
 
@@ -126,9 +130,15 @@
 			method: 'POST',
 			body: JSON.stringify(affaire)
 		})
-			.then((res) => res.json())
-			.then((data) => console.log(data))
-			.catch((err) => console.log(err))
+			.then((res) => {
+				if (res.ok){
+					modalOpened = false
+					formPosted = true
+				}
+				else
+					formError = true
+			})
+			.catch((err) => formErrorMsg = err)
 	}
 
 	let affaire = initEmptyAffaire()
@@ -301,6 +311,14 @@
 						</Column>
 					</Row>
 				</Grid>
+				{#if formError}
+					<InlineNotification
+						lowContrast
+						kind="error"
+						title="Une erreur est survenue:"
+						subtitle={`La ressource n'a pas pu être mise à jour \n ${formErrorMsg}`}
+					/>
+				{/if}
 			</Form>
 		</Content>
 	{/if}

@@ -31,11 +31,11 @@
                     {#each resolvePath(data, opt.content) as item}
                         <ListItem>
                             {#if opt.link}
-                                <Link href={`${opt.link}/${resolvePath(item, opt.slug)}`}>
-                                    {resolvePath(item, opt.linkText)}
+                                <Link href={`${opt.link.path}/${resolvePath(item, opt.link.slug)}`}>
+                                    {resolvePath(item, opt.link.text)}
                                 </Link>
                             {/if}
-                            </ListItem>
+                        </ListItem>
                     {/each}
                 </UnorderedList>
             </Column>
@@ -48,7 +48,7 @@
 		font-size: 14px;
 		font-weight: 200;
 		margin-top: 1em;
-		width: 270px;
+		width: 290px;
 	}
 	.data-group {
 		display: flex;
@@ -57,10 +57,10 @@
 	.data-group-label {
 		font-weight: bold;
 		font-size: 11px;
-		width: 100px;
+		width: 110px;
 	}
 	.data-group-value {
 		font-size: 11px;
-		width: 140px;
+		width: 180px;
 	}
 </style>

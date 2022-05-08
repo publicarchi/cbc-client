@@ -31,14 +31,17 @@
 		Link,
 		Button,
 		Loading,
-		Modal
+		Modal,
+		ToastNotification
 	} from 'carbon-components-svelte'
 	import { DocumentAdd16, Launch16, Save16 } from 'carbon-icons-svelte'
 	import DeliberationFacets from '$components/DeliberationFacets.svelte'
-	import DeliberationExpandedRow from '$components/DeliberationExpandedRow.svelte'
+	import ExpandedRow from '$components/ExpandedRow.svelte'
+	import expandedRowOptions from './_expandedRowOptions'
 	import AffaireModal from '$components/AffaireModal.svelte'
 	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers'
 	import { onMount } from 'svelte'
+	import { fly } from 'svelte/transition'
 
 	// export let user
 	export let deliberations
@@ -57,6 +60,9 @@
 	let searchQuery = ''
 	let filtered = []
 	let facets = []
+
+	let formPosted = false
+	$: console.log(formPosted)
 
 	onMount(() => {
 		filtered = filterDeliberations(searchQuery, facets, deliberations)
@@ -156,6 +162,19 @@
 	<title>Délibérations</title>
 </svelte:head>
 
+{#if formPosted}
+	<div class="toast-container" in:fly={{ x: 100 }}>
+		<ToastNotification
+				lowContrast
+				kind="success"
+				title="Modifications prises en compte"
+				subtitle="L'affaire a été ajoutée à la base de données."
+				caption={new Date().toLocaleString()}
+				on:close={() => formPosted = !formPosted}
+			/>
+	</div>
+{/if}
+
 <DeliberationFacets on:change={facetsOnChange} {types} {categories} />
 
 <DataTable
@@ -196,7 +215,7 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="expanded-row" let:row>
-		<DeliberationExpandedRow deliberation={getDeliberationById(row.id)} />
+		<ExpandedRow data={row} options={expandedRowOptions} />
 	</svelte:fragment>
 
 	<Toolbar>
@@ -250,5 +269,19 @@
 {/if}
 
 {#if affaireModalOpened}
-	<AffaireModal deliberations={selectedDeliberations} bind:modalOpened={affaireModalOpened} />
+	<AffaireModal 
+		deliberations={selectedDeliberations} 
+		bind:modalOpened={affaireModalOpened} 
+		bind:formPosted={formPosted} 
+	/>
 {/if}
+
+
+
+<style>
+    .toast-container {
+		z-index:1;
+        position: absolute;
+        margin-left: 50%;
+    }
+</style>
