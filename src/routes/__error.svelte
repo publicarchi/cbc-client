@@ -29,7 +29,7 @@
 
 		{#if error.message}
 			<InlineNotification lowContrast kind="error"
- title="Error:" subtitle="{status}: {error.message}" />
+ title="Error" subtitle="{status}: {error.message}" />
 		{:else}
 		<InlineNotification lowContrast kind="error"
  title="Error:" subtitle="Encountered a {status} error" />
