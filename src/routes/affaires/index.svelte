@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
 	export async function load({ fetch }) {
-		let response = await fetch('http://127.0.0.1:8984/cbc/affaires')
-		let data = await response.json()
-
+		let data = await fetch('http://127.0.0.1:8984/cbc/affaires')
+								.then(res => res.json())
+								.catch(err => console.log(err))
 		return {
 			props: { affaires: data.content, meta: data.meta }
 		}
@@ -10,7 +10,6 @@
 </script>
 
 <script lang="ts">
-	import { onMount } from 'svelte'
 	import {
 		DataTable,
 		Grid,
@@ -28,35 +27,22 @@
 		ToolbarBatchActions
 	} from 'carbon-components-svelte'
 	import { DocumentAdd16, Save16, Launch16 } from 'carbon-icons-svelte'
-	// import AffaireExpandedRow from '$components/AffaireExpandedRow.svelte'
-
-	export let affaires
+	import ExpandedRow from '$components/ExpandedRow.svelte'
+	import expandedRowOptions from './_expandedRowOptions';
+	import type { IAffaire } from '../../lib/types/cbc'
+	
+	export let affaires: IAffaire[]
 	export let meta
-
-	let adMap = {}
 
 	let searchQuery
 
 	let selectedRowIds = []
 	let expandedRowIds = []
 
-	onMount(async () => {
-		adMap = affaires.reduce(async (acc, a) => {
-			let deliberations = []
-			await Promise.all(
-				a.deliberations.map((id) => {
-					return fetch(`http://127.0.0.1:8984/cbc/deliberations/${id}`)
-						.then((res) => res.json())
-						.then((data) => deliberations.push(data))
-				})
-			)
-			acc[a.id] = deliberations
-		}, {})
+	console.log(affaires);
+	
 
-		console.log('adMap', adMap)
-	})
-
-	const fetchAffairs = () => {
+	$: (meta) => {
 		fetch('http://127.0.0.1:8984/cbc/affaires')
 			.then((res) => res.json())
 			.then((data) => {
@@ -82,28 +68,21 @@
 		//updates expandedRowIds
 		expandedRowIds = expandedRowIds
 	}
-
-	const getDeliberations = async (ids) => {
-		let deliberations = []
-		await Promise.all(
-			ids.map((id) => {
-				return fetch(`http://127.0.0.1:8984/cbc/deliberations/${id}`)
-					.then((res) => res.json())
-					.then((data) => deliberations.push(data))
-					.catch((err) => console.log(err))
-			})
-		)
-	}
 </script>
+
+<svelte:head>
+	<title>Affaires</title>
+</svelte:head>
 
 <Grid>
 	<DataTable
 		on:click:row={rowOnClick}
 		title="Liste des affaires"
+		expandable
 		bind:selectedRowIds
 		bind:expandedRowIds
 		headers={[
-			{ key: 'head', value: 'Titre' },
+			{ key: 'title', value: 'Titre' },
 			{ key: 'localisation.commune', value: 'Commune' },
 			{ key: 'localisation.departement', value: 'Département' },
 			{ key: 'localisation.departementAncien', value: 'Dépt. ancien' },
@@ -121,11 +100,10 @@
 			{/if}
 		</svelte:fragment>
 
-		<!-- <svelte:fragment slot="expanded-row" let:row>
-			<AffaireExpandedRow
-				deliberationIds={affaires.filter((a) => a.id === row.id)[0].deliberations}
-			/>
-		</svelte:fragment> -->
+		<svelte:fragment slot="expanded-row" let:row>
+			<ExpandedRow data={row} options={expandedRowOptions} />
+		</svelte:fragment>
+
 		<Toolbar>
 			<ToolbarBatchActions>
 				<Button icon={DocumentAdd16}>Créer une affaire</Button>

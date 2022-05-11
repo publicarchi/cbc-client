@@ -30,41 +30,13 @@
 		ToolbarBatchActions
 	} from 'carbon-components-svelte'
 	import ExpandedRow from '$components/ExpandedRow.svelte'
+	import expandedRowOptions from './_expandedRowOptions'
  
 	export let meetings
 	export let meta
 
 	let selectedRowIds = []
 	let expandedRowIds = []
-
-	let expandedOptions = [
-		{ 
-			head: 'Identidication de la séance', 
-			type: 'meta',
-			content: [
-				{ key:'title', value: 'Titre' },
-				{ key:'date', value: 'Date' },
-				{ key:'cote', value: 'Cote' },
-				{ key:'id', value: 'ID' }
-			] 
-		},
-		{
-			head: "Édifices et types d'interventions",
-			type: 'meta',
-			content: [
-				{ key: 'types', value: 'Édifices'},
-				{ key: 'categories', value: 'Interventions' }
-			]
-		},
-		{
-			head: 'Liste des déliberations',
-			type: 'list',
-			content: 'deliberations',
-			link: '/deliberations',
-			slug: 'id',
-			linkText: 'title'
-		}
-	]
 
 	const fetchData = async () => {
 		let url = new URL('http://127.0.0.1:8984/cbc/meetings')
@@ -136,7 +108,7 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="expanded-row" let:row>
-		<ExpandedRow  data={row} options={expandedOptions}/>
+		<ExpandedRow  data={row} options={expandedRowOptions}/>
 	</svelte:fragment>
 
 	<Toolbar>

@@ -2,10 +2,11 @@ import type { ExpandedRowOptionsType } from "../../lib/types/expandedRowOptions"
 
 const expandedRowOptions: ExpandedRowOptionsType = [
     {
-        head: 'Identidication de la séance',
+        head: 'Identification de la délibération',
         type: 'meta',
         content: [
             { key: 'title', value: 'Titre' },
+            { key: 'altTitle', value: 'Titre (alt.)' },
             { key: 'date', value: 'Date de la séance' },
             { key: 'id', value: 'ID' }
         ]
@@ -34,7 +35,7 @@ const expandedRowOptions: ExpandedRowOptionsType = [
         head: "Recommandation(s)",
         type: 'meta',
         content: [
-            { key: 'report', value: 'Rapporteur·euse·s' },
+            { key: 'report', value: 'Rapporteur(s)' },
             { key: 'advice', value: 'Recommandation(s)' }
         ]
     },

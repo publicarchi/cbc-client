@@ -13,8 +13,8 @@ const expandedRowOptions: ExpandedRowOptionsType = [
     {
         head: "Liste des délibérations",
         type: 'list',
-        content: 'délibérations',
-        link: { path: '/délibérations', slug: 'id', text: 'altTitle' }
+        content: 'deliberations',
+        link: { path: '/deliberations', slug: 'id', text: 'altTitle' }
     }
 ]
 

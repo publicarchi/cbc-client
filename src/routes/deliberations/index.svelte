@@ -31,17 +31,16 @@
 		Link,
 		Button,
 		Loading,
-		Modal,
-		ToastNotification
+		Modal
 	} from 'carbon-components-svelte'
 	import { DocumentAdd16, Launch16, Save16 } from 'carbon-icons-svelte'
 	import DeliberationFacets from '$components/DeliberationFacets.svelte'
 	import ExpandedRow from '$components/ExpandedRow.svelte'
 	import expandedRowOptions from './_expandedRowOptions'
 	import AffaireModal from '$components/AffaireModal.svelte'
-	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers'
+	import ToastNotification from '$components/ToastNotification.svelte'
 	import { onMount } from 'svelte'
-	import { fly } from 'svelte/transition'
+	
 
 	// export let user
 	export let deliberations
@@ -98,11 +97,6 @@
 
 		// Fetch new data
 		fetchData()
-	}
-
-	const getDeliberationById = (id) => {
-		if (deliberations) return deliberations.find((d) => d.id === id)
-		return null
 	}
 
 	const onClickNewDocument = (e) => {
@@ -163,16 +157,14 @@
 </svelte:head>
 
 {#if formPosted}
-	<div class="toast-container" in:fly={{ x: 100 }}>
-		<ToastNotification
-				lowContrast
-				kind="success"
-				title="Modifications prises en compte"
-				subtitle="L'affaire a été ajoutée à la base de données."
-				caption={new Date().toLocaleString()}
-				on:close={() => formPosted = !formPosted}
-			/>
-	</div>
+	<ToastNotification 
+		lowContrast
+		kind="success"
+		title="Modifications prises en compte"
+		subtitle="L'affaire a été ajoutée à la base de données."
+		caption={new Date().toLocaleString()}
+		onClose={() => formPosted = !formPosted}
+	/>
 {/if}
 
 <DeliberationFacets on:change={facetsOnChange} {types} {categories} />
@@ -208,7 +200,11 @@
 				{cell.value}
 			</Link>
 		{:else if cell.key === 'title'}
-			{getDeliberationTitle(getDeliberationById(row.id))}
+			{#if cell.value}
+				{cell.value}
+			{:else}
+				{deliberations.find(d => d.id === row.id).altTitle}
+			{/if}
 		{:else}
 			{cell.value}
 		{/if}
@@ -275,13 +271,3 @@
 		bind:formPosted={formPosted} 
 	/>
 {/if}
-
-
-
-<style>
-    .toast-container {
-		z-index:1;
-        position: absolute;
-        margin-left: 50%;
-    }
-</style>

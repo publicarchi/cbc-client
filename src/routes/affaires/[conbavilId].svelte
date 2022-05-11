@@ -1,10 +1,15 @@
 <script context="module" lang="ts">
-	export async function load({ fetch, params }) {
-		console.log(`http://127.0.0.1:8984/cbc/affaires/${params.conbavilId}`)
-		const response = await fetch(`http://127.0.0.1:8984/cbc/affaires/${params.conbavilId}`)
-		const affaire = await response.json()
+	export async function load({ fetch, page }) {
+		const req = `http://127.0.0.1:8984/cbc/affaires/${page.params.conbavilId}`
+		const response = await fetch(req)
+		if (!response.ok) 
+			return {
+				status: response.status,
+				error: new Error(`Oups, l'affaire n'a pas pu être chargée. ${req}`)
+			}
 
-		return { props: { affaire } }
+		const affaire = await response.json()
+		return { props : { affaire }}
 	}
 </script>
 
@@ -16,53 +21,64 @@
 		Form,
 		TextInput,
 		FormItem,
-		FormLabel,
-		InlineNotification
+		FormLabel
 	} from 'carbon-components-svelte'
+	import ToastNotification from '../../components/ToastNotification.svelte';
+	import type { IAffaire } from '../../lib/types/cbc'
 
-	const submitForm = (e) => {
-		affaireForm.deliberations = affaireForm.deliberations.map((d) => d.id)
+	export let affaire:IAffaire
 
-		affaireForm.meta = {
-			user: { id: '1', name: 'William', email: 'will@gmail.com' },
-			action: 'modification',
-			date: new Date().toISOString()
-		}
 
-		fetch('http://127.0.0.1:8984/cbc/affair/update', {
-			method: 'POST',
-			body: JSON.stringify(affaireForm),
-			headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				console.log(data)
-				modalOpened = false
-				updated = true
-			})
-			.catch((err) => console.log(err))
-	}
+	console.log('received data', affaire)
 
-	export let affaire
-
-	console.log('original data', affaire)
-
-	let affaireForm = { ...affaire }
+	let affaireForm:IAffaire = { ...affaire }
 	let modalOpened = false
 	let updated = false
+
+	const submitForm = (e) => {
+
+		affaireForm.meta.push({
+			who: 'will@gmail.com',
+			type: 'modification',
+			when: new Date().toISOString()
+		}) 
+
+		let body = {
+			type: 'modification',
+			affaire: affaireForm
+		}
+
+		console.log('post body', body)
+
+		fetch('http://127.0.0.1:8984/cbc/affaires/post', {
+			method: 'POST',
+			body: JSON.stringify(body),
+		})
+			.then((res) => {
+				if (res.ok) {
+					modalOpened = false
+					updated = true
+				}
+			})
+			
+			.catch((err) => console.log(err))
+	}
 </script>
 
 <svelte:head>
 	<title>Affaire</title>
 </svelte:head>
 
-<h1>{affaire.head}</h1>
+<h1>{affaire.title}</h1>
 
 {#if updated}
-	<InlineNotification>
-		La fiche a bien été mise à jour. Merci de recharger la page pour que les modifications soient
-		apparentes.
-	</InlineNotification>
+	<ToastNotification
+		lowContrast
+		kind="success"
+		title="Mise à jour effectuée"
+		subtitle="Merci de recharger la page pour que les modifications soient apparentes."
+		caption={new Date().toLocaleString()}
+	/>
 {/if}
 
 <h4>Localisation</h4>
@@ -110,7 +126,7 @@
 	on:close={() => (modalOpened = false)}
 	on:click:button--primary={submitForm}
 	on:click:button--secondary={() => (modalOpened = false)}
-	bind:modalHeading={affaire.head}
+	bind:modalHeading={affaire.title}
 	size="sm"
 	hasForm={true}
 	primaryButtonText="Envoyer les modifications"
@@ -120,7 +136,7 @@
 	<Form>
 		<FormItem>
 			<FormLabel>Titre de l'affaire</FormLabel>
-			<TextInput placeholder="Indiquez le titre de l'affaire" bind:value={affaireForm.head} />
+			<TextInput placeholder="Indiquez le titre de l'affaire" bind:value={affaireForm.title} />
 		</FormItem>
 
 		<h4>Localisation de l'affaire</h4>

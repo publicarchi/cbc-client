@@ -19,25 +19,24 @@
 		InlineNotification
 	} from 'carbon-components-svelte'
 	import { Edit16, Launch16 } from 'carbon-icons-svelte'
-
 	import { onMount } from 'svelte'
-
 	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte'
-	import type { AffaireType, MetaType } from '../lib/types/affaire'
+	import type { IAffaire, IDeliberation } from '../lib/types/cbc'
+	import { initEmptyAffaire } from '../lib/helpers/helpers'
 
-	export let deliberations
-	export let modalOpened
-	export let formPosted
+	export let deliberations: IDeliberation[]
+	export let modalOpened: boolean
+	export let formPosted: boolean
 
-	let formError = false
-	let formErrorMsg = ''
+	let formError:boolean = false
+	let formErrorMsg:string = ''
+	let affaire:IAffaire
 
-	deliberations[0].affaireId = 'aff100'
-
-	let currentIndex = 0
-	let searchValue = ''
-	let suggestions = []
-	let searchSuggestions = []
+	let currentIndex: 0 | 1 = 0
+	let searchValue:string = ''
+	let suggestions: IAffaire[] = []
+	let searchSuggestions: IAffaire[] = []
+	let changeType: 'creation' | 'modification' = 'creation'
 
 	onMount(() => {
 		fetch('http://127.0.0.1:8984/cbc/affaires/fromDeliberations', {
@@ -47,40 +46,25 @@
 			.then((res) => res.json())
 			.then((data) => {
 				suggestions = data
-				console.log('received data', data)
+				console.log('received suggestions', data)
 			})
 			.catch((err) => console.log(err))
 	})
 
-	const initEmptyAffaire = (): AffaireType => {
-		return {
-			head: '',
-			id: '',
-			localisation: {
-				commune: '',
-				departementDecimal: '',
-				departement: '',
-				departementAncien: '',
-				region: ''
-			},
-			types: '',
-			deliberations: deliberations.map((d) => d.id),
-			meta: []
-		}
-	}
-
 	const onClickNext = () => {
-		if (!affaire) affaire = initEmptyAffaire()
-
+		if (!affaire) {
+			affaire = initEmptyAffaire(deliberations)
+			changeType = 'creation'
+		}
 		currentIndex += 1
 		console.log(affaire)
 	}
-	const onClickPrevious = () => {
-		currentIndex = 0
-		affaire = initEmptyAffaire()
-	}
+	const onClickPrevious = () => currentIndex = 0
+
 	const onClickAffId = (id) => {
 		affaire = suggestions.concat(searchSuggestions).find((aff) => aff.id === id)
+		affaire.id = id
+		changeType = 'modification'
 		onClickNext()
 	}
 
@@ -98,37 +82,51 @@
 
 			// searchSuggestions = data.affaires;
 
-			searchSuggestions = [
-				{
-					id: 'aff003',
-					title: 'Affaire du couvent de Paris',
-					localisation: { commune: 'Paris', region: '', departement: '' },
-					deliberations: [
-						{ title: 'dépôt de mendicité de Paris', id: 'conbavil00286' },
-						{
-							title: 'tribunal judiciaire du département ; tribunal de police correctionnelle',
-							id: 'conbavil00286'
-						}
-					],
-					meta: {
-						dateCreated: '2022/01/22',
-						modifiedLast: '2022/02/01',
-						creator: 'Emmanuel Chateau-Dutier'
-					},
-					notes: '',
-					bibliography: '',
-					typology: '',
-					adminstratif: ''
-				}
-			]
+			// searchSuggestions = [
+			// 	{
+			// 		id: 'aff003',
+			// 		title: 'Affaire du couvent de Paris',
+			// 		localisation: { commune: 'Paris', region: '', departement: '' },
+			// 		deliberations: [
+			// 			{ title: 'dépôt de mendicité de Paris', id: 'conbavil00286' },
+			// 			{
+			// 				title: 'tribunal judiciaire du département ; tribunal de police correctionnelle',
+			// 				id: 'conbavil00286'
+			// 			}
+			// 		],
+			// 		meta: {
+			// 			dateCreated: '2022/01/22',
+			// 			modifiedLast: '2022/02/01',
+			// 			creator: 'Emmanuel Chateau-Dutier'
+			// 		},
+			// 		notes: '',
+			// 		bibliography: '',
+			// 		typology: '',
+			// 		adminstratif: ''
+			// 	}
+			// ]
 		}
 	}
 
 	const postAffaire = (e) => {
-		console.log('[ + ] Posting new affaire', affaire)
-		fetch('http://127.0.0.1:8984/cbc/affaires/create', {
+
+		affaire.meta.push({
+			who: 'will@gmail.com',
+			when: new Date().toLocaleString(),
+			type: changeType 
+		})
+
+		console.log('[ + ] Posting new affaire', {
+				type: changeType,
+				affaire: affaire
+			})
+
+		fetch('http://127.0.0.1:8984/cbc/affaires/post', {
 			method: 'POST',
-			body: JSON.stringify(affaire)
+			body: JSON.stringify({
+				type: changeType,
+				affaire: affaire
+			})
 		})
 			.then((res) => {
 				if (res.ok){
@@ -141,7 +139,7 @@
 			.catch((err) => formErrorMsg = err)
 	}
 
-	let affaire = initEmptyAffaire()
+	
 </script>
 
 <Modal
@@ -263,7 +261,7 @@
 							</FormItem>
 							<FormItem>
 								<FormLabel>Nom de l'affaire</FormLabel>
-								<TextInput placeholder="Titre de l'affaire" bind:value={affaire.head} />
+								<TextInput placeholder="Titre de l'affaire" bind:value={affaire.title} />
 							</FormItem>
 							<br />
 							<h4>Localisation de l'affaire</h4>
@@ -302,7 +300,7 @@
 								Les délibérations suivantes seront attachées à l'affaire
 							</p>
 							<AffaireModalDeliberations
-								deliberations={deliberations.filter((d) => d.affaireId === '')}
+								deliberations={deliberations.filter((d) => d.affairId === '')}
 							/>
 							<br />
 							<p style="font-weight: bold;">

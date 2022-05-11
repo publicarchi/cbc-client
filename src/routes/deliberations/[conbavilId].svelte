@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
-	export async function load({ fetch, params }) {
-		const id = params.conbavilId;
+	export async function load({ fetch, page }) {
+		const id = page.params.conbavilId;
 
 		try {
 			const res = await Promise.all([
@@ -8,6 +8,7 @@
 				fetch('http://127.0.0.1:8984/cbc/types'),
 				fetch('http://127.0.0.1:8984/cbc/categories')
 			]);
+			
 			const data = await Promise.all(res.map((r) => r.json()));
 
 			return {
@@ -38,9 +39,8 @@
 		Column,
 		Row
 	} from 'carbon-components-svelte';
-	import { AddAlt16, ValueVariable16, Delete16 } from 'carbon-icons-svelte';
+	import { AddAlt16, Delete16 } from 'carbon-icons-svelte';
 	import { validateForm } from '$lib/helpers/deliberationFormValidator';
-	import { getDeliberationTitle } from '$lib/helpers/deliberationHelpers';
 	import { form, formGroups, labelMap } from '$lib/types/form';
 
 	export let deliberation;
@@ -133,7 +133,7 @@
 	<title>Délibération</title>
 </svelte:head>
 
-<h1>{getDeliberationTitle(deliberation)}</h1>
+<h1>{deliberation.title ? deliberation.title : deliberation.altTitle}</h1>
 
 {#each formGroups as g}
 	<h4>{g.name}</h4>
@@ -141,18 +141,18 @@
 		{#if k === 'localisation'}
 			{#each g.subkeys as sk}
 				<div class="data-group">
-					<span class="data-group-label">{labelMap[sk]} :</span>
+					<span class="data-group-label">{labelMap[sk]}</span>
 					<span class="data-group-value">{deliberation[k][sk]}</span>
 				</div>
 			{/each}
 		{:else if k === 'title'}
 			<div class="data-group">
-				<span class="data-group-label">{labelMap[k]} :</span>
-				<span class="data-group-value">{getDeliberationTitle(deliberation)}</span>
+				<span class="data-group-label">{labelMap[k]}</span>
+				<span class="data-group-value">{deliberation.title ? deliberation.title : deliberation.altTitle}</span>
 			</div>
 		{:else}
 			<div class="data-group">
-				<span class="data-group-label">{labelMap[k]} :</span>
+				<span class="data-group-label">{labelMap[k]}</span>
 				<span class="data-group-value">{deliberation[k]}</span>
 			</div>
 		{/if}
@@ -167,7 +167,7 @@
 	<Modal
 		size="lg"
 		open
-		modalHeading={'Modifier la fiche :\n' + getDeliberationTitle(deliberation)}
+		modalHeading={'Modifier la fiche :\n' + deliberation.title ? deliberation.title : deliberation.altTitle}
 		primaryButtonText="Enregistrer les modifications"
 		secondaryButtonText="Annuler"
 		on:click:button--secondary={toggleForm}
