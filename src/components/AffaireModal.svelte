@@ -27,6 +27,7 @@
 	export let deliberations: IDeliberation[]
 	export let modalOpened: boolean
 	export let formPosted: boolean
+	export let selectedRowIds
 
 	let formError:boolean = false
 	let formErrorMsg:string = ''
@@ -132,11 +133,12 @@
 				if (res.ok){
 					modalOpened = false
 					formPosted = true
+					selectedRowIds = []
 				}
 				else
 					formError = true
 			})
-			.catch((err) => formErrorMsg = err)
+			.catch((err) => console.log(err))
 	}
 
 	

@@ -269,5 +269,6 @@
 		deliberations={selectedDeliberations} 
 		bind:modalOpened={affaireModalOpened} 
 		bind:formPosted={formPosted} 
+		bind:selectedRowIds={selectedRowIds}
 	/>
 {/if}
