@@ -1,4 +1,4 @@
-import type { ExpandedRowOptionsType } from "../../lib/types/expandedRowOptions"
+import type { ExpandedRowOptionsType } from "$lib/types/expandedRowOptions"
 
 const expandedRowOptions: ExpandedRowOptionsType = [
     {

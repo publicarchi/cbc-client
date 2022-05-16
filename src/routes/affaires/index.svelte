@@ -29,7 +29,7 @@
 	import { DocumentAdd16, Save16, Launch16 } from 'carbon-icons-svelte'
 	import ExpandedRow from '$components/ExpandedRow.svelte'
 	import expandedRowOptions from './_expandedRowOptions';
-	import type { IAffaire } from '../../lib/types/cbc'
+	import type { IAffaire } from '$lib/types/cbc'
 	
 	export let affaires: IAffaire[]
 	export let meta

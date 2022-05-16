@@ -21,8 +21,8 @@
 	import { Edit16, Launch16 } from 'carbon-icons-svelte'
 	import { onMount } from 'svelte'
 	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte'
-	import type { IAffaire, IDeliberation } from '../lib/types/cbc'
-	import { initEmptyAffaire } from '../lib/helpers/helpers'
+	import type { IAffaire, IDeliberation } from '$lib/types/cbc'
+	import { initEmptyAffaire } from '$lib/helpers/helpers'
 
 	export let deliberations: IDeliberation[]
 	export let modalOpened: boolean

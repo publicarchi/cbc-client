@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { resolvePath } from '$lib/helpers/resolvePath.ts'
+    import { resolvePath } from '$lib/helpers/resolvePath'
     import { Grid, Row, Column, Link, UnorderedList, ListItem } from 'carbon-components-svelte'
 
     export let options

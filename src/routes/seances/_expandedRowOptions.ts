@@ -1,21 +1,21 @@
-import type { ExpandedRowOptionsType } from "../../lib/types/expandedRowOptions"
+import type { ExpandedRowOptionsType } from "$lib/types/expandedRowOptions"
 
-const expandedRowOptions:ExpandedRowOptionsType = [
-    { 
-        head: 'Identidication de la séance', 
+const expandedRowOptions: ExpandedRowOptionsType = [
+    {
+        head: 'Identidication de la séance',
         type: 'meta',
         content: [
-            { key:'title', value: 'Titre' },
-            { key:'date', value: 'Date' },
-            { key:'cote', value: 'Cote' },
-            { key:'id', value: 'ID' }
-        ] 
+            { key: 'title', value: 'Titre' },
+            { key: 'date', value: 'Date' },
+            { key: 'cote', value: 'Cote' },
+            { key: 'id', value: 'ID' }
+        ]
     },
     {
         head: "Édifices et types d'interventions",
         type: 'meta',
         content: [
-            { key: 'types', value: 'Édifices'},
+            { key: 'types', value: 'Édifices' },
             { key: 'categories', value: 'Interventions' }
         ]
     },

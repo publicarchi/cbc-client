@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { DataTable, Button, Link } from 'carbon-components-svelte';
-	import { Launch16, Delete16, CheckmarkOutline16, MisuseOutline16 } from 'carbon-icons-svelte';
-	import type { IDeliberation } from '../lib/types/cbc'
+	import { DataTable, Button, Link } from 'carbon-components-svelte'
+	import { Launch16, Delete16, CheckmarkOutline16, MisuseOutline16 } from 'carbon-icons-svelte'
+	import type { IDeliberation } from '$lib/types/cbc'
 
 	export let deliberations: IDeliberation[]
 
-	const removeDeliberation = (id) => (deliberations = deliberations.filter((d) => d.id !== id));
+	const removeDeliberation = (id) => (deliberations = deliberations.filter((d) => d.id !== id))
 </script>
 
 <DataTable
@@ -28,7 +28,7 @@
 			{#if cell.value}
 				{cell.value}
 			{:else}
-				{deliberations.find(d => d.id === row.id).altTitle}
+				{deliberations.find((d) => d.id === row.id).altTitle}
 			{/if}
 		{:else if cell.key === 'overflow'}
 			<Button
