@@ -4,62 +4,31 @@
 			props: {
 				user: session.user
 			}
-		};
+		}
 	}
 </script>
 
 <script lang="ts">
-	import LoginModal from '$components/LoginModal.svelte';
-	import 'carbon-components-svelte/css/g10.css';
-	import {
-		Content,
-		Header,
-		HeaderNav,
-		HeaderNavItem,
-		HeaderUtilities,
-		HeaderActionLink
-	} from 'carbon-components-svelte';
+	import { Content } from 'carbon-components-svelte'
+	import { Header } from '$components/index'
 
-	export let user;
-	console.log('Hello ', user, 'from layout :o');
+	export let user
 
-	let loginModalOpened = false;
+	console.log('Hello ', user, 'from layout :o')
+	let loginModalOpened = false
 </script>
 
 <header>
-	<Header aria-label="CBC Project" company="cbc@publicarchi" href="/">
-		<HeaderNav>
-			<HeaderNavItem href="/seances" text="Séances" />
-			<HeaderNavItem href="/deliberations" text="Délibérations" />
-			<HeaderNavItem href="/affaires" text="Affaires" />
-			<HeaderNavItem href="/blogs" text="Blog" />
-
-			<HeaderNavItem href="/a-propos" text="À propos" />
-		</HeaderNav>
-		<HeaderUtilities>
-			{#if user}
-				<HeaderNavItem text={user} />
-				<HeaderNavItem text="Deconnexion" href="/oauth/github/logout" rel="external" />
-			{:else}
-				<HeaderNavItem text="Connexion" on:click={() => (loginModalOpened = true)} />
-			{/if}
-		</HeaderUtilities>
-	</Header>
-
-	<LoginModal bind:open={loginModalOpened} />
+	<Header {loginModalOpened} {user} />
 </header>
 
-<main>
-	<Content>
-		<slot />
-	</Content>
-</main>
+<slot />
 
 <footer>
 	<p>just a footer</p>
 </footer>
 
-<style>
+<!-- <style>
 	/* @import '../app.scss'; */
 
 	main {
@@ -80,4 +49,4 @@
 		align-items: center;
 		padding: 40px;
 	}
-</style>
+</style> -->

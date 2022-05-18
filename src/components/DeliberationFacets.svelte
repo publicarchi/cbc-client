@@ -38,7 +38,7 @@
 	}
 </script>
 
-<SideNav style="width: 100rem;" isOpen={true} ariaLabel="Filtres">
+<SideNav isOpen={true} ariaLabel="Filtres">
 	<SideNavItems>
 		<h4>Facettes</h4>
 		<SideNavDivider />

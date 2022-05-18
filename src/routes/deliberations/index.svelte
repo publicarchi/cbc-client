@@ -34,38 +34,37 @@
 		Modal
 	} from 'carbon-components-svelte'
 	import { DocumentAdd16, Launch16, Save16 } from 'carbon-icons-svelte'
-	import DeliberationFacets from '$components/DeliberationFacets.svelte'
-	import ExpandedRow from '$components/ExpandedRow.svelte'
+	import {
+		DeliberationFacets,
+		ExpandedRow,
+		AffaireModal,
+		ToastNotification,
+		Facets
+	} from '$components/index'
 	import expandedRowOptions from './_expandedRowOptions'
-	import AffaireModal from '$components/AffaireModal.svelte'
-	import ToastNotification from '$components/ToastNotification.svelte'
-	import { onMount } from 'svelte'
-	
+	import type { IDeliberation } from '$lib/types/cbc'
+	import type { IPaginationMeta } from '$lib/types/requests'
 
 	// export let user
-	export let deliberations
-	export let meta
-	export let types
-	export let categories
+	export let deliberations: IDeliberation[]
+	export let meta: IPaginationMeta
+	export let types: string[]
+	export let categories: string[]
 
-	let selectedRowIds = []
-	let expandedRowIds = []
-	let selectedDeliberations = []
+	let selectedRowIds: string[] = []
+	let expandedRowIds: string[] = []
+	let selectedDeliberations: IDeliberation[] = []
 
-	let userConnected = true
-	let toggleLoginModal = false
-	let affaireModalOpened = false
+	let userConnected: boolean = true
+	let toggleLoginModal: boolean = false
+	let affaireModalOpened: boolean = false
 
-	let searchQuery = ''
-	let filtered = []
+	let searchQuery: string = ''
+	let filtered: IDeliberation[] = []
 	let facets = []
 
-	let formPosted = false
+	let formPosted: boolean = false
 	$: console.log(formPosted)
-
-	onMount(() => {
-		filtered = filterDeliberations(searchQuery, facets, deliberations)
-	})
 
 	const fetchData = async () => {
 		let url = new URL('http://127.0.0.1:8984/cbc/deliberations')
@@ -89,6 +88,8 @@
 		}
 	}
 
+	// Search deliberations
+
 	const onPaginationUpdate = (e) => {
 		let { pageSize, page } = e.detail
 
@@ -107,36 +108,6 @@
 		}
 	}
 
-	// const containsSearchQuery = (deliberation) => {
-	// 	console.log('containsSearchQuery', searchQuery)
-	// 	return Object.keys(deliberation).some(k => {
-	// 		deliberation[k].toString().includes(searchQuery)})
-	// }
-
-	const filterDeliberations = (searchQuery, facets, deliberations) => {
-		if (deliberations) {
-			let filtered = deliberations
-
-			// Filter searchQuery
-			filtered = filtered.filter((d) => {
-				return Object.keys(d).some((k) =>
-					d[k].toString().toLowerCase().includes(searchQuery.toLowerCase())
-				)
-			})
-
-			// Facets
-			// console.log(filtered)
-
-			return filtered
-		} else {
-			return []
-		}
-	}
-
-	const facetsOnChange = (e) => {
-		console.log(e.detail.data)
-	}
-
 	const rowOnClick = (row) => {
 		if (expandedRowIds.includes(row.detail.id)) {
 			expandedRowIds.splice(expandedRowIds.indexOf(row.detail.id), 1)
@@ -147,8 +118,6 @@
 		expandedRowIds = expandedRowIds
 	}
 
-	$: filtered = filterDeliberations(searchQuery, facets, deliberations)
-
 	$: selectedDeliberations = deliberations.filter((d) => selectedRowIds.includes(d.id))
 </script>
 
@@ -156,97 +125,106 @@
 	<title>Délibérations</title>
 </svelte:head>
 
+<!-- <DeliberationFacets slot='aside' {types} {categories} /> -->
+
 {#if formPosted}
-	<ToastNotification 
+	<ToastNotification
 		lowContrast
 		kind="success"
 		title="Modifications prises en compte"
 		subtitle="L'affaire a été ajoutée à la base de données."
 		caption={new Date().toLocaleString()}
-		onClose={() => formPosted = !formPosted}
+		onClose={() => (formPosted = !formPosted)}
 	/>
 {/if}
 
-<DeliberationFacets on:change={facetsOnChange} {types} {categories} />
+<div class="container">
+	<div class="aside">
+		<Facets />
+	</div>
 
-<DataTable
-	sortable
-	expandable
-	selectable={true}
-	bind:selectedRowIds
-	bind:expandedRowIds
-	on:click:row={rowOnClick}
-	title="Liste des délibérations"
-	description="Ensemble des délibérations du Conseil des bâtiments civils."
-	headers={[
-		{ key: 'title', value: 'Titre' },
-		{ key: 'localisation.commune', value: 'Commune' },
-		{
-			key: 'recommendation',
-			value: 'Recommandation',
-			sort: (a, b) => {
-				//todo: trigger an onChangeFilterKey
-				console.log('Recommandation est focus !')
-				return a.localeCompare(b)
-			}
-		},
-		{ key: 'id', empty: true }
-	]}
-	rows={filtered}
->
-	<svelte:fragment slot="cell" let:cell let:row>
-		{#if cell.key === 'id'}
-			<Link icon={Launch16} href="/deliberations/{cell.value}" target="_blank">
-				{cell.value}
-			</Link>
-		{:else if cell.key === 'title'}
-			{#if cell.value}
-				{cell.value}
-			{:else}
-				{deliberations.find(d => d.id === row.id).altTitle}
+	<div class="content">
+		<DataTable
+			sortable
+			expandable
+			selectable={true}
+			bind:selectedRowIds
+			bind:expandedRowIds
+			on:click:row={rowOnClick}
+			title="Liste des délibérations"
+			description="Ensemble des délibérations du Conseil des bâtiments civils."
+			headers={[
+				{ key: 'title', value: 'Titre' },
+				{ key: 'localisation.commune', value: 'Commune' },
+				{
+					key: 'recommendation',
+					value: 'Recommandation',
+					sort: (a, b) => {
+						//todo: trigger an onChangeFilterKey
+						console.log('Recommandation est focus !')
+						return a.localeCompare(b)
+					}
+				},
+				{ key: 'id', empty: true }
+			]}
+			rows={deliberations}
+		>
+			<svelte:fragment slot="cell" let:cell let:row>
+				{#if cell.key === 'id'}
+					<Link icon={Launch16} href="/deliberations/{cell.value}" target="_blank">
+						{cell.value}
+					</Link>
+				{:else if cell.key === 'title'}
+					{#if cell.value}
+						{cell.value}
+					{:else}
+						{deliberations.find((d) => d.id === row.id).altTitle}
+					{/if}
+				{:else}
+					{cell.value}
+				{/if}
+			</svelte:fragment>
+
+			<svelte:fragment slot="expanded-row" let:row>
+				<ExpandedRow data={row} options={expandedRowOptions} />
+			</svelte:fragment>
+
+			<Toolbar>
+				<ToolbarBatchActions>
+					<Button icon={DocumentAdd16} on:click={onClickNewDocument}>Créer une affaire</Button>
+					<Button icon={Save16}>Exporter les fiches</Button>
+				</ToolbarBatchActions>
+				<ToolbarContent>
+					<ToolbarSearch expanded={true} persistent={true} bind:value={searchQuery} />
+					<ToolbarMenu>
+						<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
+						<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
+							>API documentation</ToolbarMenuItem
+						>
+						<ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
+					</ToolbarMenu>
+
+					<Button>Rechercher</Button>
+				</ToolbarContent>
+			</Toolbar>
+
+			<Pagination
+				on:update={onPaginationUpdate}
+				backwardText="Page précédente"
+				forwardText="Page suivante"
+				itemsPerPageText="Fiches par page :"
+				pageSizes={[20, 50, 100, 250, 500]}
+				bind:page={meta.currentPage}
+				bind:pageSize={meta.count}
+				bind:totalItems={meta.totalItems}
+			/>
+
+			{#if deliberations.length === 0}
+				<Loading />
 			{/if}
-		{:else}
-			{cell.value}
-		{/if}
-	</svelte:fragment>
-
-	<svelte:fragment slot="expanded-row" let:row>
-		<ExpandedRow data={row} options={expandedRowOptions} />
-	</svelte:fragment>
-
-	<Toolbar>
-		<ToolbarBatchActions>
-			<Button icon={DocumentAdd16} on:click={onClickNewDocument}>Créer une affaire</Button>
-			<Button icon={Save16}>Exporter les fiches</Button>
-		</ToolbarBatchActions>
-		<ToolbarContent>
-			<ToolbarSearch expanded={true} persistent={true} bind:value={searchQuery} />
-			<ToolbarMenu>
-				<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
-				<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
-					>API documentation</ToolbarMenuItem
-				>
-				<ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
-			</ToolbarMenu>
-			<Button>Create balancer</Button>
-		</ToolbarContent>
-	</Toolbar>
-
-	<Pagination
-		on:update={onPaginationUpdate}
-		backwardText="Page précédente"
-		forwardText="Page suivante"
-		itemsPerPageText="Fiches par page :"
-		pageSizes={[20, 50, 100, 250, 500]}
-		bind:page={meta.currentPage}
-		bind:pageSize={meta.count}
-		bind:totalItems={meta.totalItems}
-	/>
-
-	{#if deliberations.length === 0}
-		<Loading />
-	{/if}
-</DataTable>
+		</DataTable>
+	</div>
+</div>
 
 {#if toggleLoginModal}
 	<Modal
@@ -265,10 +243,29 @@
 {/if}
 
 {#if affaireModalOpened}
-	<AffaireModal 
-		deliberations={selectedDeliberations} 
-		bind:modalOpened={affaireModalOpened} 
-		bind:formPosted={formPosted} 
-		bind:selectedRowIds={selectedRowIds}
+	<AffaireModal
+		deliberations={selectedDeliberations}
+		bind:modalOpened={affaireModalOpened}
+		bind:formPosted
+		bind:selectedRowIds
 	/>
 {/if}
+
+<style>
+	.container {
+		display: grid;
+		grid-template-columns: repeat(1fr, 5);
+		grid-template-areas: '. aside content content content .';
+
+		gap: 1.5rem;
+		margin-top: 4rem;
+	}
+
+	.aside {
+		grid-area: aside;
+	}
+
+	.content {
+		grid-area: content;
+	}
+</style>
