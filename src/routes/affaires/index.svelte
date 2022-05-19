@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
 	export async function load({ fetch }) {
 		let data = await fetch('http://127.0.0.1:8984/cbc/affaires')
-								.then(res => res.json())
-								.catch(err => console.log(err))
+			.then((res) => res.json())
+			.catch((err) => console.log(err))
 		return {
 			props: { affaires: data.content, meta: data.meta }
 		}
@@ -26,11 +26,13 @@
 		ToolbarMenuItem,
 		ToolbarBatchActions
 	} from 'carbon-components-svelte'
-	import { DocumentAdd16, Save16, Launch16 } from 'carbon-icons-svelte'
+	import DocumentAdd from 'carbon-icons-svelte/lib/DocumentAdd.svelte'
+	import Save from 'carbon-icons-svelte/lib/Save.svelte'
+	import Launch from 'carbon-icons-svelte/lib/Launch.svelte'
 	import ExpandedRow from '$components/ExpandedRow.svelte'
-	import expandedRowOptions from './_expandedRowOptions';
+	import expandedRowOptions from './_expandedRowOptions'
 	import type { IAffaire } from '$lib/types/cbc'
-	
+
 	export let affaires: IAffaire[]
 	export let meta
 
@@ -39,8 +41,7 @@
 	let selectedRowIds = []
 	let expandedRowIds = []
 
-	console.log(affaires);
-	
+	console.log(affaires)
 
 	$: (meta) => {
 		fetch('http://127.0.0.1:8984/cbc/affaires')
@@ -94,7 +95,7 @@
 	>
 		<svelte:fragment slot="cell" let:cell let:row>
 			{#if cell.key === 'id'}
-				<Link icon={Launch16} href="/affaires/{cell.value}" target="_blank" />
+				<Link icon={Launch} href="/affaires/{cell.value}" target="_blank" />
 			{:else}
 				{cell.value}
 			{/if}
@@ -106,8 +107,8 @@
 
 		<Toolbar>
 			<ToolbarBatchActions>
-				<Button icon={DocumentAdd16}>Créer une affaire</Button>
-				<Button icon={Save16}>Exporter les fiches</Button>
+				<Button icon={DocumentAdd}>Créer une affaire</Button>
+				<Button icon={Save}>Exporter les fiches</Button>
 			</ToolbarBatchActions>
 			<ToolbarContent>
 				<ToolbarSearch expanded={true} persistent={true} bind:value={searchQuery} />

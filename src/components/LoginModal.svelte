@@ -7,9 +7,10 @@
 		TextInput,
 		ButtonSet,
 		Button
-	} from 'carbon-components-svelte';
-	import { LogoGithub32, LogoInstagram16 } from 'carbon-icons-svelte';
-	export let open = false;
+	} from 'carbon-components-svelte'
+	import LogoGithub from 'carbon-icons-svelte/lib/LogoGithub.svelte'
+	import LogoInstagram from 'carbon-icons-svelte/lib/LogoInstagram.svelte'
+	export let open = false
 </script>
 
 <Modal
@@ -35,7 +36,7 @@
 	<br />
 	<ButtonSet>
 		<a rel="external" href="/oauth/github/login">
-			<LogoGithub32 />
+			<LogoGithub size={32} />
 		</a>
 	</ButtonSet>
 </Modal>

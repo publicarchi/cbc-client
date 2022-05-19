@@ -33,7 +33,9 @@
 		Loading,
 		Modal
 	} from 'carbon-components-svelte'
-	import { DocumentAdd16, Launch16, Save16 } from 'carbon-icons-svelte'
+	import DocumentAdd from 'carbon-icons-svelte/lib/DocumentAdd.svelte'
+	import Launch from 'carbon-icons-svelte/lib/Launch.svelte'
+	import Save from 'carbon-icons-svelte/lib/Save.svelte'
 	import {
 		DeliberationFacets,
 		ExpandedRow,
@@ -171,7 +173,7 @@
 		>
 			<svelte:fragment slot="cell" let:cell let:row>
 				{#if cell.key === 'id'}
-					<Link icon={Launch16} href="/deliberations/{cell.value}" target="_blank">
+					<Link icon={Launch} href="/deliberations/{cell.value}" target="_blank">
 						{cell.value}
 					</Link>
 				{:else if cell.key === 'title'}
@@ -191,8 +193,8 @@
 
 			<Toolbar>
 				<ToolbarBatchActions>
-					<Button icon={DocumentAdd16} on:click={onClickNewDocument}>Créer une affaire</Button>
-					<Button icon={Save16}>Exporter les fiches</Button>
+					<Button icon={DocumentAdd} on:click={onClickNewDocument}>Créer une affaire</Button>
+					<Button icon={Save}>Exporter les fiches</Button>
 				</ToolbarBatchActions>
 				<ToolbarContent>
 					<ToolbarSearch expanded={true} persistent={true} bind:value={searchQuery} />

@@ -18,7 +18,8 @@
 		Column,
 		InlineNotification
 	} from 'carbon-components-svelte'
-	import { Edit16, Launch16 } from 'carbon-icons-svelte'
+	import Edit from 'carbon-icons-svelte/lib/Edit.svelte'
+	import Launch from 'carbon-icons-svelte/lib/Launch.svelte'
 	import { onMount } from 'svelte'
 	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte'
 	import type { IAffaire, IDeliberation } from '$lib/types/cbc'
@@ -29,12 +30,12 @@
 	export let formPosted: boolean
 	export let selectedRowIds
 
-	let formError:boolean = false
-	let formErrorMsg:string = ''
-	let affaire:IAffaire
+	let formError: boolean = false
+	let formErrorMsg: string = ''
+	let affaire: IAffaire
 
 	let currentIndex: 0 | 1 = 0
-	let searchValue:string = ''
+	let searchValue: string = ''
 	let suggestions: IAffaire[] = []
 	let searchSuggestions: IAffaire[] = []
 	let changeType: 'creation' | 'modification' = 'creation'
@@ -60,7 +61,7 @@
 		currentIndex += 1
 		console.log(affaire)
 	}
-	const onClickPrevious = () => currentIndex = 0
+	const onClickPrevious = () => (currentIndex = 0)
 
 	const onClickAffId = (id) => {
 		affaire = suggestions.concat(searchSuggestions).find((aff) => aff.id === id)
@@ -109,18 +110,17 @@
 		}
 	}
 
-	const postAffaire = (e) => {
-
+	const postAffaire = () => {
 		affaire.meta.push({
 			who: 'will@gmail.com',
 			when: new Date().toLocaleString(),
-			type: changeType 
+			type: changeType
 		})
 
 		console.log('[ + ] Posting new affaire', {
-				type: changeType,
-				affaire: affaire
-			})
+			type: changeType,
+			affaire: affaire
+		})
 
 		fetch('http://127.0.0.1:8984/cbc/affaires/post', {
 			method: 'POST',
@@ -130,18 +130,14 @@
 			})
 		})
 			.then((res) => {
-				if (res.ok){
+				if (res.ok) {
 					modalOpened = false
 					formPosted = true
 					selectedRowIds = []
-				}
-				else
-					formError = true
+				} else formError = true
 			})
 			.catch((err) => console.log(err))
 	}
-
-	
 </script>
 
 <Modal
@@ -191,14 +187,12 @@
 				>
 					<svelte:fragment slot="cell" let:cell>
 						{#if cell.key === 'id'}
-							<Link icon={Launch16} href="/deliberations/{cell.value}" target="_blank">
-								Accéder
-							</Link>
+							<Link icon={Launch} href="/deliberations/{cell.value}" target="_blank">Accéder</Link>
 						{:else if cell.key === 'overflow'}
 							<Button
 								kind="ghost"
 								size="small"
-								icon={Edit16}
+								icon={Edit}
 								on:click={() => onClickAffId(cell.value)}>Modifier</Button
 							>
 						{:else}
@@ -227,13 +221,10 @@
 			>
 				<svelte:fragment slot="cell" let:cell>
 					{#if cell.key === 'id'}
-						<Link icon={Launch16} href="/affaires/{cell.value}" target="_blank">Accéder</Link>
+						<Link icon={Launch} href="/affaires/{cell.value}" target="_blank">Accéder</Link>
 					{:else if cell.key === 'overflow'}
-						<Button
-							kind="ghost"
-							size="small"
-							icon={Edit16}
-							on:click={() => onClickAffId(cell.value)}>Modifier</Button
+						<Button kind="ghost" size="small" icon={Edit} on:click={() => onClickAffId(cell.value)}
+							>Modifier</Button
 						>
 					{:else}
 						{cell.value}
