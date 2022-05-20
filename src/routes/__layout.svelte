@@ -9,7 +9,6 @@
 </script>
 
 <script lang="ts">
-	import { Content } from 'carbon-components-svelte'
 	import { Header } from '$components/index'
 
 	export let user

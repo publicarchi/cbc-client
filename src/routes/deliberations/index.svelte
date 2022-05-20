@@ -127,8 +127,6 @@
 	<title>Délibérations</title>
 </svelte:head>
 
-<!-- <DeliberationFacets slot='aside' {types} {categories} /> -->
-
 {#if formPosted}
 	<ToastNotification
 		lowContrast
@@ -143,6 +141,7 @@
 <div class="container">
 	<div class="aside">
 		<Facets />
+		<!-- <DeliberationFacets {types} {categories} /> -->
 	</div>
 
 	<div class="content">
@@ -256,9 +255,8 @@
 <style>
 	.container {
 		display: grid;
-		grid-template-columns: repeat(1fr, 5);
+		grid-template-columns: 1.5em 1fr 1fr 1fr 1fr 1.5em;
 		grid-template-areas: '. aside content content content .';
-
 		gap: 1.5rem;
 		margin-top: 4rem;
 	}
