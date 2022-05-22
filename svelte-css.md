@@ -13,6 +13,10 @@
 - Kevin Powell, [Learn CSS Grid the easy way](https://www.youtube.com/watch?v=rg7Fvvl3taU) (video)
 - Kevin Powell, [Why CSS grid-area is the best property for laying out content](https://www.youtube.com/watch?v=duH4DLq5yoo) (video)
 
+### CSS flexbox
+
+- [A Complete Guide to Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+
 ### CSS vs SCSS
 
 - [Should We Use CSS or SCSS in 2021?](https://blog.bitsrc.io/will-scss-be-replaced-by-css3-754842d6b681)

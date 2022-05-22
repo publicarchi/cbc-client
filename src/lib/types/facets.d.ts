@@ -6,7 +6,7 @@ export interface IDeliberationFacets {
     departementAncien: string[]
     projectGenre: string[]
     buildingType: string[]
-    buildingCategory: string[]
+    buildingGenre: string[]
     administrativeObject: string[]
     participant: string[]
     date: string
