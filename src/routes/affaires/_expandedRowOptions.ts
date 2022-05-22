@@ -1,6 +1,6 @@
-import type { ExpandedRowOptionsType } from "$lib/types/expandedRowOptions"
+import type { IExpandedRowOption } from "$lib/types/expandedRowOptions"
 
-const expandedRowOptions: ExpandedRowOptionsType = [
+const expandedRowOptions: IExpandedRowOption[] = [
     {
         head: "Identidication de l'affaire",
         type: 'meta',

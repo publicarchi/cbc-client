@@ -1,7 +1,7 @@
-export function resolvePath(obj:object, path:string):unknown {
-    let current = { ... obj }
+export function resolvePath(obj: object, path: string): string | object | object[] {
+    let current = { ...obj }
     path.split('.').forEach(attr => {
-        try{
+        try {
             current = current[attr]
         } catch {
             throw new Error(`resolvePath: cannot get attribute ${attr} from ${current}`)

@@ -1,6 +1,6 @@
-import type { ExpandedRowOptionsType } from "$lib/types/expandedRowOptions"
+import type { IExpandedRowOption } from "$lib/types/expandedRowOptions"
 
-const expandedRowOptions: ExpandedRowOptionsType = [
+const expandedRowOptions: IExpandedRowOption[] = [
     {
         head: 'Identification de la délibération',
         type: 'meta',
@@ -9,14 +9,6 @@ const expandedRowOptions: ExpandedRowOptionsType = [
             { key: 'altTitle', value: 'Titre (alt.)' },
             { key: 'date', value: 'Date de la séance' },
             { key: 'id', value: 'ID' }
-        ]
-    },
-    {
-        head: "Édifices et types d'interventions",
-        type: 'meta',
-        content: [
-            { key: 'types', value: 'Édifices' },
-            { key: 'categories', value: 'Interventions' }
         ]
     },
     {
@@ -29,6 +21,14 @@ const expandedRowOptions: ExpandedRowOptionsType = [
             { key: 'localisation.departementDecimal', value: 'Code Dpt.' },
             { key: 'localisation.departementAncien', value: 'Département ancien' },
             { key: 'localisation.adress', value: 'Adresse' },
+        ]
+    },
+    {
+        head: "Édifices et types d'interventions",
+        type: 'meta',
+        content: [
+            { key: 'types', value: 'Édifices' },
+            { key: 'categories', value: 'Interventions' }
         ]
     },
     {
