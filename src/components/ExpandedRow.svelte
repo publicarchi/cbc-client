@@ -27,22 +27,24 @@
 	{/each}
 
 	{#each listOptions as opt}
-		<h4>{opt.head}</h4>
-		<UnorderedList>
+		<div class="section">
+			<h4>{opt.head}</h4>
 			{#if typeof opt.content === 'string' && typeof resolvePath(data, opt.content) === 'object'}
 				{#each resolvePath(data, opt.content) as item}
 					{#if typeof item === 'object'}
-						<ListItem>
+						<div class="data-group">
 							{#if opt.link}
-								<Link href={`${opt.link.path}/${resolvePath(item, opt.link.slug)}`}>
-									{resolvePath(item, opt.link.text)}
+								<Link class="list" href={`${opt.link.path}/${resolvePath(item, opt.link.slug)}`}>
+									<span style="font-size: 11px;">
+										{resolvePath(item, opt.link.text)}
+									</span>
 								</Link>
 							{/if}
-						</ListItem>
+						</div>
 					{/if}
 				{/each}
 			{/if}
-		</UnorderedList>
+		</div>
 	{/each}
 </div>
 
@@ -56,8 +58,9 @@
 	.container {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
-		gap: 1em;
+		gap: var(--gap, 1em);
 		margin-bottom: 1.5em;
+		font-size: var(--font-small, 11px);
 	}
 	.data-group {
 		display: flex;
@@ -65,11 +68,11 @@
 	}
 	.data-group-label {
 		font-weight: bold;
-		font-size: 11px;
+		font-size: --font-small;
 		width: 110px;
 	}
 	.data-group-value {
-		font-size: 11px;
+		font-size: --font-small;
 		width: 180px;
 	}
 </style>
