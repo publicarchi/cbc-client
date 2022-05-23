@@ -86,53 +86,57 @@
 	<title>Séances</title>
 </svelte:head>
 
-<DataTable
-	title="Liste des séances"
-	bind:selectedRowIds
-	bind:expandedRowIds
-	on:click:row={rowOnClick}
-	expandable
-	rows={meetings}
-	headers={[
-		{ key: 'title', value: 'Titre' },
-		{ key: 'date', value: 'Date' },
-		{ key: 'cote', value: 'Cote' }
-	]}
->
-	<svelte:fragment slot="cell" let:cell>
-		{#if Array.isArray(cell.value)}
-			{cell.value.join(', ')}
-		{:else}
-			{cell.value}
-		{/if}
-	</svelte:fragment>
+<div class="cbc-aside" />
 
-	<svelte:fragment slot="expanded-row" let:row>
-		<ExpandedRow data={meetings.find((m) => m.id === row.id)} options={expandedRowOptions} />
-	</svelte:fragment>
+<div class="cbc-content">
+	<DataTable
+		title="Liste des séances"
+		bind:selectedRowIds
+		bind:expandedRowIds
+		on:click:row={rowOnClick}
+		expandable
+		rows={meetings}
+		headers={[
+			{ key: 'title', value: 'Titre' },
+			{ key: 'date', value: 'Date' },
+			{ key: 'cote', value: 'Cote' }
+		]}
+	>
+		<svelte:fragment slot="cell" let:cell>
+			{#if Array.isArray(cell.value)}
+				{cell.value.join(', ')}
+			{:else}
+				{cell.value}
+			{/if}
+		</svelte:fragment>
 
-	<Toolbar>
-		<ToolbarContent>
-			<ToolbarSearch expanded={true} persistent={true} placeholder="rechercher une séance" />
-			<ToolbarMenu>
-				<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
-				<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
-					>API documentation</ToolbarMenuItem
-				>
-				<ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
-			</ToolbarMenu>
-			<Button>Rechercher</Button>
-		</ToolbarContent>
-	</Toolbar>
+		<svelte:fragment slot="expanded-row" let:row>
+			<ExpandedRow data={meetings.find((m) => m.id === row.id)} options={expandedRowOptions} />
+		</svelte:fragment>
 
-	<Pagination
-		on:update={onPaginationUpdate}
-		backwardText="Page précédente"
-		forwardText="Page suivante"
-		itemsPerPageText="Fiches par page :"
-		pageSizes={[20, 50, 100, 250, 500]}
-		bind:page={meta.currentPage}
-		bind:pageSize={meta.count}
-		bind:totalItems={meta.totalItems}
-	/>
-</DataTable>
+		<Toolbar>
+			<ToolbarContent>
+				<ToolbarSearch expanded={true} persistent={true} placeholder="rechercher une séance" />
+				<ToolbarMenu>
+					<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
+					<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
+						>API documentation</ToolbarMenuItem
+					>
+					<ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
+				</ToolbarMenu>
+				<Button>Rechercher</Button>
+			</ToolbarContent>
+		</Toolbar>
+
+		<Pagination
+			on:update={onPaginationUpdate}
+			backwardText="Page précédente"
+			forwardText="Page suivante"
+			itemsPerPageText="Fiches par page :"
+			pageSizes={[20, 50, 100, 250, 500]}
+			bind:page={meta.currentPage}
+			bind:pageSize={meta.count}
+			bind:totalItems={meta.totalItems}
+		/>
+	</DataTable>
+</div>

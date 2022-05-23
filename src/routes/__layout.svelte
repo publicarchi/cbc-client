@@ -21,24 +21,28 @@
 	<Header {loginModalOpened} {user} />
 </header>
 
-<slot />
+<div class="container">
+	<slot />
+</div>
 
 <footer>
 	<p>just a footer</p>
 </footer>
 
-<!-- <style>
-	/* @import '../app.scss'; */
+<style>
+	.container {
+		display: grid;
+		grid-template-columns: 1.5em 1fr 1fr 1fr 1fr 1.5em;
+		grid-template-areas: '. aside content content content .';
+		gap: 1.5rem;
+		margin-top: 4rem;
+	}
 
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 1024px;
-		margin: 0 auto;
-		box-sizing: border-box;
+	:global(.cbc-aside) {
+		grid-area: aside;
+	}
+	:global(.cbc-content) {
+		grid-area: content;
 	}
 
 	footer {
@@ -48,4 +52,4 @@
 		align-items: center;
 		padding: 40px;
 	}
-</style> -->
+</style>

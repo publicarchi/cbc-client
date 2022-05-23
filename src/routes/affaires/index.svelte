@@ -12,9 +12,6 @@
 <script lang="ts">
 	import {
 		DataTable,
-		Grid,
-		Row,
-		Column,
 		Button,
 		Loading,
 		Link,
@@ -75,7 +72,8 @@
 	<title>Affaires</title>
 </svelte:head>
 
-<Grid>
+<div class="cbc-aside" />
+<div class="cbc-content">
 	<DataTable
 		on:click:row={rowOnClick}
 		title="Liste des affaires"
@@ -138,4 +136,4 @@
 			<Loading />
 		{/if}
 	</DataTable>
-</Grid>
+</div>

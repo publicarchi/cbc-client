@@ -113,6 +113,93 @@
 	<title>Délibérations</title>
 </svelte:head>
 
+<div class="cbc-aside">
+	<Facets />
+	<!-- <DeliberationFacets {types} {categories} /> -->
+</div>
+
+<div class="cbc-content">
+	<DataTable
+		sortable
+		expandable
+		selectable={true}
+		bind:selectedRowIds
+		bind:expandedRowIds
+		on:click:row={rowOnClick}
+		title="Liste des délibérations"
+		description="Ensemble des délibérations du Conseil des bâtiments civils."
+		headers={[
+			{ key: 'title', value: 'Titre' },
+			{ key: 'localisation.commune', value: 'Commune' },
+			{
+				key: 'recommendation',
+				value: 'Recommandation',
+				sort: (a, b) => {
+					//todo: trigger an onChangeFilterKey
+					console.log('Recommandation est focus !')
+					return a.localeCompare(b)
+				}
+			},
+			{ key: 'id', empty: true }
+		]}
+		rows={deliberations}
+	>
+		<svelte:fragment slot="cell" let:cell let:row>
+			{#if cell.key === 'id'}
+				<Link icon={Launch} href="/deliberations/{cell.value}" target="_blank">
+					{cell.value}
+				</Link>
+			{:else if cell.key === 'title'}
+				{#if cell.value}
+					{cell.value}
+				{:else}
+					{deliberations.find((d) => d.id === row.id).altTitle}
+				{/if}
+			{:else}
+				{cell.value}
+			{/if}
+		</svelte:fragment>
+
+		<svelte:fragment slot="expanded-row" let:row>
+			<ExpandedRow data={deliberations.find((d) => d.id === row.id)} options={expandedRowOptions} />
+		</svelte:fragment>
+
+		<Toolbar>
+			<ToolbarBatchActions>
+				<Button icon={DocumentAdd} on:click={onClickNewDocument}>Créer une affaire</Button>
+				<Button icon={Save}>Exporter les fiches</Button>
+			</ToolbarBatchActions>
+			<ToolbarContent>
+				<ToolbarSearch expanded={true} persistent={true} bind:value={searchQuery} />
+				<ToolbarMenu>
+					<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
+					<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
+						>API documentation</ToolbarMenuItem
+					>
+					<ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
+				</ToolbarMenu>
+
+				<Button>Rechercher</Button>
+			</ToolbarContent>
+		</Toolbar>
+
+		<Pagination
+			on:update={onPaginationUpdate}
+			backwardText="Page précédente"
+			forwardText="Page suivante"
+			itemsPerPageText="Fiches par page :"
+			pageSizes={[20, 50, 100, 250, 500]}
+			bind:page={meta.currentPage}
+			bind:pageSize={meta.count}
+			bind:totalItems={meta.totalItems}
+		/>
+
+		{#if deliberations.length === 0}
+			<Loading />
+		{/if}
+	</DataTable>
+</div>
+
 {#if formPosted}
 	<ToastNotification
 		lowContrast
@@ -123,98 +210,6 @@
 		onClose={() => (formPosted = !formPosted)}
 	/>
 {/if}
-
-<div class="container">
-	<div class="aside">
-		<Facets />
-		<!-- <DeliberationFacets {types} {categories} /> -->
-	</div>
-
-	<div class="content">
-		<DataTable
-			sortable
-			expandable
-			selectable={true}
-			bind:selectedRowIds
-			bind:expandedRowIds
-			on:click:row={rowOnClick}
-			title="Liste des délibérations"
-			description="Ensemble des délibérations du Conseil des bâtiments civils."
-			headers={[
-				{ key: 'title', value: 'Titre' },
-				{ key: 'localisation.commune', value: 'Commune' },
-				{
-					key: 'recommendation',
-					value: 'Recommandation',
-					sort: (a, b) => {
-						//todo: trigger an onChangeFilterKey
-						console.log('Recommandation est focus !')
-						return a.localeCompare(b)
-					}
-				},
-				{ key: 'id', empty: true }
-			]}
-			rows={deliberations}
-		>
-			<svelte:fragment slot="cell" let:cell let:row>
-				{#if cell.key === 'id'}
-					<Link icon={Launch} href="/deliberations/{cell.value}" target="_blank">
-						{cell.value}
-					</Link>
-				{:else if cell.key === 'title'}
-					{#if cell.value}
-						{cell.value}
-					{:else}
-						{deliberations.find((d) => d.id === row.id).altTitle}
-					{/if}
-				{:else}
-					{cell.value}
-				{/if}
-			</svelte:fragment>
-
-			<svelte:fragment slot="expanded-row" let:row>
-				<ExpandedRow
-					data={deliberations.find((d) => d.id === row.id)}
-					options={expandedRowOptions}
-				/>
-			</svelte:fragment>
-
-			<Toolbar>
-				<ToolbarBatchActions>
-					<Button icon={DocumentAdd} on:click={onClickNewDocument}>Créer une affaire</Button>
-					<Button icon={Save}>Exporter les fiches</Button>
-				</ToolbarBatchActions>
-				<ToolbarContent>
-					<ToolbarSearch expanded={true} persistent={true} bind:value={searchQuery} />
-					<ToolbarMenu>
-						<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
-						<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
-							>API documentation</ToolbarMenuItem
-						>
-						<ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
-					</ToolbarMenu>
-
-					<Button>Rechercher</Button>
-				</ToolbarContent>
-			</Toolbar>
-
-			<Pagination
-				on:update={onPaginationUpdate}
-				backwardText="Page précédente"
-				forwardText="Page suivante"
-				itemsPerPageText="Fiches par page :"
-				pageSizes={[20, 50, 100, 250, 500]}
-				bind:page={meta.currentPage}
-				bind:pageSize={meta.count}
-				bind:totalItems={meta.totalItems}
-			/>
-
-			{#if deliberations.length === 0}
-				<Loading />
-			{/if}
-		</DataTable>
-	</div>
-</div>
 
 {#if toggleLoginModal}
 	<Modal
@@ -240,21 +235,3 @@
 		bind:selectedRowIds
 	/>
 {/if}
-
-<style>
-	.container {
-		display: grid;
-		grid-template-columns: 1.5em 1fr 1fr 1fr 1fr 1.5em;
-		grid-template-areas: '. aside content content content .';
-		gap: 1.5rem;
-		margin-top: 4rem;
-	}
-
-	.aside {
-		grid-area: aside;
-	}
-
-	.content {
-		grid-area: content;
-	}
-</style>
