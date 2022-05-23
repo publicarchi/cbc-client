@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
 	export async function load({ fetch }) {
-		const response = await fetch('http://127.0.0.1:8984/cbc/meetings');		
+		const response = await fetch('http://127.0.0.1:8984/cbc/meetings')
 		const data = await response.json()
 
 		// create temporary ids
@@ -9,8 +9,8 @@
 			return d
 		})
 
-		return { 
-			props: { meetings: content, meta: data.meta } 
+		return {
+			props: { meetings: content, meta: data.meta }
 		}
 	}
 </script>
@@ -31,7 +31,7 @@
 	} from 'carbon-components-svelte'
 	import ExpandedRow from '$components/ExpandedRow.svelte'
 	import expandedRowOptions from './_expandedRowOptions'
- 
+
 	export let meetings
 	export let meta
 
@@ -48,7 +48,7 @@
 		// Function doesnt allow URL object as parameter -> needs type string
 		const res = await fetch(url.toString())
 		const data = await res.json()
-		
+
 		// create temporary ids
 		meetings = data.content.map((d, i) => {
 			d['id'] = i
@@ -108,12 +108,12 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="expanded-row" let:row>
-		<ExpandedRow  data={row} options={expandedRowOptions}/>
+		<ExpandedRow data={meetings.find((m) => m.id === row.id)} options={expandedRowOptions} />
 	</svelte:fragment>
 
 	<Toolbar>
 		<ToolbarContent>
-			<ToolbarSearch expanded={true} persistent={true} placeholder="rechercher une séance"/>
+			<ToolbarSearch expanded={true} persistent={true} placeholder="rechercher une séance" />
 			<ToolbarMenu>
 				<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
 				<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"
@@ -126,13 +126,13 @@
 	</Toolbar>
 
 	<Pagination
-			on:update={onPaginationUpdate}
-			backwardText="Page précédente"
-			forwardText="Page suivante"
-			itemsPerPageText="Fiches par page :"
-			pageSizes={[20, 50, 100, 250, 500]}
-			bind:page={meta.currentPage}
-			bind:pageSize={meta.count}
-			bind:totalItems={meta.totalItems}
-		/>
+		on:update={onPaginationUpdate}
+		backwardText="Page précédente"
+		forwardText="Page suivante"
+		itemsPerPageText="Fiches par page :"
+		pageSizes={[20, 50, 100, 250, 500]}
+		bind:page={meta.currentPage}
+		bind:pageSize={meta.count}
+		bind:totalItems={meta.totalItems}
+	/>
 </DataTable>

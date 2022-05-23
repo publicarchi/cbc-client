@@ -102,7 +102,7 @@
 		</svelte:fragment>
 
 		<svelte:fragment slot="expanded-row" let:row>
-			<ExpandedRow data={row} options={expandedRowOptions} />
+			<ExpandedRow data={affaires.find((a) => a.id === row.id)} options={expandedRowOptions} />
 		</svelte:fragment>
 
 		<Toolbar>

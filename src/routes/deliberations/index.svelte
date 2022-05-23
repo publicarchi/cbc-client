@@ -1,18 +1,12 @@
 <script context="module" lang="ts">
 	export async function load({ fetch }) {
-		const res = await Promise.all([
-			fetch('http://127.0.0.1:8984/cbc/deliberations'),
-			fetch('http://127.0.0.1:8984/cbc/types'),
-			fetch('http://127.0.0.1:8984/cbc/categories')
-		])
-		const data = await Promise.all(res.map((r) => r.json()))
+		const res = await fetch('http://127.0.0.1:8984/cbc/deliberations')
+		const data = await res.json()
 
 		return {
 			props: {
-				meta: data[0].meta,
-				deliberations: data[0].content,
-				types: data[1],
-				categories: data[2]
+				meta: data.meta,
+				deliberations: data.content
 			}
 		}
 	}
@@ -36,13 +30,7 @@
 	import DocumentAdd from 'carbon-icons-svelte/lib/DocumentAdd.svelte'
 	import Launch from 'carbon-icons-svelte/lib/Launch.svelte'
 	import Save from 'carbon-icons-svelte/lib/Save.svelte'
-	import {
-		DeliberationFacets,
-		ExpandedRow,
-		AffaireModal,
-		ToastNotification,
-		Facets
-	} from '$components/index'
+	import { ExpandedRow, AffaireModal, ToastNotification, Facets } from '$components'
 	import expandedRowOptions from './_expandedRowOptions'
 	import type { IDeliberation } from '$lib/types/cbc'
 	import type { IPaginationMeta } from '$lib/types/requests'
@@ -50,8 +38,6 @@
 	// export let user
 	export let deliberations: IDeliberation[]
 	export let meta: IPaginationMeta
-	export let types: string[]
-	export let categories: string[]
 
 	let selectedRowIds: string[] = []
 	let expandedRowIds: string[] = []
@@ -187,7 +173,10 @@
 			</svelte:fragment>
 
 			<svelte:fragment slot="expanded-row" let:row>
-				<ExpandedRow data={row} options={expandedRowOptions} />
+				<ExpandedRow
+					data={deliberations.find((d) => d.id === row.id)}
+					options={expandedRowOptions}
+				/>
 			</svelte:fragment>
 
 			<Toolbar>

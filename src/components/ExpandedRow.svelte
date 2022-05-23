@@ -3,10 +3,9 @@
 	import { Link, UnorderedList, ListItem } from 'carbon-components-svelte'
 	import type { IDeliberation, IAffaire } from '$lib/types/cbc'
 	import type { IExpandedRowOption } from '$lib/types/expandedRowOptions'
-	import { object } from 'yup/lib/locale'
 
 	export let options: IExpandedRowOption[]
-	export let data: IDeliberation[] | IAffaire[]
+	export let data: IDeliberation | IAffaire
 
 	let metaOptions = options.filter((o) => o.type === 'meta')
 	let listOptions = options.filter((o) => o.type === 'list')
