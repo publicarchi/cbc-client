@@ -4,6 +4,7 @@
 
 - Rich Harris, [The zen of Just Writing CSS](https://svelte.dev/blog/the-zen-of-just-writing-css)
 - CSS Tricks, [What I Like About Writing Styles with Svelte](https://css-tricks.com/what-i-like-about-writing-styles-with-svelte/)
+- [Dynamic css classes in Svelte](https://imfeld.dev/writing/svelte_dynamic_css)
 
 ### CSS grid
 
