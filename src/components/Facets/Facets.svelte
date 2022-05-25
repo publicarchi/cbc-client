@@ -50,8 +50,6 @@
 		const div = document.getElementById(id)
 		div.hidden = !div.hidden
 	}
-
-	$: console.log(facets)
 </script>
 
 <div class="container">
@@ -149,9 +147,7 @@
 	h5 {
 		font-size: small;
 	}
-	span {
-		align-self: flex-end;
-	}
+
 	.facet-group-header {
 		display: flex;
 		justify-content: space-between;

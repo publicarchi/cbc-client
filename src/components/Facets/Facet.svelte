@@ -36,6 +36,21 @@
 
 	.group-label-icon {
 		margin-left: 0.5em;
-		animation: rotation 2s linear infinite;
+		animation: button-loading-spinner 1s ease infinite;
+	}
+
+	.group-label-icon {
+		transition-property: transform;
+		animation-name: svelte-spinner_infinite-spin;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+	}
+	@keyframes svelte-spinner_infinite-spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(-360deg);
+		}
 	}
 </style>
