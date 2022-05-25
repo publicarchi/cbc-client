@@ -1,15 +1,15 @@
 <script context="module" lang="ts">
-	export async function load({ fetch, page }) {
-		const req = `http://127.0.0.1:8984/cbc/affaires/${page.params.conbavilId}`
+	export async function load({ fetch, params }) {
+		const req = `http://127.0.0.1:8984/cbc/affaires/${params.conbavilId}`
 		const response = await fetch(req)
-		if (!response.ok) 
+		if (!response.ok)
 			return {
 				status: response.status,
 				error: new Error(`Oups, l'affaire n'a pas pu être chargée. ${req}`)
 			}
 
 		const affaire = await response.json()
-		return { props : { affaire }}
+		return { props: { affaire } }
 	}
 </script>
 
@@ -27,25 +27,23 @@
 	import { createForm } from 'felte'
 	import * as yup from 'yup'
 	import { validator } from '@felte/validator-yup'
-	import { validateSchema,  warnSchema } from './_formValidators'
-	import ToastNotification from '$components/ToastNotification.svelte'
+	import { validateSchema, warnSchema } from './_formValidators'
+	import { ToastNotification } from '$components'
 	import type { IAffaire } from '$lib/types/cbc'
 
-	export let affaire:IAffaire
+	export let affaire: IAffaire
 
-	let categories:string[] = []
-	let types:string[] = []
-	let selectedTypes:string[] = []
-	let selectedCategories:string[] = []
+	let categories: string[] = []
+	let types: string[] = []
 
-	let affaireForm:IAffaire = { ...affaire }
+	let affaireForm: IAffaire = { ...affaire }
 	let modalOpened = false
 	let updated = false
 
 	onMount(async () => {
 		[types, categories] = await Promise.all([
-			fetch('http://127.0.0.1:8984/cbc/types').then(res => res.json()),
-			fetch('http://127.0.0.1:8984/cbc/categories').then(res => res.json())
+			fetch('http://127.0.0.1:8984/cbc/types').then((res) => res.json()),
+			fetch('http://127.0.0.1:8984/cbc/categories').then((res) => res.json())
 		])
 	})
 
@@ -54,14 +52,14 @@
 			// Post data with fetch
 		},
 		onSuccess(response, context) {
-      		// Do something with the returned value from `onSubmit`.
+			// Do something with the returned value from `onSubmit`.
 		},
 		onError(err, context) {
 			// Do something with the error thrown from `onSubmit`.
 		},
 		extend: [
-			validator({ schema: validateSchema }),	
-			validator({ schema: warnSchema, level: 'warning'}),	
+			validator({ schema: validateSchema }),
+			validator({ schema: warnSchema, level: 'warning' })
 		]
 	})
 </script>
@@ -70,59 +68,55 @@
 	<title>Affaire</title>
 </svelte:head>
 
-<h1>{affaire.title}</h1>
+<div class="cbc-container">
+	<div class="cbc-content">
+		<h1>{affaire.title}</h1>
 
-{#if updated}
-	<ToastNotification
-		lowContrast
-		kind="success"
-		title="Mise à jour effectuée"
-		subtitle="Merci de recharger la page pour que les modifications soient apparentes."
-		caption={new Date().toLocaleString()}
-	/>
-{/if}
+		<h4>Localisation</h4>
+		<div class="data-group">
+			<span class="data-group-label">Commune</span>
+			<span class="data-group-value">{affaire.localisation.commune}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Département</span>
+			<span class="data-group-value">{affaire.localisation.departement}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Département ancien</span>
+			<span class="data-group-value">{affaire.localisation.departementAncien}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Région</span>
+			<span class="data-group-value">{affaire.localisation.region}</span>
+		</div>
 
-<h4>Localisation</h4>
-<div class="data-group">
-	<span class="data-group-label">Commune</span>
-	<span class="data-group-value">{affaire.localisation.commune}</span>
+		<h4>Types de l'affaire</h4>
+		<span class="data-group-value">{affaire.types}</span>
+		<ul>
+			{#each affaire.types as t}
+				<span class="data-group-value">{t}</span>
+			{/each}
+		</ul>
+
+		<h4>Délibérations</h4>
+		<ul>
+			{#each affaire.deliberations as d}
+				<li>
+					<Link href="http://127.0.0.1:3000/deliberations/{d.id}"
+						>{d.title ? d.title : d.altTitle}</Link
+					>
+				</li>
+			{/each}
+		</ul>
+
+		<br />
+		<br />
+
+		<!-- on:click:button--primary -->
+		<Button on:click={() => (modalOpened = true)}>Modifier la fiche</Button>
+	</div>
 </div>
-<div class="data-group">
-	<span class="data-group-label">Département</span>
-	<span class="data-group-value">{affaire.localisation.departement}</span>
-</div>
-<div class="data-group">
-	<span class="data-group-label">Département ancien</span>
-	<span class="data-group-value">{affaire.localisation.departementAncien}</span>
-</div>
-<div class="data-group">
-	<span class="data-group-label">Région</span>
-	<span class="data-group-value">{affaire.localisation.region}</span>
-</div>
 
-<h4>Types de l'affaire</h4>
-<span class="data-group-value">{affaire.types}</span>
-<ul>
-	{#each affaire.types as t}
-		<span class="data-group-value">{t}</span>
-	{/each}
-</ul>
-
-<h4>Délibérations</h4>
-<ul>
-	{#each affaire.deliberations as d}
-		<li>
-			<Link href="http://127.0.0.1:3000/deliberations/{d.id}">{d.title ? d.title : d.altTitle}</Link
-			>
-		</li>
-	{/each}
-</ul>
-
-<br />
-<br />
-
-<!-- on:click:button--primary -->
-<Button on:click={() => (modalOpened = true)}>Modifier la fiche</Button>
 <Modal
 	bind:open={modalOpened}
 	on:close={() => (modalOpened = false)}
@@ -136,53 +130,63 @@
 >
 	<form use:form>
 		<h4>Identification de l'affaire</h4>
-		<div class='form-item'>
-			<label class='form-label' for='title'>Titre</label>
-			<input type='text' name='title' />
+		<div class="form-item">
+			<label class="form-label" for="title">Titre</label>
+			<input type="text" name="title" />
 		</div>
 
 		<h4>Localisation</h4>
-		<div class='form-item'>
-			<label class='form-label' for='localisation.commune'>Commune</label>
-			<input type='text' name='localisation.commune' />
+		<div class="form-item">
+			<label class="form-label" for="localisation.commune">Commune</label>
+			<input type="text" name="localisation.commune" />
 		</div>
-		<div class='form-item'>
-			<label class='form-label' for='localisation.departementDecimal'>Département (décimal)</label>
-			<input type='number' name='localisation.departementDecimal' />
+		<div class="form-item">
+			<label class="form-label" for="localisation.departementDecimal">Département (décimal)</label>
+			<input type="number" name="localisation.departementDecimal" />
 		</div>
-		<div class='form-item'>
-			<label class='form-label' for='localisation.departement'>Département</label>
-			<input type='text' name='localisation.departement' />
+		<div class="form-item">
+			<label class="form-label" for="localisation.departement">Département</label>
+			<input type="text" name="localisation.departement" />
 		</div>
-		<div class='form-item'>
-			<label class='form-label' for='localisation.departementAncien'>Département ancien</label>
-			<input type='text' name='localisation.departementAncien' />
+		<div class="form-item">
+			<label class="form-label" for="localisation.departementAncien">Département ancien</label>
+			<input type="text" name="localisation.departementAncien" />
 		</div>
-		<div class='form-item'>
-			<label class='form-label' for='localisation.region'>Région</label>
-			<input type='text' name='localisation.region' />
+		<div class="form-item">
+			<label class="form-label" for="localisation.region">Région</label>
+			<input type="text" name="localisation.region" />
 		</div>
-		
+
 		<h4>Édifice et types d'interventions</h4>
-		<div class='for-item'>
-			<label class='form-label' for='type'>Types</label>
-			<input list='types' name='type'/>
+		<div class="for-item">
+			<label class="form-label" for="type">Types</label>
+			<input list="types" name="type" />
 			{#each affaire.types as t}
-				<div class='form-item-list'>{t}</div>
+				<div class="form-item-list">{t}</div>
 			{/each}
 		</div>
 	</form>
 </Modal>
 
-<datalist id='types'>
+{#if updated}
+	<ToastNotification
+		lowContrast
+		kind="success"
+		title="Mise à jour effectuée"
+		subtitle="Merci de recharger la page pour que les modifications soient apparentes."
+		caption={new Date().toLocaleString()}
+	/>
+{/if}
+
+<datalist id="types">
 	{#each types as t}
-		<option value={t}/>
+		<option value={t} />
 	{/each}
 </datalist>
 
-<datalist id='categories'>
+<datalist id="categories">
 	{#each categories as c}
-		<option value={c}/>
+		<option value={c} />
 	{/each}
 </datalist>
 

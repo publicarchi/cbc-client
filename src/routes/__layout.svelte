@@ -1,41 +1,55 @@
 <script context="module">
-	export async function load({ session }) {
+	export async function load({ url }) {
 		return {
 			props: {
-				user: session.user
+				url
 			}
 		}
 	}
 </script>
 
 <script lang="ts">
-	import { Header } from '$components/index'
+	import { Header } from '$components'
 
-	export let user
+	export let url
 
-	console.log('Hello ', user, 'from layout :o')
+	// This sets the content layout depending on the page
+	let route = url.pathname
+	let containerClass =
+		route === '/' || route === '/blogs' || route === '/a-propos' ? 'container' : 'container-grid'
+
+	// console.log('PATHNAME', url.pathname)
+	// console.log('containerClass', containerClass)
+
 	let loginModalOpened = false
+	let user = {}
 </script>
 
 <header>
 	<Header {loginModalOpened} {user} />
 </header>
 
-<div class="container">
-	<slot />
-</div>
+<slot />
 
 <footer>
 	<p>just a footer</p>
 </footer>
 
 <style>
-	.container {
+	:global(.cbc-container-grid) {
 		display: grid;
-		grid-template-columns: 1.5em 1fr 1fr 1fr 1fr 1.5em;
-		grid-template-areas: '. aside content content content .';
-		gap: 1.5rem;
-		margin-top: 4rem;
+		grid-template-columns: 1.5em 1fr 3fr 1.5em;
+		grid-template-areas: '. aside content  .';
+		gap: 1.5em;
+		margin-top: 6em;
+	}
+
+	:global(.cbc-container) {
+		display: grid;
+		grid-template-columns: 1fr 4fr 1fr;
+		grid-template-areas: '. content  .';
+		gap: 1.5em;
+		margin-top: 6em;
 	}
 
 	:global(.cbc-aside) {

@@ -17,7 +17,8 @@ const config = {
 	preprocess: [
 		preprocess(),
 		mdsvex({
-			extensions: ['.md']
+			extensions: ['.md'],
+			layout: './src/routes/_markdown_layout.svelte'
 		}),
 		optimizeImports(),
 		elements()

@@ -3,6 +3,12 @@
 
 	"compilerOptions": {
 		"paths": {
+			"$lib": [
+				"src/lib"
+			],
+			"$lib/*": [
+				"src/lib/*"
+			],
 			"$components": [
 				"src/components/index.ts"
 			]

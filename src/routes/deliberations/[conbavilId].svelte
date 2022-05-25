@@ -1,15 +1,15 @@
 <script context="module" lang="ts">
-	export async function load({ fetch, page }) {
-		const id = page.params.conbavilId;
+	export async function load({ fetch, params }) {
+		const id = params.conbavilId
 
 		try {
 			const res = await Promise.all([
 				fetch(`http://127.0.0.1:8984/cbc/deliberations/${id}`),
 				fetch('http://127.0.0.1:8984/cbc/types'),
 				fetch('http://127.0.0.1:8984/cbc/categories')
-			]);
-			
-			const data = await Promise.all(res.map((r) => r.json()));
+			])
+
+			const data = await Promise.all(res.map((r) => r.json()))
 
 			return {
 				props: {
@@ -17,9 +17,9 @@
 					types: data[1],
 					categories: data[2]
 				}
-			};
+			}
 		} catch (err) {
-			console.log(err);
+			console.log(err)
 		}
 	}
 </script>
@@ -38,53 +38,53 @@
 		Grid,
 		Column,
 		Row
-	} from 'carbon-components-svelte';
-	import { AddAlt16, Delete16 } from 'carbon-icons-svelte';
-	import { validateForm } from '$lib/helpers/deliberationFormValidator';
-	import { form, formGroups, labelMap } from '$lib/types/form';
+	} from 'carbon-components-svelte'
+	import TrashCan from 'carbon-icons-svelte/lib/TrashCan.svelte'
+	import AddAlt from 'carbon-icons-svelte/lib/AddAlt.svelte'
+	import { form, formGroups, labelMap } from '$lib/types/form'
 
-	export let deliberation;
-	export let types;
-	export let categories;
+	export let deliberation
+	export let types
+	export let categories
 
 	// Used as copy to display form.
 	// Values are binded to form inputs.
-	let formData = { ...deliberation };
+	let formData = { ...deliberation }
 
 	// $: console.log(deliberation);
-	$: console.log(formData);
+	$: console.log(formData)
 	// $: console.log(types);
 	// $: console.log(categories);
 
-	let formIsToggled = false;
-	let postResponse = { message: '' };
-	let postStatus = false;
-	let submited = false;
+	let formIsToggled = false
+	let postResponse = { message: '' }
+	let postStatus = false
+	let submited = false
 
-	let invalidStates = {};
+	let invalidStates = {}
 	Object.keys(formData).forEach((k) => {
 		if (k === 'localisation') {
 			Object.keys(formData[k]).forEach((sk) => {
-				invalidStates[sk] = false;
-			});
+				invalidStates[sk] = false
+			})
 		} else if (k === 'types' || k === 'categories') {
 			formData[k].forEach((elt, i) => {
-				invalidStates[`${k}-${i}`] = false;
-			});
+				invalidStates[`${k}-${i}`] = false
+			})
 		} else {
-			invalidStates[k] = false;
+			invalidStates[k] = false
 		}
-	});
+	})
 
-	console.log(invalidStates);
+	console.log(invalidStates)
 
-	const toggleForm = () => (formIsToggled = !formIsToggled);
+	const toggleForm = () => (formIsToggled = !formIsToggled)
 
 	const handleSubmit = async (e) => {
 		// todo : custom validation
 		// let validated = customValidation(formData)
 
-		console.log(formData);
+		console.log(formData)
 
 		if (!checkValidity()) {
 			let res = await fetch('http://127.0.0.1:8984/cbc/post', {
@@ -93,81 +93,88 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify(formData)
-			});
-			postStatus = res.ok;
-			postResponse = await res.json();
-			submited = true;
+			})
+			postStatus = res.ok
+			postResponse = await res.json()
+			submited = true
 		} else {
-			submited = true;
-			postStatus = false;
+			submited = true
+			postStatus = false
 		}
-	};
+	}
 
 	const checkValidity = () => {
-		let hasInvalid = false;
+		let hasInvalid = false
 		Object.keys(invalidStates).forEach((id) => {
-			let node = document.getElementById(id);
+			let node = document.getElementById(id)
 			if (
 				node.validity.typeMismatch ||
 				node.validity.valueMissing ||
 				node.validity.patternMismatch
 			) {
-				invalidStates[id] = true;
-				hasInvalid = true;
+				invalidStates[id] = true
+				hasInvalid = true
 			} else {
-				invalidStates[id] = false;
+				invalidStates[id] = false
 			}
-		});
-		return hasInvalid;
-	};
+		})
+		return hasInvalid
+	}
 
-	const addFormField = (attr) => (formData[attr] = [...formData[attr], '']);
+	const addFormField = (attr) => (formData[attr] = [...formData[attr], ''])
 
 	const removeFormField = (e, attr, index) => {
-		formData[attr].splice(index, 1);
-		formData = formData;
-	};
+		formData[attr].splice(index, 1)
+		formData = formData
+	}
 </script>
 
 <svelte:head>
 	<title>Délibération</title>
 </svelte:head>
 
-<h1>{deliberation.title ? deliberation.title : deliberation.altTitle}</h1>
+<div class="cbc-container">
+	<div class="cbc-content">
+		<h1>{deliberation.title ? deliberation.title : deliberation.altTitle}</h1>
 
-{#each formGroups as g}
-	<h4>{g.name}</h4>
-	{#each g.keys as k}
-		{#if k === 'localisation'}
-			{#each g.subkeys as sk}
-				<div class="data-group">
-					<span class="data-group-label">{labelMap[sk]}</span>
-					<span class="data-group-value">{deliberation[k][sk]}</span>
-				</div>
+		{#each formGroups as g}
+			<h4>{g.name}</h4>
+			{#each g.keys as k}
+				{#if k === 'localisation'}
+					{#each g.subkeys as sk}
+						<div class="data-group">
+							<span class="data-group-label">{labelMap[sk]}</span>
+							<span class="data-group-value">{deliberation[k][sk]}</span>
+						</div>
+					{/each}
+				{:else if k === 'title'}
+					<div class="data-group">
+						<span class="data-group-label">{labelMap[k]}</span>
+						<span class="data-group-value"
+							>{deliberation.title ? deliberation.title : deliberation.altTitle}</span
+						>
+					</div>
+				{:else}
+					<div class="data-group">
+						<span class="data-group-label">{labelMap[k]}</span>
+						<span class="data-group-value">{deliberation[k]}</span>
+					</div>
+				{/if}
 			{/each}
-		{:else if k === 'title'}
-			<div class="data-group">
-				<span class="data-group-label">{labelMap[k]}</span>
-				<span class="data-group-value">{deliberation.title ? deliberation.title : deliberation.altTitle}</span>
-			</div>
-		{:else}
-			<div class="data-group">
-				<span class="data-group-label">{labelMap[k]}</span>
-				<span class="data-group-value">{deliberation[k]}</span>
-			</div>
-		{/if}
-	{/each}
-{/each}
-
-<br />
-<br />
-<Button on:click={toggleForm}>Modifier la fiche</Button>
+		{/each}
+		<br />
+		<br />
+		<Button on:click={toggleForm}>Modifier la fiche</Button>
+	</div>
+</div>
 
 {#if formIsToggled}
 	<Modal
 		size="lg"
 		open
-		modalHeading={'Modifier la fiche :\n' + deliberation.title ? deliberation.title : deliberation.altTitle}
+		modalHeading={'Modifier la fiche :\n' + deliberation.title
+			? deliberation.title
+			: deliberation.altTitle}
 		primaryButtonText="Enregistrer les modifications"
 		secondaryButtonText="Annuler"
 		on:click:button--secondary={toggleForm}
@@ -189,7 +196,6 @@
 										id={sk}
 										bind:value={formData.localisation[sk]}
 										type={form[sk]?.type ? form[sk].type : 'text'}
-										pattern={form[sk].pattern}
 										disabled={form[sk].disabled}
 										invalidText={form[sk].validityMessage}
 										bind:invalid={invalidStates[sk]}
@@ -217,12 +223,12 @@
 											<Button
 												kind="ghost"
 												iconDescription="Delete"
-												icon={Delete16}
+												icon={TrashCan}
 												on:click={(e) => removeFormField(e, k, i)}
 											/>
 										</div>
 									{/each}
-									<Button kind="ghost" icon={AddAlt16} on:click={() => addFormField(k)}>
+									<Button kind="ghost" icon={AddAlt} on:click={() => addFormField(k)}>
 										Ajouter un champs
 									</Button>
 								{:else}
