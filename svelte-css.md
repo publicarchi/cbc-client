@@ -22,3 +22,9 @@
 
 - [Should We Use CSS or SCSS in 2021?](https://blog.bitsrc.io/will-scss-be-replaced-by-css3-754842d6b681)
 - Kevin Powell, [Is Sass still relevant?](https://www.youtube.com/watch?v=JzoGgIB9FDQ&t=393s) (video)
+
+### Problèmes avec Carbon
+
+- doc pas toujours à jour,
+- parti pris assez forts sur des composants importants tant sur l'UI que l'UX:
+  - ie. active search
