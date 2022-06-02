@@ -1,75 +1,102 @@
 <script context="module" lang="ts">
+	import { affairSchema } from '$lib/types/cbcSchemas'
 	export async function load({ fetch, params }) {
 		const req = `http://127.0.0.1:8984/cbc/affaires/${params.conbavilId}`
 		const response = await fetch(req)
-		if (!response.ok)
-			return {
-				status: response.status,
-				error: new Error(`Oups, l'affaire n'a pas pu être chargée. ${req}`)
-			}
-
 		const affaire = await response.json()
-		return { props: { affaire } }
+		return {
+			props: {
+				affaire: affairSchema.cast(affaire)
+			}
+		}
 	}
 </script>
 
 <script lang="ts">
-	import {
-		Button,
-		Link,
-		Modal,
-		Form,
-		TextInput,
-		FormItem,
-		FormLabel
-	} from 'carbon-components-svelte'
+	import { Button, Link, Modal } from 'carbon-components-svelte'
 	import { onMount } from 'svelte'
 	import { createForm } from 'felte'
-	import * as yup from 'yup'
 	import { validator } from '@felte/validator-yup'
-	import { validateSchema, warnSchema } from './_formValidators'
-	import { ToastNotification } from '$components'
-	import type { IAffaire } from '$lib/types/cbc'
+	import { reporter } from '@felte/reporter-svelte'
+	import { validateSchema, warnSchema, type validateSchemaType } from './_validators'
+	import { CustomInput, ToastNotification } from '$components'
+	import type { Affair } from '$lib/types/cbc'
 
-	export let affaire: IAffaire
+	export let affaire: Affair
 
 	let categories: string[] = []
 	let types: string[] = []
 
-	let affaireForm: IAffaire = { ...affaire }
 	let modalOpened = false
 	let updated = false
 
 	onMount(async () => {
-		[types, categories] = await Promise.all([
+		;[types, categories] = await Promise.all([
 			fetch('http://127.0.0.1:8984/cbc/types').then((res) => res.json()),
 			fetch('http://127.0.0.1:8984/cbc/categories').then((res) => res.json())
 		])
 	})
 
-	const { form } = createForm({
-		onSubmit(values, context) {
-			// Post data with fetch
+	const { form, errors, warnings, isValid } = createForm<validateSchemaType>({
+		initialValues: affaire,
+		onSubmit: async (values, context) => {
+			console.log('Submitting !!')
+			console.log(values)
+
+			// Update meta
+			values.meta.push({
+				who: 'oauth-not-implemented',
+				type: 'modification',
+				when: new Date().toISOString()
+			})
+
+			// Post form data
+			const res = await fetch('http://127.0.0.1:8984/cbc/affaires/post', {
+				method: 'POST',
+				body: JSON.stringify({
+					type: 'modification',
+					affaire: values
+				})
+			})
+			if (res.status === 500) {
+				throw new Error('La modification n a pas eu lieu')
+			}
 		},
-		onSuccess(response, context) {
+		onSuccess: (response, context) => {
 			// Do something with the returned value from `onSubmit`.
+			modalOpened = false
+			updated = true
 		},
-		onError(err, context) {
+		onError: (err, context) => {
 			// Do something with the error thrown from `onSubmit`.
+			console.log('Felte has received an error', err)
 		},
 		extend: [
-			validator({ schema: validateSchema }),
-			validator({ schema: warnSchema, level: 'warning' })
+			reporter,
+			validator({ schema: warnSchema, level: 'warning' }),
+			validator({ schema: validateSchema })
 		]
 	})
+
+	$: console.log({ $errors, $warnings, $isValid })
 </script>
 
 <svelte:head>
 	<title>Affaire</title>
 </svelte:head>
 
-<div class="cbc-container">
-	<div class="cbc-content">
+{#if updated}
+	<ToastNotification
+		lowContrast
+		kind="success"
+		title="Mise à jour effectuée"
+		subtitle="Merci de recharger la page pour que les modifications soient apparentes."
+		caption={new Date().toLocaleString()}
+	/>
+{/if}
+
+<div class="cbc-container-grid">
+	<div class="cbc-aside">
 		<h1>{affaire.title}</h1>
 
 		<h4>Localisation</h4>
@@ -81,10 +108,7 @@
 			<span class="data-group-label">Département</span>
 			<span class="data-group-value">{affaire.localisation.departement}</span>
 		</div>
-		<div class="data-group">
-			<span class="data-group-label">Département ancien</span>
-			<span class="data-group-value">{affaire.localisation.departementAncien}</span>
-		</div>
+
 		<div class="data-group">
 			<span class="data-group-label">Région</span>
 			<span class="data-group-value">{affaire.localisation.region}</span>
@@ -109,10 +133,6 @@
 			{/each}
 		</ul>
 
-		<br />
-		<br />
-
-		<!-- on:click:button--primary -->
 		<Button on:click={() => (modalOpened = true)}>Modifier la fiche</Button>
 	</div>
 </div>
@@ -123,60 +143,33 @@
 	on:click:button--secondary={() => (modalOpened = false)}
 	bind:modalHeading={affaire.title}
 	size="sm"
-	hasForm={true}
+	hasForm
+	formId="affair-form"
 	primaryButtonText="Soumettre les modifications"
+	primaryButtonDisabled={!$isValid}
 	shouldSubmitOnEnter={false}
 	secondaryButtonText="Annuler"
 >
-	<form use:form>
-		<h4>Identification de l'affaire</h4>
-		<div class="form-item">
-			<label class="form-label" for="title">Titre</label>
-			<input type="text" name="title" />
+	<form use:form id="affair-form">
+		<div class="invisible">
+			<input name="id" />
 		</div>
+		<h4>Identification de l'affaire</h4>
+		<CustomInput name="title" label="Titre" />
 
 		<h4>Localisation</h4>
-		<div class="form-item">
-			<label class="form-label" for="localisation.commune">Commune</label>
-			<input type="text" name="localisation.commune" />
-		</div>
-		<div class="form-item">
-			<label class="form-label" for="localisation.departementDecimal">Département (décimal)</label>
-			<input type="number" name="localisation.departementDecimal" />
-		</div>
-		<div class="form-item">
-			<label class="form-label" for="localisation.departement">Département</label>
-			<input type="text" name="localisation.departement" />
-		</div>
-		<div class="form-item">
-			<label class="form-label" for="localisation.departementAncien">Département ancien</label>
-			<input type="text" name="localisation.departementAncien" />
-		</div>
-		<div class="form-item">
-			<label class="form-label" for="localisation.region">Région</label>
-			<input type="text" name="localisation.region" />
-		</div>
+		<CustomInput name="localisation.commune" label="Commune" />
+		<CustomInput name="localisation.departement" label="Département" />
+		<CustomInput
+			type="number"
+			name="localisation.departementDecimal"
+			label="Département (decimal)"
+		/>
+		<CustomInput name="localisation.region" label="Région" />
 
 		<h4>Édifice et types d'interventions</h4>
-		<div class="for-item">
-			<label class="form-label" for="type">Types</label>
-			<input list="types" name="type" />
-			{#each affaire.types as t}
-				<div class="form-item-list">{t}</div>
-			{/each}
-		</div>
 	</form>
 </Modal>
-
-{#if updated}
-	<ToastNotification
-		lowContrast
-		kind="success"
-		title="Mise à jour effectuée"
-		subtitle="Merci de recharger la page pour que les modifications soient apparentes."
-		caption={new Date().toLocaleString()}
-	/>
-{/if}
 
 <datalist id="types">
 	{#each types as t}
@@ -204,5 +197,11 @@
 	}
 	.data-group-value {
 		margin-left: 1em;
+	}
+	.invisible {
+		visibility: hidden;
+		height: 0;
+		width: 0;
+		margin: 0;
 	}
 </style>

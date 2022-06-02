@@ -11,6 +11,9 @@
 			],
 			"$components": [
 				"src/components/index.ts"
+			],
+			"$helpers": [
+				"src/lib/helpers/index.ts"
 			]
 		}
 	}

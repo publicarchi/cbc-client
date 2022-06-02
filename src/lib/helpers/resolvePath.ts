@@ -1,4 +1,4 @@
-export function resolvePath(obj: object, path: string): string | object | object[] {
+export default function resolvePath(obj: object, path: string): string | object | object[] {
     let current = { ...obj }
     path.split('.').forEach(attr => {
         try {

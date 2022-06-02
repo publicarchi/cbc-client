@@ -1,292 +1,218 @@
 <script context="module" lang="ts">
 	export async function load({ fetch, params }) {
-		const id = params.conbavilId
-
-		try {
-			const res = await Promise.all([
-				fetch(`http://127.0.0.1:8984/cbc/deliberations/${id}`),
-				fetch('http://127.0.0.1:8984/cbc/types'),
-				fetch('http://127.0.0.1:8984/cbc/categories')
-			])
-
-			const data = await Promise.all(res.map((r) => r.json()))
-
-			return {
-				props: {
-					deliberation: data[0],
-					types: data[1],
-					categories: data[2]
-				}
-			}
-		} catch (err) {
-			console.log(err)
+		const res = await fetch(`http://127.0.0.1:8984/cbc/deliberations/${params.conbavilId}`)
+		const deliberation = await res.json()
+		return {
+			props: { deliberation }
 		}
 	}
 </script>
 
 <script lang="ts">
-	import {
-		Button,
-		ButtonSet,
-		Content,
-		Modal,
-		Form,
-		TextInput,
-		InlineNotification,
-		FormItem,
-		FormLabel,
-		Grid,
-		Column,
-		Row
-	} from 'carbon-components-svelte'
-	import TrashCan from 'carbon-icons-svelte/lib/TrashCan.svelte'
-	import AddAlt from 'carbon-icons-svelte/lib/AddAlt.svelte'
-	import { form, formGroups, labelMap } from '$lib/types/form'
+	import { Button, Modal, TextInput, InlineNotification, Link } from 'carbon-components-svelte'
+	import { createForm } from 'felte'
+	import { validator } from '@felte/validator-yup'
+	import { reporter } from '@felte/reporter-svelte'
+	import { validateSchema, warnSchema, type schemaType } from './_validators'
+	import { CustomInput, ToastNotification } from '$components'
+	import type { Deliberation } from '$lib/types/cbc'
 
-	export let deliberation
-	export let types
-	export let categories
-
-	// Used as copy to display form.
-	// Values are binded to form inputs.
-	let formData = { ...deliberation }
-
-	// $: console.log(deliberation);
-	$: console.log(formData)
-	// $: console.log(types);
-	// $: console.log(categories);
+	export let deliberation: Deliberation
 
 	let formIsToggled = false
 	let postResponse = { message: '' }
 	let postStatus = false
 	let submited = false
 
-	let invalidStates = {}
-	Object.keys(formData).forEach((k) => {
-		if (k === 'localisation') {
-			Object.keys(formData[k]).forEach((sk) => {
-				invalidStates[sk] = false
-			})
-		} else if (k === 'types' || k === 'categories') {
-			formData[k].forEach((elt, i) => {
-				invalidStates[`${k}-${i}`] = false
-			})
-		} else {
-			invalidStates[k] = false
-		}
+	const { form, errors, warnings, isValid } = createForm<schemaType>({
+		initialValues: deliberation,
+		onSubmit: (values, context) => {
+			// fetch('http://127.0.0.1:8984/deliberation/post', {
+			// 	method: 'POST',
+			// 	body: JSON.stringify(values)
+			// })
+
+			console.log('Form has been sumbmited !')
+		},
+		onSuccess: (response, context) => {
+			// Do something with the returned value from `onSubmit`.
+			// toggleForm()
+			// submited = true
+		},
+		onError: (err, context) => {
+			// Do something with the error thrown from `onSubmit`.
+		},
+		extend: [
+			reporter,
+			validator({ schema: validateSchema }),
+			validator({ schema: warnSchema, level: 'warning' })
+		]
 	})
-
-	console.log(invalidStates)
-
 	const toggleForm = () => (formIsToggled = !formIsToggled)
 
-	const handleSubmit = async (e) => {
-		// todo : custom validation
-		// let validated = customValidation(formData)
-
-		console.log(formData)
-
-		if (!checkValidity()) {
-			let res = await fetch('http://127.0.0.1:8984/cbc/post', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(formData)
-			})
-			postStatus = res.ok
-			postResponse = await res.json()
-			submited = true
-		} else {
-			submited = true
-			postStatus = false
-		}
-	}
-
-	const checkValidity = () => {
-		let hasInvalid = false
-		Object.keys(invalidStates).forEach((id) => {
-			let node = document.getElementById(id)
-			if (
-				node.validity.typeMismatch ||
-				node.validity.valueMissing ||
-				node.validity.patternMismatch
-			) {
-				invalidStates[id] = true
-				hasInvalid = true
-			} else {
-				invalidStates[id] = false
-			}
-		})
-		return hasInvalid
-	}
-
-	const addFormField = (attr) => (formData[attr] = [...formData[attr], ''])
-
-	const removeFormField = (e, attr, index) => {
-		formData[attr].splice(index, 1)
-		formData = formData
-	}
+	$: console.log({ $isValid, $warnings, $errors })
 </script>
 
 <svelte:head>
 	<title>Délibération</title>
 </svelte:head>
 
-<div class="cbc-container">
-	<div class="cbc-content">
-		<h1>{deliberation.title ? deliberation.title : deliberation.altTitle}</h1>
+<div class="cbc-container-grid">
+	<div class="cbc-aside">
+		<h4>{deliberation.title ? deliberation.title : deliberation.altTitle}</h4>
 
-		{#each formGroups as g}
-			<h4>{g.name}</h4>
-			{#each g.keys as k}
-				{#if k === 'localisation'}
-					{#each g.subkeys as sk}
-						<div class="data-group">
-							<span class="data-group-label">{labelMap[sk]}</span>
-							<span class="data-group-value">{deliberation[k][sk]}</span>
-						</div>
-					{/each}
-				{:else if k === 'title'}
-					<div class="data-group">
-						<span class="data-group-label">{labelMap[k]}</span>
-						<span class="data-group-value"
-							>{deliberation.title ? deliberation.title : deliberation.altTitle}</span
-						>
-					</div>
-				{:else}
-					<div class="data-group">
-						<span class="data-group-label">{labelMap[k]}</span>
-						<span class="data-group-value">{deliberation[k]}</span>
-					</div>
-				{/if}
-			{/each}
-		{/each}
-		<br />
-		<br />
+		<h5>Identification de l'affaire</h5>
+		<div class="data-group">
+			<span class="data-group-label">Titre</span>
+			<span class="data-group-value">{deliberation.title}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Titre (alt.)</span>
+			<span class="data-group-value">{deliberation.altTitle}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">ID Séance</span>
+			<span class="data-group-value">
+				<Link href="#">{deliberation.meetingId}</Link>
+			</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Cote</span>
+			<span class="data-group-value">{deliberation.cote}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">ID affaire</span>
+			<span class="data-group-value">
+				<Link href={`http://127.0.0.1:3000/affaires/${deliberation.affairId}`}>
+					{deliberation.affairId}
+				</Link>
+			</span>
+		</div>
+
+		<h5>Localisation de l'édifice</h5>
+		<div class="data-group">
+			<span class="data-group-label">Commune</span>
+			<span class="data-group-value">{deliberation.localisation.commune}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Département</span>
+			<span class="data-group-value">{deliberation.localisation.departement}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Département (dec.)</span>
+			<span class="data-group-value">{deliberation.localisation.departementDecimal}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Région</span>
+			<span class="data-group-value">{deliberation.localisation.region}</span>
+		</div>
+
+		<h5>Caratéristiques de l'édifice</h5>
+		<div class="data-group">
+			<span class="data-group-label">Types de l'édifice</span>
+			<span class="data-group-value">{deliberation.buildingTypes}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Catégories de l'édifice</span>
+			<span class="data-group-value">{deliberation.buildingCategories}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Objet administratif</span>
+			<span class="data-group-value">{deliberation.administrativeObjects}</span>
+		</div>
+
+		<h5>Délibération</h5>
+		<div class="data-group">
+			<span class="data-group-label">Recommandation</span>
+			<span class="data-group-value">{deliberation.advice}</span>
+			<span class="data-group-value">{deliberation.recommandation}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Rapporteur</span>
+			<span class="data-group-value">{deliberation.report}</span>
+		</div>
+		<div class="data-group">
+			<span class="data-group-label">Participants</span>
+			<span class="data-group-value">{deliberation.participants}</span>
+		</div>
+
 		<Button on:click={toggleForm}>Modifier la fiche</Button>
 	</div>
 </div>
 
-{#if formIsToggled}
-	<Modal
-		size="lg"
-		open
-		modalHeading={'Modifier la fiche :\n' + deliberation.title
-			? deliberation.title
-			: deliberation.altTitle}
-		primaryButtonText="Enregistrer les modifications"
-		secondaryButtonText="Annuler"
-		on:click:button--secondary={toggleForm}
-		on:close={toggleForm}
-		hasForm={true}
-		passiveModal={true}
-	>
-		<Content>
-			<Form on:submit={handleSubmit} method="post" novalidate>
-				{#each formGroups as g}
-					<h4>{g.name}</h4>
-					{#each g.keys as k}
-						{#if k === 'localisation'}
-							{#each g.subkeys as sk}
-								<FormItem>
-									<FormLabel>{labelMap[sk]}</FormLabel>
-									<TextInput
-										name={sk}
-										id={sk}
-										bind:value={formData.localisation[sk]}
-										type={form[sk]?.type ? form[sk].type : 'text'}
-										disabled={form[sk].disabled}
-										invalidText={form[sk].validityMessage}
-										bind:invalid={invalidStates[sk]}
-									/>
-								</FormItem>
-							{/each}
-						{:else}
-							<FormItem>
-								<FormLabel>{labelMap[k]}</FormLabel>
-								{#if k === 'types' || k === 'categories'}
-									{#each formData[k] as _, i}
-										<div class="flex-input">
-											<TextInput
-												name={k}
-												id={`${k}-${i}`}
-												bind:value={formData[k][i]}
-												type={form[k]?.type ? form[k].type : 'text'}
-												pattern={form[k].pattern}
-												list={`${k}-datalist`}
-												disabled={form[k].disabled}
-												required={form[k].required}
-												invalidText={form[k].validityMessage}
-												bind:invalid={invalidStates[`${k}-${i}`]}
-											/>
-											<Button
-												kind="ghost"
-												iconDescription="Delete"
-												icon={TrashCan}
-												on:click={(e) => removeFormField(e, k, i)}
-											/>
-										</div>
-									{/each}
-									<Button kind="ghost" icon={AddAlt} on:click={() => addFormField(k)}>
-										Ajouter un champs
-									</Button>
-								{:else}
-									<TextInput
-										name={k}
-										id={k}
-										bind:value={formData[k]}
-										type={form[k]?.type ? form[k].type : 'text'}
-										pattern={form[k].pattern}
-										disabled={form[k].disabled}
-										required={form[k].required}
-										invalidText={form[k].validityMessage}
-										title={form[k].validityMessage}
-										bind:invalid={invalidStates[k]}
-									/>
-								{/if}
-							</FormItem>
-						{/if}
-					{/each}
-				{/each}
-
-				<ButtonSet>
-					<Button kind="secondary">Annuler</Button>
-					<Button type="submit">Modifier la fiche</Button>
-				</ButtonSet>
-
-				<datalist id="types-datalist">
-					{#each types as t}
-						<option value={t} />
-					{/each}
-				</datalist>
-				<datalist id="categories-datalist">
-					{#each categories as c}
-						<option value={c} />
-					{/each}
-				</datalist>
-			</Form>
-		</Content>
-
-		{#if submited}
-			{#if postStatus}
-				<InlineNotification title="Succès" kind="success" subtitle={postResponse.message} />
-			{:else}
-				<InlineNotification
-					title="Erreur lors de l'envoi du formulaire"
-					kind="error"
-					subtitle={postResponse.message}
+<Modal
+	bind:open={formIsToggled}
+	size="sm"
+	hasForm
+	formId="deliberation-form"
+	modalHeading={`Modifier la fiche : ${
+		deliberation.title ? deliberation.title : deliberation.altTitle
+	}`}
+	primaryButtonText="Soumettre les modifications"
+	secondaryButtonText="Annuler"
+	on:click:button--secondary={toggleForm}
+	on:close={toggleForm}
+>
+	<form use:form id="deliberation-form">
+		<div class="invisible">
+			<TextInput name="id" />
+			<TextInput name="affairId" />
+			<TextInput name="meetingId" />
+			<TextInput name="altTitle" />
+			<TextInput name="cote" />
+		</div>
+		<div class="form-grid">
+			<div class="form-section">
+				<h4>Identification de l'édifice</h4>
+				<CustomInput name="title" label="Titre" />
+			</div>
+			<div class="form-section">
+				<h4>Localisation de l'édifice</h4>
+				<CustomInput name="localisation.commune" label="Commune" />
+				<CustomInput name="localisation.departement" label="Département" />
+				<CustomInput
+					type="number"
+					name="localisation.departementDecimal"
+					label="Département (decimal)"
 				/>
-			{/if}
+				<CustomInput name="localisation.region" label="Région" />
+			</div>
+			<div class="form-section">
+				<h4>Caractéristiques de l'édifice</h4>
+				<!-- <CustomInput type="multi" name="buildingTypes" label="Types de l'édifice" /> -->
+			</div>
+			<div class="form-section">
+				<h4>Délibération</h4>
+				<CustomInput name="advice" label="Avis" />
+				<CustomInput type="area" name="recommendation" label="Recommandation" />
+			</div>
+		</div>
+	</form>
+
+	{#if submited}
+		{#if postStatus}
+			<InlineNotification title="Succès" kind="success" subtitle={postResponse.message} />
+		{:else}
+			<InlineNotification
+				title="Erreur lors de l'envoi du formulaire"
+				kind="error"
+				subtitle={postResponse.message}
+			/>
 		{/if}
-	</Modal>
-{/if}
+	{/if}
+</Modal>
 
 <style>
-	h4 {
-		margin-top: 1em;
-		font-weight: 300;
+	h5 {
+		font-size: small;
 	}
+	.form-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5em;
+		flex-wrap: wrap;
+	}
+
 	.data-group {
 		display: flex;
 		margin-top: 0.5em;
@@ -297,7 +223,11 @@
 	.data-group-value {
 		margin-left: 1em;
 	}
-	.flex-input {
-		display: flex;
+
+	.invisible {
+		visibility: hidden;
+		height: 0;
+		width: 0;
+		margin: 0;
 	}
 </style>
