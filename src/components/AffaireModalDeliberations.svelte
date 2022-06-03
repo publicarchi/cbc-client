@@ -4,9 +4,9 @@
 	import RowDelete from 'carbon-icons-svelte/lib/RowDelete.svelte'
 	import CheckmarkOutline from 'carbon-icons-svelte/lib/CheckmarkOutline.svelte'
 	import MisuseOutline from 'carbon-icons-svelte/lib/MisuseOutline.svelte'
-	import type { IDeliberation } from '$lib/types/cbc'
+	import type { Deliberation } from '$lib/types/cbc'
 
-	export let deliberations: IDeliberation[]
+	export let deliberations: Deliberation[]
 
 	const removeDeliberation = (id) => (deliberations = deliberations.filter((d) => d.id !== id))
 </script>

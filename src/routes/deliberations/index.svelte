@@ -32,23 +32,23 @@
 	import Save from 'carbon-icons-svelte/lib/Save.svelte'
 	import { ExpandedRow, AffaireModal, ToastNotification, Facets } from '$components'
 	import expandedRowOptions from './_expandedRowOptions'
-	import type { IDeliberation } from '$lib/types/cbc'
+	import type { Deliberation } from '$lib/types/cbc'
 	import type { IPaginationMeta } from '$lib/types/requests'
 
 	// export let user
-	export let deliberations: IDeliberation[]
+	export let deliberations: Deliberation[]
 	export let meta: IPaginationMeta
 
 	let selectedRowIds: string[] = []
 	let expandedRowIds: string[] = []
-	let selectedDeliberations: IDeliberation[] = []
+	let selectedDeliberations: Deliberation[] = []
 
 	let userConnected: boolean = true
 	let toggleLoginModal: boolean = false
 	let affaireModalOpened: boolean = false
 
 	let searchQuery: string = ''
-	let filtered: IDeliberation[] = []
+	let filtered: Deliberation[] = []
 	let facets = []
 
 	let formPosted: boolean = false

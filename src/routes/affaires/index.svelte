@@ -4,7 +4,10 @@
 			.then((res) => res.json())
 			.catch((err) => console.log(err))
 		return {
-			props: { affaires: data.content, meta: data.meta }
+			props: {
+				affaires: data.content,
+				meta: data.meta
+			}
 		}
 	}
 </script>
@@ -28,9 +31,9 @@
 	import Launch from 'carbon-icons-svelte/lib/Launch.svelte'
 	import { ExpandedRow } from '$components'
 	import expandedRowOptions from './_expandedRowOptions'
-	import type { IAffaire } from '$lib/types/cbc'
+	import type { Affair } from '$lib/types/cbc'
 
-	export let affaires: IAffaire[]
+	export let affaires: Affair[]
 	export let meta
 
 	let searchQuery

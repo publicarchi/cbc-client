@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { resolvePath } from '$lib/helpers/resolvePath'
+	import { resolvePath } from '$helpers'
 	import { Link, UnorderedList, ListItem } from 'carbon-components-svelte'
-	import type { IDeliberation, IAffaire } from '$lib/types/cbc'
+	import type { Deliberation, Affair } from '$lib/types/cbc'
 	import type { IExpandedRowOption } from '$lib/types/expandedRowOptions'
 
 	export let options: IExpandedRowOption[]
-	export let data: IDeliberation | IAffaire
+	export let data: Deliberation | Affair
 
 	let metaOptions = options.filter((o) => o.type === 'meta')
 	let listOptions = options.filter((o) => o.type === 'list')

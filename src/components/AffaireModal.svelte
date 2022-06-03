@@ -22,22 +22,22 @@
 	import Launch from 'carbon-icons-svelte/lib/Launch.svelte'
 	import { onMount } from 'svelte'
 	import AffaireModalDeliberations from './AffaireModalDeliberations.svelte'
-	import type { IAffaire, IDeliberation } from '$lib/types/cbc'
-	import { initEmptyAffaire } from '$lib/helpers/helpers'
+	import { cbc } from '$helpers'
+	import type { Affair, Deliberation } from '$lib/types/cbc'
 
-	export let deliberations: IDeliberation[]
+	export let deliberations: Deliberation[]
 	export let modalOpened: boolean
 	export let formPosted: boolean
 	export let selectedRowIds
 
 	let formError: boolean = false
 	let formErrorMsg: string = ''
-	let affaire: IAffaire
+	let affaire: Affair
 
 	let currentIndex: 0 | 1 = 0
 	let searchValue: string = ''
-	let suggestions: IAffaire[] = []
-	let searchSuggestions: IAffaire[] = []
+	let suggestions: Affair[] = []
+	let searchSuggestions: Affair[] = []
 	let changeType: 'creation' | 'modification' = 'creation'
 
 	onMount(() => {
@@ -55,7 +55,7 @@
 
 	const onClickNext = () => {
 		if (!affaire) {
-			affaire = initEmptyAffaire(deliberations)
+			affaire = cbc.affair()
 			changeType = 'creation'
 		}
 		currentIndex += 1
