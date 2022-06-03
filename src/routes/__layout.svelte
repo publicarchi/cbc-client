@@ -59,6 +59,11 @@
 		grid-area: content;
 	}
 
+	:global(.cbc-separator) {
+		border-top: 1px solid #bbb;
+		width: 100%;
+	}
+
 	footer {
 		display: flex;
 		flex-direction: column;
