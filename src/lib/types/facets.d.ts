@@ -3,10 +3,9 @@ export interface IDeliberationFacets {
     region: string[]
     departement: string[]
     departementDecimal: number
-    departementAncien: string[]
     projectGenre: string[]
     buildingType: string[]
-    buildingGenre: string[]
+    buildingCategory: string[]
     administrativeObject: string[]
     participant: string[]
     date: string

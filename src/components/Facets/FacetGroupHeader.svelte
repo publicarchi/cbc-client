@@ -8,6 +8,9 @@
 		const div = document.getElementById(id)
 		div.hidden = !div.hidden
 	}
+
+	const reset = (facets: string[]): void => {}
+	
 </script>
 
 <div class="separator" />

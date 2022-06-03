@@ -10,21 +10,18 @@
 		region: [],
 		departement: [],
 		departementDecimal: null,
-		departementAncien: [],
 		projectGenre: [],
 		buildingType: [],
-		buildingGenre: [],
+		buildingCategory: [],
 		administrativeObject: [],
 		participant: [],
 		date: ''
 	}
 
-	let datalists: { [name: string]: string[] } = {
-		commune: ['Paris', 'Sartrouville', 'Montesson']
-	}
+	let datalists: { [name: string]: string[] } = {}
 
 	onMount(async () => {
-		const res = await fetch('http://127.0.0.1:8984/cbc/deliberations/facets')
+		const res = await fetch('http://127.0.0.1:8984/cbc/facets')
 		datalists = await res.json()
 		datalists = datalists
 	})
@@ -55,7 +52,7 @@
 <div class="container">
 	<h4>Facettes</h4>
 
-	<div class="separator" />
+	<div class="cbc-separator" />
 
 	<div class="facet-group-header">
 		<h5>Localisation de l'affaire</h5>
@@ -75,15 +72,10 @@
 	<div class="facet-group" id="localisation-group">
 		<Facet label="Commune" items={datalists.commune} bind:selected={facets.commune} />
 		<Facet label="Département" items={datalists.departement} bind:selected={facets.departement} />
-		<Facet
-			label="Département ancien"
-			items={datalists.departementAncien}
-			bind:selected={facets.departementAncien}
-		/>
 		<Facet label="Région" items={datalists.region} bind:selected={facets.region} />
 	</div>
 
-	<div class="separator" />
+	<div class="cbc-separator" />
 	<div class="facet-group-header">
 		<h5>Édifices et types d'intervention</h5>
 		<div class="facet-group-header-btns">
@@ -112,8 +104,8 @@
 		/>
 		<Facet
 			label="Catégorie du bâtiment"
-			items={datalists.buildingGenre}
-			bind:selected={facets.buildingGenre}
+			items={datalists.buildingCategory}
+			bind:selected={facets.buildingCategory}
 		/>
 		<Facet
 			label="Objet administratif"
@@ -122,7 +114,7 @@
 		/>
 	</div>
 
-	<div class="separator" />
+	<div class="cbc-separator" />
 	<div class="facet-group-header">
 		<h5>Participants</h5>
 		<div class="facet-group-header-btns">
@@ -158,10 +150,7 @@
 		display: flex;
 		gap: 1.5em;
 	}
-	.separator {
-		border-top: 1px solid #bbb;
-		width: 100%;
-	}
+
 	.container {
 		display: flex;
 		flex-direction: column;
