@@ -20,6 +20,7 @@
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type validateSchemaType } from './_validators'
 	import { CustomInput, ToastNotification } from '$components'
+	import { user, isAuthenticated, auth } from '$stores'
 	import type { Affair } from '$lib/types/cbc'
 
 	export let affaire: Affair
@@ -37,6 +38,11 @@
 		])
 	})
 
+	const modifyDocument = () => {
+		if (!$isAuthenticated) $auth.login()
+		else modalOpened = true
+	}
+
 	const { form, errors, warnings, isValid } = createForm<validateSchemaType>({
 		initialValues: affaire,
 		onSubmit: async (values, context) => {
@@ -45,7 +51,7 @@
 
 			// Update meta
 			values.meta.push({
-				who: 'oauth-not-implemented',
+				who: $user.email,
 				type: 'modification',
 				when: new Date().toISOString()
 			})
@@ -133,7 +139,7 @@
 			{/each}
 		</ul>
 
-		<Button on:click={() => (modalOpened = true)}>Modifier la fiche</Button>
+		<Button on:click={modifyDocument}>Modifier la fiche</Button>
 	</div>
 </div>
 

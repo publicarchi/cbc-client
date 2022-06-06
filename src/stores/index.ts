@@ -1,2 +1,2 @@
-export { user, error, popupOpen, isAuthenticated } from './authStores'
+export { user, error, popupOpen, isAuthenticated, auth } from './authStores'
 

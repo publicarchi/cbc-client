@@ -1,4 +1,3 @@
-export { default as Header } from './Header.svelte'
 export { default as AffaireModal } from './AffaireModal.svelte'
 export { default as AffaireModalDeliberation } from './AffaireModalDeliberations.svelte'
 export { default as DeliberationFacets } from './DeliberationFacets.svelte'

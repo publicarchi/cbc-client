@@ -15,18 +15,30 @@
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type schemaType } from './_validators'
 	import { CustomInput, ToastNotification } from '$components'
+	import { user, isAuthenticated, auth } from '$stores'
 	import type { Deliberation } from '$lib/types/cbc'
 
 	export let deliberation: Deliberation
 
-	let formIsToggled = false
+	let modalOpened = false
 	let postResponse = { message: '' }
 	let postStatus = false
 	let submited = false
 
+	const modifyDocument = () => {
+		if (!$isAuthenticated) $auth.login()
+		else modalOpened = true
+	}
+
 	const { form, errors, warnings, isValid } = createForm<schemaType>({
 		initialValues: deliberation,
 		onSubmit: (values, context) => {
+			// Update meta
+			// values.meta.push({
+			// 	who: $user.email,
+			// 	type: 'modification',
+			// 	when: new Date().toISOString()
+			// })
 			// fetch('http://127.0.0.1:8984/deliberation/post', {
 			// 	method: 'POST',
 			// 	body: JSON.stringify(values)
@@ -48,7 +60,7 @@
 			validator({ schema: warnSchema, level: 'warning' })
 		]
 	})
-	const toggleForm = () => (formIsToggled = !formIsToggled)
+	const toggleForm = () => (modalOpened = !modalOpened)
 
 	$: console.log({ $isValid, $warnings, $errors })
 </script>
@@ -136,12 +148,12 @@
 			<span class="data-group-value">{deliberation.participants}</span>
 		</div>
 
-		<Button on:click={toggleForm}>Modifier la fiche</Button>
+		<Button on:click={modifyDocument}>Modifier la fiche</Button>
 	</div>
 </div>
 
 <Modal
-	bind:open={formIsToggled}
+	bind:open={modalOpened}
 	size="sm"
 	hasForm
 	formId="deliberation-form"
@@ -150,8 +162,8 @@
 	}`}
 	primaryButtonText="Soumettre les modifications"
 	secondaryButtonText="Annuler"
-	on:click:button--secondary={toggleForm}
-	on:close={toggleForm}
+	on:click:button--secondary={() => (modalOpened = false)}
+	on:close={() => (modalOpened = false)}
 >
 	<form use:form id="deliberation-form">
 		<div class="invisible">

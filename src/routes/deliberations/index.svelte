@@ -27,6 +27,7 @@
 		Loading,
 		Modal
 	} from 'carbon-components-svelte'
+	import { user, isAuthenticated, auth } from '$stores'
 	import DocumentAdd from 'carbon-icons-svelte/lib/DocumentAdd.svelte'
 	import Launch from 'carbon-icons-svelte/lib/Launch.svelte'
 	import Save from 'carbon-icons-svelte/lib/Save.svelte'
@@ -42,9 +43,6 @@
 	let selectedRowIds: string[] = []
 	let expandedRowIds: string[] = []
 	let selectedDeliberations: Deliberation[] = []
-
-	let userConnected: boolean = true
-	let toggleLoginModal: boolean = false
 	let affaireModalOpened: boolean = false
 
 	let searchQuery: string = ''
@@ -86,8 +84,8 @@
 	}
 
 	const onClickNewDocument = (e) => {
-		if (!userConnected) {
-			toggleLoginModal = true
+		if (!$isAuthenticated) {
+			$auth.login()
 		} else {
 			affaireModalOpened = true
 		}
@@ -210,22 +208,6 @@
 		caption={new Date().toLocaleString()}
 		onClose={() => (formPosted = !formPosted)}
 	/>
-{/if}
-
-{#if toggleLoginModal}
-	<Modal
-		open
-		size="sm"
-		modalHeading="Connexion"
-		primaryButtonText="Me connecter"
-		secondaryButtonText="Annuler"
-		on:click:button--primary={() => (userConnected = true)}
-	>
-		<p>Il est nécessaire de se connecter pour modifier les fiches.</p>
-		{#if userConnected}
-			<p>Vous êtes connecté(e) !</p>
-		{/if}
-	</Modal>
 {/if}
 
 {#if affaireModalOpened}
