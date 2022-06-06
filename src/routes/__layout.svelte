@@ -1,32 +1,52 @@
-<script context="module">
-	export async function load({ url }) {
-		return {
-			props: {
-				url
-			}
-		}
-	}
-</script>
-
 <script lang="ts">
-	import { Header } from '$components'
+	import 'carbon-components-svelte/css/g10.css'
+	import {
+		Header,
+		HeaderNav,
+		HeaderNavItem,
+		HeaderUtilities,
+		HeaderGlobalAction,
+		HeaderPanelLinks,
+		HeaderPanelLink,
+		HeaderPanelDivider,
+		HeaderAction
+	} from 'carbon-components-svelte'
+	import auth from '$lib/services/auth'
+	import { user, isAuthenticated } from '$stores'
+	import { onMount } from 'svelte'
+	import type { Auth0Client } from '@auth0/auth0-spa-js'
 
-	export let url
+	let authClient: Auth0Client
 
-	// This sets the content layout depending on the page
-	let route = url.pathname
-	let containerClass =
-		route === '/' || route === '/blogs' || route === '/a-propos' ? 'container' : 'container-grid'
-
-	// console.log('PATHNAME', url.pathname)
-	// console.log('containerClass', containerClass)
-
-	let loginModalOpened = false
-	let user = {}
+	onMount(async () => {
+		authClient = await auth.createClient()
+		isAuthenticated.set(await authClient.isAuthenticated())
+		user.set(await authClient.getUser())
+	})
 </script>
 
 <header>
-	<Header {loginModalOpened} {user} />
+	<Header aria-label="CBC Project" company="cbc@publicarchi" href="/">
+		<HeaderNav>
+			<HeaderNavItem href="/seances" text="Séances" />
+			<HeaderNavItem href="/deliberations" text="Délibérations" />
+			<HeaderNavItem href="/affaires" text="Affaires" />
+			<HeaderNavItem href="/blogs" text="Blog" />
+		</HeaderNav>
+		<HeaderUtilities>
+			{#if $isAuthenticated}
+				<HeaderAction text={$user.email}>
+					<HeaderPanelLinks>
+						<HeaderPanelDivider>Compte</HeaderPanelDivider>
+						<HeaderPanelLink on:click={() => auth.logout(authClient)}>Déconnexion</HeaderPanelLink>
+					</HeaderPanelLinks>
+				</HeaderAction>
+			{:else}
+				<HeaderNavItem text="Connexion" on:click={() => auth.loginWithPopup(authClient, null)} />
+			{/if}
+			<HeaderNavItem href="/a-propos" text="À propos" />
+		</HeaderUtilities>
+	</Header>
 </header>
 
 <slot />

@@ -13,13 +13,12 @@ import adapter from '@sveltejs/adapter-auto';
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
-	extensions: ['.svelte', '.md'],
+	extensions: ['.svelte', '.md', '.svx'],
 	preprocess: [
-		preprocess(),
 		mdsvex({
 			extensions: ['.md'],
-			layout: './src/routes/_markdown_layout.svelte'
 		}),
+		preprocess(),
 		optimizeImports(),
 		elements()
 
@@ -43,6 +42,7 @@ const config = {
 				alias: {
 					$posts: path.resolve('./src/posts'),
 					$components: path.resolve('./src/components'),
+					$helpers: path.resolve('./src/lib/helpers'),
 					$stores: path.resolve('./src/stores')
 				}
 			}
