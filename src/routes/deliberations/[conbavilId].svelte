@@ -17,6 +17,7 @@
 	import { CustomInput, ToastNotification } from '$components'
 	import { user, isAuthenticated, auth } from '$stores'
 	import type { Deliberation } from '$lib/types/cbc'
+	import Error from '../__error.svelte'
 
 	export let deliberation: Deliberation
 
@@ -33,26 +34,38 @@
 	const { form, errors, warnings, isValid } = createForm<schemaType>({
 		initialValues: deliberation,
 		onSubmit: (values, context) => {
-			// Update meta
-			// values.meta.push({
-			// 	who: $user.email,
-			// 	type: 'modification',
-			// 	when: new Date().toISOString()
-			// })
-			// fetch('http://127.0.0.1:8984/deliberation/post', {
-			// 	method: 'POST',
-			// 	body: JSON.stringify(values)
-			// })
+			let m = {
+				who: $user.email,
+				type: 'modification',
+				when: new Date().toISOString()
+			}
+			values.meta ? values.meta.push(m) : (values.meta = [m])
 
-			console.log('Form has been sumbmited !')
+			let response
+			fetch('http://127.0.0.1:8984/cbc/deliberations/post', {
+				method: 'POST',
+				body: JSON.stringify({
+					type: 'modification',
+					deliberation: values
+				})
+			})
+				.then((res) => res.json())
+				.then((data) => (response = data))
+				.catch((err) => {
+					throw new Error(err.message)
+				})
+
+			return response
 		},
 		onSuccess: (response, context) => {
-			// Do something with the returned value from `onSubmit`.
 			// toggleForm()
-			// submited = true
+			console.log('form submitted')
+			console.log('response', response)
+			submited = true
 		},
 		onError: (err, context) => {
 			// Do something with the error thrown from `onSubmit`.
+			console.log(err)
 		},
 		extend: [
 			reporter,
@@ -62,7 +75,7 @@
 	})
 	const toggleForm = () => (modalOpened = !modalOpened)
 
-	$: console.log({ $isValid, $warnings, $errors })
+	$: console.log('for is valid:', $isValid)
 </script>
 
 <svelte:head>
@@ -142,10 +155,6 @@
 		<div class="data-group">
 			<span class="data-group-label">Rapporteur</span>
 			<span class="data-group-value">{deliberation.report}</span>
-		</div>
-		<div class="data-group">
-			<span class="data-group-label">Participants</span>
-			<span class="data-group-value">{deliberation.participants}</span>
 		</div>
 
 		<Button on:click={modifyDocument}>Modifier la fiche</Button>

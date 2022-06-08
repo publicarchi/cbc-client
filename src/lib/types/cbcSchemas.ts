@@ -3,7 +3,7 @@ import { string, number, array, object } from 'yup'
 const metaSchema = object({
     who: string().required(),
     type: string().required(),
-    when: string().required()
+    when: string().required().default(() => new Date().toISOString())
 })
 
 export const localisationSchema = object({
@@ -24,7 +24,7 @@ const participantSchema = object({
 export const deliberationSchema = object({
     id: string().required(),
     meetingId: string().required(),
-    affairId: string().required(),
+    affairId: string(),
     cote: string(),
     title: string(),
     altTitle: string(),
@@ -35,7 +35,6 @@ export const deliberationSchema = object({
     report: string(),
     recommandation: string(),
     advice: string(),
-    participants: array(participantSchema),
     meta: array(metaSchema)
 })
 

@@ -46,7 +46,6 @@
 	let affaireModalOpened: boolean = false
 
 	let searchQuery: string = ''
-	let filtered: Deliberation[] = []
 	let facets = []
 
 	let formPosted: boolean = false
@@ -72,8 +71,6 @@
 			}
 		}
 	}
-
-	// Search deliberations
 
 	const onPaginationUpdate = (e) => {
 		// Computes new start index
@@ -102,6 +99,8 @@
 	}
 
 	$: selectedDeliberations = deliberations.filter((d) => selectedRowIds.includes(d.id))
+
+	console.log(deliberations)
 </script>
 
 <svelte:head>
