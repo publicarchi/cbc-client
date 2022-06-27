@@ -103,43 +103,44 @@
 
 <div class="cbc-container-grid">
 	<div class="cbc-aside">
-		<h1>{affaire.title}</h1>
-
-		<h4>Localisation</h4>
-		<div class="data-group">
-			<span class="data-group-label">Commune</span>
-			<span class="data-group-value">{affaire.localisation.commune}</span>
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Titre</span>
+			<span class="cbc-aside-field-value">{affaire.title}</span>
 		</div>
-		<div class="data-group">
-			<span class="data-group-label">Département</span>
-			<span class="data-group-value">{affaire.localisation.departement}</span>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Commune</span>
+			<span class="cbc-aside-field-value">{affaire.localisation.commune}</span>
+		</div>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Département</span>
+			<span class="cbc-aside-field-value">{affaire.localisation.departement}</span>
+		</div>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Région</span>
+			<span class="cbc-aside-field-value">{affaire.localisation.region}</span>
+		</div>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<div class="cbc-aside-field-label">Délibérations</div>
+			<ul>
+				{#each affaire.deliberations as d}
+					<li>
+						<Link href="http://127.0.0.1:3000/deliberations/{d.id}"
+							>{d.title ? d.title : d.altTitle}</Link
+						>
+					</li>
+				{/each}
+			</ul>
 		</div>
 
-		<div class="data-group">
-			<span class="data-group-label">Région</span>
-			<span class="data-group-value">{affaire.localisation.region}</span>
-		</div>
-
-		<h4>Types de l'affaire</h4>
-		<span class="data-group-value">{affaire.types}</span>
-		<ul>
-			{#each affaire.types as t}
-				<span class="data-group-value">{t}</span>
-			{/each}
-		</ul>
-
-		<h4>Délibérations</h4>
-		<ul>
-			{#each affaire.deliberations as d}
-				<li>
-					<Link href="http://127.0.0.1:3000/deliberations/{d.id}"
-						>{d.title ? d.title : d.altTitle}</Link
-					>
-				</li>
-			{/each}
-		</ul>
-
-		<Button on:click={modifyDocument}>Modifier la fiche</Button>
+		<Button kind="ghost" on:click={modifyDocument}>Modifier la fiche</Button>
 	</div>
 </div>
 
@@ -194,16 +195,7 @@
 		margin-top: 1em;
 		font-weight: 300;
 	}
-	.data-group {
-		display: flex;
-		margin-top: 0.5em;
-	}
-	.data-group-label {
-		font-weight: bold;
-	}
-	.data-group-value {
-		margin-left: 1em;
-	}
+
 	.invisible {
 		visibility: hidden;
 		height: 0;

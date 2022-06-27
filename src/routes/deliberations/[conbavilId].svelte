@@ -105,78 +105,93 @@
 
 <div class="cbc-container-grid">
 	<div class="cbc-aside">
-		<h4>{deliberation.title ? deliberation.title : deliberation.altTitle}</h4>
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Titre</span>
+			<span class="cbc-aside-field-value"
+				>{deliberation.title ? deliberation.title : deliberation.altTitle}</span
+			>
+		</div>
 
-		<h5>Identification de l'affaire</h5>
-		<div class="data-group">
-			<span class="data-group-label">Titre</span>
-			<span class="data-group-value">{deliberation.title}</span>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Cote</span>
+			<span class="cbc-aside-field-value">{deliberation.cote}</span>
 		</div>
-		<div class="data-group">
-			<span class="data-group-label">Titre (alt.)</span>
-			<span class="data-group-value">{deliberation.altTitle}</span>
-		</div>
-		<div class="data-group">
-			<span class="data-group-label">ID Séance</span>
-			<span class="data-group-value">
-				<Link href="#">{deliberation.meetingId}</Link>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">ID Séance</span>
+			<span class="cbc-aside-field-value">
+				<Link href={`/seances/${deliberation.meetingId}`}>{deliberation.meetingId}</Link>
 			</span>
 		</div>
-		<div class="data-group">
-			<span class="data-group-label">Cote</span>
-			<span class="data-group-value">{deliberation.cote}</span>
-		</div>
-		<div class="data-group">
-			<span class="data-group-label">ID affaire</span>
-			<span class="data-group-value">
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">ID affaire</span>
+			<span class="cbc-aside-field-value">
 				<Link href={`http://127.0.0.1:3000/affaires/${deliberation.affairId}`}>
 					{deliberation.affairId}
 				</Link>
 			</span>
 		</div>
+		<div class="cbc-separator" />
 
-		<h5>Localisation de l'édifice</h5>
-		<div class="data-group">
-			<span class="data-group-label">Commune</span>
-			<span class="data-group-value">{deliberation.localisation.commune}</span>
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Types de l'édifice</span>
+			<span class="cbc-aside-field-value">{deliberation.buildingTypes}</span>
 		</div>
-		<div class="data-group">
-			<span class="data-group-label">Département</span>
-			<span class="data-group-value">{deliberation.localisation.departement}</span>
-		</div>
-		<div class="data-group">
-			<span class="data-group-label">Département (dec.)</span>
-			<span class="data-group-value">{deliberation.localisation.departementDecimal}</span>
-		</div>
-		<div class="data-group">
-			<span class="data-group-label">Région</span>
-			<span class="data-group-value">{deliberation.localisation.region}</span>
-		</div>
+		<div class="cbc-separator" />
 
-		<h5>Caratéristiques de l'édifice</h5>
-		<div class="data-group">
-			<span class="data-group-label">Types de l'édifice</span>
-			<span class="data-group-value">{deliberation.buildingTypes}</span>
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Catégories de l'édifice</span>
+			<span class="cbc-aside-field-value">{deliberation.buildingCategories}</span>
 		</div>
-		<div class="data-group">
-			<span class="data-group-label">Catégories de l'édifice</span>
-			<span class="data-group-value">{deliberation.buildingCategories}</span>
-		</div>
-		<div class="data-group">
-			<span class="data-group-label">Objet administratif</span>
-			<span class="data-group-value">{deliberation.administrativeObjects}</span>
-		</div>
+		<div class="cbc-separator" />
 
-		<h5>Délibération</h5>
-		<div class="data-group">
-			<span class="data-group-label">Recommandation</span>
-			<span class="data-group-value">{deliberation.advice}</span>
-			<span class="data-group-value">{deliberation.recommandation}</span>
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Objet administratif</span>
+			<span class="cbc-aside-field-value">{deliberation.administrativeObjects}</span>
 		</div>
-		<div class="data-group">
-			<span class="data-group-label">Rapporteur</span>
-			<span class="data-group-value">{deliberation.report}</span>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Commune</span>
+			<span class="cbc-aside-field-value">{deliberation.localisation.commune}</span>
 		</div>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Département</span>
+			<span class="cbc-aside-field-value">{deliberation.localisation.departement}</span>
+		</div>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Département (dec.)</span>
+			<span class="cbc-aside-field-value">{deliberation.localisation.departementDecimal}</span>
+		</div>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Région</span>
+			<span class="cbc-aside-field-value">{deliberation.localisation.region}</span>
+		</div>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Recommandation</span>
+			<span class="cbc-aside-field-value">{deliberation.advice}</span>
+			<span class="cbc-aside-field-value">{deliberation.recommandation}</span>
+		</div>
+		<div class="cbc-separator" />
+
+		<div class="cbc-aside-field">
+			<span class="cbc-aside-field-label">Rapporteur</span>
+			<span class="cbc-aside-field-value">{deliberation.report}</span>
+		</div>
+		<div class="cbc-separator" />
 
 		<Button on:click={modifyDocument}>Modifier la fiche</Button>
 	</div>
@@ -265,17 +280,6 @@
 <style>
 	h5 {
 		font-size: small;
-	}
-
-	.data-group {
-		display: flex;
-		margin-top: 0.5em;
-	}
-	.data-group-label {
-		font-weight: bold;
-	}
-	.data-group-value {
-		margin-left: 1em;
 	}
 
 	.invisible {

@@ -78,9 +78,28 @@
 	:global(.cbc-aside) {
 		grid-area: aside;
 	}
-	
+
 	:global(.cbc-content) {
 		grid-area: content;
+	}
+
+
+	:global(.cbc-aside-field) {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+		/* border-bottom: solid 0.5px lightgray; */
+	}
+
+	:global(.cbc-aside-field-label) {
+		font-weight: 300;
+		font-size: smaller;
+		width: 35%;
+		text-transform: uppercase;
+	}
+	:global(.cbc-aside-field-value) {
+		width: 65%;
 	}
 
 	:global(.cbc-separator) {
