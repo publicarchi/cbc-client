@@ -1,4 +1,9 @@
 <!-- src/routes/about.svelte -->
+---
+layout: article
+title: À propos
+---
+
 <script lang="ts">
   import { Button } from 'carbon-components-svelte'
 </script>
