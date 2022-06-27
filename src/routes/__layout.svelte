@@ -55,7 +55,7 @@
 <slot />
 
 <footer>
-	<p>just a footer</p>
+	<p>cbc@publicarchi</p>
 </footer>
 
 <style>
@@ -65,6 +65,7 @@
 		grid-template-areas: '. aside content  .';
 		gap: 1.5em;
 		margin-top: 6em;
+		min-height: 95vh;
 	}
 
 	:global(.cbc-container) {
@@ -73,6 +74,7 @@
 		grid-template-areas: '. content  .';
 		gap: 1.5em;
 		margin-top: 6em;
+		min-height: 95vh;
 	}
 
 	:global(.cbc-aside) {
@@ -82,7 +84,6 @@
 	:global(.cbc-content) {
 		grid-area: content;
 	}
-
 
 	:global(.cbc-aside-field) {
 		display: flex;
@@ -102,6 +103,10 @@
 		width: 65%;
 	}
 
+	:global(.cbc-aside-field-value > ul > li) {
+		margin-bottom: 0.6em;
+	}
+
 	:global(.cbc-separator) {
 		border-top: solid 0.5px #bbb;
 		width: 100%;
@@ -110,6 +115,9 @@
 	}
 
 	footer {
+		height: 20vh;
+		background: black;
+		color: white;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
