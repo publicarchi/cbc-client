@@ -6,15 +6,15 @@
 	import type { IDeliberationFacets } from '$lib/types/facets'
 
 	let facets: IDeliberationFacets = {
-		commune: [],
-		region: [],
-		departement: [],
+		commune: '',
+		region: '',
+		departement: '',
 		departementDecimal: null,
-		projectGenre: [],
-		buildingType: [],
-		buildingCategory: [],
-		administrativeObject: [],
-		participant: [],
+		projectGenre: '',
+		buildingType: '',
+		buildingCategory: '',
+		administrativeObject: '',
+		participant: '',
 		date: ''
 	}
 
@@ -38,7 +38,7 @@
 	const reset = (list: string[]): void => {
 		console.log('reseting', list)
 		list.forEach((f) => {
-			facets[f] = []
+			facets[f] = ''
 		})
 		facets = facets
 	}
@@ -70,9 +70,9 @@
 	</div>
 
 	<div class="facet-group" id="localisation-group">
-		<Facet label="Commune" items={datalists.commune} bind:selected={facets.commune} />
-		<Facet label="Département" items={datalists.departement} bind:selected={facets.departement} />
-		<Facet label="Région" items={datalists.region} bind:selected={facets.region} />
+		<Facet label="Commune" items={datalists.commune} bind:value={facets.commune} />
+		<Facet label="Département" items={datalists.departement} bind:value={facets.departement} />
+		<Facet label="Région" items={datalists.region} bind:value={facets.region} />
 	</div>
 
 	<div class="cbc-separator" />
@@ -95,22 +95,22 @@
 		<Facet
 			label="Genre du projet"
 			items={datalists.projectGenre}
-			bind:selected={facets.projectGenre}
+			bind:value={facets.projectGenre}
 		/>
 		<Facet
 			label="Type de bâtiment"
 			items={datalists.buildingType}
-			bind:selected={facets.buildingType}
+			bind:value={facets.buildingType}
 		/>
 		<Facet
 			label="Catégorie du bâtiment"
 			items={datalists.buildingCategory}
-			bind:selected={facets.buildingCategory}
+			bind:value={facets.buildingCategory}
 		/>
 		<Facet
 			label="Objet administratif"
 			items={datalists.administrativeObject}
-			bind:selected={facets.administrativeObject}
+			bind:value={facets.administrativeObject}
 		/>
 	</div>
 
@@ -131,7 +131,7 @@
 	</div>
 
 	<div class="facet-group" id="participant-group">
-		<Facet label="Participants" items={datalists.participant} bind:selected={facets.participant} />
+		<Facet label="Participants" items={datalists.participant} bind:value={facets.participant} />
 	</div>
 </div>
 

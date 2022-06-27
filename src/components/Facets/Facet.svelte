@@ -3,7 +3,7 @@
 	import Rotate from 'carbon-icons-svelte/lib/Rotate.svelte'
 	export let items: string[]
 	export let label: string
-	export let selected: string[] | null = []
+	export let value: string
 </script>
 
 <div class="group">
@@ -16,12 +16,15 @@
 		</div>
 	{:else}
 		<span>{label}</span>
-		<Select isMulti isSearchable placeholder="" {items} bind:justValue={selected} />
+		<Select isMulti isSearchable placeholder="" {items} bind:value />
 	{/if}
 </div>
 
 <style>
 	.group {
+		--border: 0px solid red;
+		border-bottom: 1px solid grey;
+
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
