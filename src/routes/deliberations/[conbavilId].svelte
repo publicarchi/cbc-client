@@ -9,15 +9,23 @@
 </script>
 
 <script lang="ts">
-	import { Button, Modal, TextInput, InlineNotification, Link } from 'carbon-components-svelte'
+	import {
+		Button,
+		Modal,
+		TextInput,
+		InlineNotification,
+		Link,
+		Search
+	} from 'carbon-components-svelte'
 	import { createForm } from 'felte'
 	import { validator } from '@felte/validator-yup'
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type schemaType } from './_validators'
 	import { CustomInput, ToastNotification } from '$components'
+	import Select from 'svelte-select'
 	import { user, isAuthenticated, auth } from '$stores'
 	import type { Deliberation } from '$lib/types/cbc'
-	import Error from '../__error.svelte'
+	import { onMount } from 'svelte'
 
 	export let deliberation: Deliberation
 
@@ -25,6 +33,18 @@
 	let postResponse = { message: '' }
 	let postStatus = false
 	let submited = false
+	let datalists
+
+	type SelectType = { value: string; label: string }[]
+	let selectedBuildingTypes: SelectType = []
+	let selectedProjectGenres: SelectType = []
+	let selectedAdministrativeObjects: SelectType = []
+
+	onMount(async () => {
+		const res = await fetch('http://127.0.0.1:8984/cbc/facets')
+		datalists = await res.json()
+		datalists = datalists
+	})
 
 	const modifyDocument = () => {
 		if (!$isAuthenticated) $auth.login()
@@ -76,6 +96,7 @@
 	const toggleForm = () => (modalOpened = !modalOpened)
 
 	$: console.log('for is valid:', $isValid)
+	$: console.log(datalists)
 </script>
 
 <svelte:head>
@@ -182,31 +203,49 @@
 			<TextInput name="altTitle" />
 			<TextInput name="cote" />
 		</div>
-		<div class="form-grid">
-			<div class="form-section">
-				<h4>Identification de l'édifice</h4>
-				<CustomInput name="title" label="Titre" />
-			</div>
-			<div class="form-section">
-				<h4>Localisation de l'édifice</h4>
-				<CustomInput name="localisation.commune" label="Commune" />
-				<CustomInput name="localisation.departement" label="Département" />
-				<CustomInput
-					type="number"
-					name="localisation.departementDecimal"
-					label="Département (decimal)"
-				/>
-				<CustomInput name="localisation.region" label="Région" />
-			</div>
-			<div class="form-section">
-				<h4>Caractéristiques de l'édifice</h4>
-				<!-- <CustomInput type="multi" name="buildingTypes" label="Types de l'édifice" /> -->
-			</div>
-			<div class="form-section">
-				<h4>Délibération</h4>
-				<CustomInput name="advice" label="Avis" />
-				<CustomInput type="area" name="recommendation" label="Recommandation" />
-			</div>
+
+		<div class="form-section">
+			<h4>Identification de l'édifice</h4>
+			<CustomInput name="title" label="Titre" />
+		</div>
+		<div class="form-section">
+			<h4>Localisation de l'édifice</h4>
+			<CustomInput name="localisation.commune" label="Commune" />
+			<CustomInput name="localisation.departement" label="Département" />
+			<CustomInput
+				type="number"
+				name="localisation.departementDecimal"
+				label="Département (decimal)"
+			/>
+			<CustomInput name="localisation.region" label="Région" />
+		</div>
+		<div class="form-section">
+			<h4>Caractéristiques de l'édifice</h4>
+			<!-- <CustomInput type="multi" name="buildingTypes" label="Types de l'édifice" /> -->
+			<CustomInput
+				label="Types de l'édifices"
+				type="multi"
+				listOpen
+				items={datalists ? datalists.buildingType : []}
+				bind:value={selectedBuildingTypes}
+			/>
+			<CustomInput
+				label="Genres du projet"
+				type="multi"
+				items={datalists ? datalists.projectGenre : []}
+				bind:value={selectedProjectGenres}
+			/>
+			<CustomInput
+				label="Objets administratifs"
+				type="multi"
+				items={datalists ? datalists.administrativeObject : []}
+				bind:value={selectedAdministrativeObjects}
+			/>
+		</div>
+		<div class="form-section">
+			<h4>Délibération</h4>
+			<CustomInput name="advice" label="Avis" />
+			<CustomInput type="area" name="recommendation" label="Recommandation" />
 		</div>
 	</form>
 
@@ -226,12 +265,6 @@
 <style>
 	h5 {
 		font-size: small;
-	}
-	.form-grid {
-		display: flex;
-		flex-direction: column;
-		gap: 1.5em;
-		flex-wrap: wrap;
 	}
 
 	.data-group {
