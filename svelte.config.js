@@ -1,10 +1,10 @@
 import path from 'path';
 import preprocess from 'svelte-preprocess';
-// import { sveltePreprocess } from 'svelte-preprocess/dist/autoProcess';
+
 
 import { mdsvex } from 'mdsvex';
 
-import { optimizeImports, elements } from 'carbon-preprocess-svelte';
+import { optimizeImports } from 'carbon-preprocess-svelte';
 
 import adapter from '@sveltejs/adapter-auto';
 // import adapter from '@sveltejs/adapter-static';
@@ -20,15 +20,7 @@ const config = {
 		}),
 		preprocess(),
 		optimizeImports(),
-		elements()
-
-		// Auto-preprocess mode - no need for specifying standlone SCSS preprocesors, etc.
-		// https://github.com/sveltejs/svelte-preprocess/blob/main/docs/preprocessing.md#auto-preprocessing
-		// sveltePreprocess()
-
-		// Standalone preprocessors go here for customized configurations.
-		// https://github.com/sveltejs/svelte-preprocess/blob/main/docs/preprocessing.md#stand-alone-processors
-		// scss(),
+		// elements()
 	],
 
 	kit: {
