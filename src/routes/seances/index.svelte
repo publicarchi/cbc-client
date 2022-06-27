@@ -1,71 +1,43 @@
-<script context="module" lang="ts">
-	export async function load({ fetch }) {
-		const response = await fetch('http://127.0.0.1:8984/cbc/meetings')
-		const data = await response.json()
-
-		// create temporary ids
-		let content = data.content.map((d, i) => {
-			d['id'] = i
-			return d
-		})
-
-		return {
-			props: { meetings: content, meta: data.meta }
-		}
-	}
-</script>
-
 <script lang="ts">
 	import {
 		DataTable,
 		Button,
-		Loading,
 		Link,
 		Pagination,
 		Toolbar,
 		ToolbarContent,
 		ToolbarSearch,
 		ToolbarMenu,
-		ToolbarMenuItem,
-		ToolbarBatchActions
+		ToolbarMenuItem
 	} from 'carbon-components-svelte'
 	import { ExpandedRow } from '$components'
 	import expandedRowOptions from './_expandedRowOptions'
 
 	export let meetings
-	export let meta
+	export let meta = {
+		start: 1,
+		count: 20,
+		totalItems: 0
+	}
 
-	let selectedRowIds = []
 	let expandedRowIds = []
+	let currentPage = 1
 
 	const fetchData = async () => {
-		let url = new URL('http://127.0.0.1:8984/cbc/meetings')
-		Object.keys(meta).forEach((k) => {
-			url.searchParams.append(k, meta[k])
+		const res = await fetch('http://127.0.0.1:8984/cbc/meetings', {
+			method: 'POST',
+			body: JSON.stringify({
+				meta
+			})
 		})
-
-		// This uses the sveltekit's fetch function?
-		// Function doesnt allow URL object as parameter -> needs type string
-		const res = await fetch(url.toString())
 		const data = await res.json()
-
-		// create temporary ids
-		meetings = data.content.map((d, i) => {
-			d['id'] = i
-			return d
-		})
-
-		meta = {
-			...meta,
-			start: parseInt(data.meta.start),
-			count: parseInt(data.meta.count),
-			totalItems: data.meta.totalItems
-		}
+		meetings = data.meetings
+		meta = data.meta
 	}
 
 	const onPaginationUpdate = (e) => {
 		// Computes new start index
-		meta.start = meta.count * (meta.currentPage - 1)
+		meta.start = meta.count * (currentPage - 1)
 
 		// Fetch new data
 		fetchData()
@@ -92,7 +64,6 @@
 	<div class="cbc-content">
 		<DataTable
 			title="Liste des séances"
-			bind:selectedRowIds
 			bind:expandedRowIds
 			on:click:row={rowOnClick}
 			expandable
@@ -100,12 +71,15 @@
 			headers={[
 				{ key: 'title', value: 'Titre' },
 				{ key: 'date', value: 'Date' },
-				{ key: 'cote', value: 'Cote' }
+				{ key: 'cote', value: 'Cote' },
+				{ key: 'id', value: 'Identifiant' }
 			]}
 		>
 			<svelte:fragment slot="cell" let:cell>
 				{#if Array.isArray(cell.value)}
 					{cell.value.join(', ')}
+				{:else if cell.key === 'id'}
+					<Link href={`/seances/${cell.value}`}>{cell.value}</Link>
 				{:else}
 					{cell.value}
 				{/if}
@@ -135,7 +109,7 @@
 				forwardText="Page suivante"
 				itemsPerPageText="Fiches par page :"
 				pageSizes={[20, 50, 100, 250, 500]}
-				bind:page={meta.currentPage}
+				bind:page={currentPage}
 				bind:pageSize={meta.count}
 				bind:totalItems={meta.totalItems}
 			/>
