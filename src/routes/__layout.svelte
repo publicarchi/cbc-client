@@ -5,24 +5,27 @@
 		HeaderNav,
 		HeaderNavItem,
 		HeaderUtilities,
-		HeaderGlobalAction,
 		HeaderPanelLinks,
 		HeaderPanelLink,
 		HeaderPanelDivider,
 		HeaderAction
 	} from 'carbon-components-svelte'
-	import auth from '$lib/services/auth'
-	import { user, isAuthenticated } from '$stores'
+	import Auth from '$lib/services/auth'
+	import { auth, user, isAuthenticated } from '$stores'
 	import { onMount } from 'svelte'
-	import type { Auth0Client } from '@auth0/auth0-spa-js'
 
-	let authClient: Auth0Client
+	let authClient
 
 	onMount(async () => {
-		authClient = await auth.createClient()
+		authClient = await Auth.createClient()
+
 		isAuthenticated.set(await authClient.isAuthenticated())
 		user.set(await authClient.getUser())
+		auth.set({ login, logout })
 	})
+
+	const login = () => Auth.loginWithPopup(authClient, {})
+	const logout = () => Auth.logout(authClient)
 </script>
 
 <header>
@@ -38,11 +41,11 @@
 				<HeaderAction text={$user.email}>
 					<HeaderPanelLinks>
 						<HeaderPanelDivider>Compte</HeaderPanelDivider>
-						<HeaderPanelLink on:click={() => auth.logout(authClient)}>Déconnexion</HeaderPanelLink>
+						<HeaderPanelLink on:click={() => logout()}>Déconnexion</HeaderPanelLink>
 					</HeaderPanelLinks>
 				</HeaderAction>
 			{:else}
-				<HeaderNavItem text="Connexion" on:click={() => auth.loginWithPopup(authClient, null)} />
+				<HeaderNavItem text="Connexion" on:click={() => login()} />
 			{/if}
 			<HeaderNavItem href="/a-propos" text="À propos" />
 		</HeaderUtilities>
@@ -75,13 +78,16 @@
 	:global(.cbc-aside) {
 		grid-area: aside;
 	}
+	
 	:global(.cbc-content) {
 		grid-area: content;
 	}
 
 	:global(.cbc-separator) {
-		border-top: 1px solid #bbb;
+		border-top: solid 0.5px #bbb;
 		width: 100%;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
 	}
 
 	footer {
