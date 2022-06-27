@@ -1,4 +1,4 @@
-import { string, number, array, object } from 'yup'
+import { string, number, array, object, mixed } from 'yup'
 
 const metaSchema = object({
     who: string().required(),
@@ -11,15 +11,10 @@ export const localisationSchema = object({
     commune: string(),
     communeAncien: string(),
     departement: string(),
-    departementDecimal: number().min(1).max(101),
+    departementDecimal: mixed(),
     region: string(),
 })
 
-const participantSchema = object({
-    name: string(),
-    occupation: string(),
-    role: string()
-})
 
 export const deliberationSchema = object({
     id: string().required(),
