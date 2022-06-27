@@ -21,7 +21,7 @@
 	import { validator } from '@felte/validator-yup'
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type schemaType } from './_validators'
-	import { CustomInput, ToastNotification } from '$components'
+	import { CustomInput, ToastNotification, Gallery } from '$components'
 	import Select from 'svelte-select'
 	import { user, isAuthenticated, auth } from '$stores'
 	import type { Deliberation } from '$lib/types/cbc'
@@ -194,6 +194,10 @@
 		<div class="cbc-separator" />
 
 		<Button on:click={modifyDocument}>Modifier la fiche</Button>
+	</div>
+
+	<div class="cbc-content">
+		<Gallery min={0} max={4} />
 	</div>
 </div>
 

@@ -19,7 +19,7 @@
 	import { validator } from '@felte/validator-yup'
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type validateSchemaType } from './_validators'
-	import { CustomInput, ToastNotification } from '$components'
+	import { CustomInput, ToastNotification, Gallery } from '$components'
 	import { user, isAuthenticated, auth } from '$stores'
 	import type { Affair } from '$lib/types/cbc'
 
@@ -141,6 +141,10 @@
 		</div>
 
 		<Button kind="ghost" on:click={modifyDocument}>Modifier la fiche</Button>
+	</div>
+
+	<div class="cbc-content">
+		<Gallery min={0} max={0} />
 	</div>
 </div>
 

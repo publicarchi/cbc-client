@@ -44,18 +44,24 @@
 		<div class="cbc-aside-field">
 			<span class="cbc-aside-field-label">Délibérations</span>
 
-			<ul>
-				{#each meeting.deliberations as d}
-					<li>
-						<Link href={`/deliberations/${d.id}`}>{d.title ? d.title : d.altTitle}</Link>
-					</li>
-				{/each}
-			</ul>
+			<div class="cbc-aside-field-value">
+				<ul>
+					{#each meeting.deliberations as d}
+						<li>
+							<Link href={`/deliberations/${d.id}`}>{d.title ? d.title : d.altTitle}</Link>
+						</li>
+					{/each}
+				</ul>
+			</div>
 		</div>
 
 		<div class="cbc-aside-field">
 			<span class="cbc-aside-field-label" />
 			<span class="cbc-aside-field-value" />
 		</div>
+	</div>
+
+	<div class="cbc-content">
+		<Gallery min={2} max={9} />
 	</div>
 </div>
