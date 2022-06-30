@@ -12,27 +12,35 @@
 	} from 'carbon-components-svelte'
 	import { ExpandedRow } from '$components'
 	import expandedRowOptions from './_expandedRowOptions'
+	import type { PaginationType } from '$lib/types/cbc'
 
 	export let meetings
-	export let meta = {
-		start: 1,
-		count: 20,
-		totalItems: 0
-	}
+	export let meta: PaginationType
 
 	let expandedRowIds = []
 	let currentPage = 1
 
 	const fetchData = async () => {
-		const res = await fetch('http://127.0.0.1:8984/cbc/meetings', {
-			method: 'POST',
-			body: JSON.stringify({
-				meta
-			})
-		})
-		const data = await res.json()
-		meetings = data.meetings
-		meta = data.meta
+		let url = new URL('http://127.0.0.1:8984/cbc/meetings')
+		url.searchParams.append('start', meta.start.toString())
+		url.searchParams.append('count', meta.count.toString())
+
+		console.log('fetching...', url.toString())
+
+		// This uses the sveltekit's fetch function?
+		// Function doesnt allow URL object as parameter -> needs type string
+		const res = await fetch(url.toString())
+
+		if (res.ok) {
+			const data = await res.json()
+			meetings = data.meetings
+			meta = {
+				...meta,
+				start: parseInt(data.meta.start),
+				count: parseInt(data.meta.count),
+				totalItems: data.meta.totalItems
+			}
+		}
 	}
 
 	const onPaginationUpdate = (e) => {
@@ -111,7 +119,7 @@
 				pageSizes={[20, 50, 100, 250, 500]}
 				bind:page={currentPage}
 				bind:pageSize={meta.count}
-				bind:totalItems={meta.totalItems}
+				totalItems={meta.totalItems}
 			/>
 		</DataTable>
 	</div>

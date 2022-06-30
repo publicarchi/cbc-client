@@ -6,6 +6,13 @@ const metaSchema = object({
     when: string().required().default(() => new Date().toISOString())
 })
 
+export const paginationSchema = object({
+    start: number().required(),
+    count: number().required(),
+    totalItems: number().required(),
+    currentPage: number()
+})
+
 export const localisationSchema = object({
     adress: string(),
     commune: string(),
