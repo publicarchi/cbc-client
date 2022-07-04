@@ -18,14 +18,14 @@
 		Pagination,
 		Toolbar,
 		ToolbarContent,
-		ToolbarSearch,
 		ToolbarMenu,
 		ToolbarMenuItem,
 		ToolbarBatchActions,
 		Link,
 		Button,
 		Loading,
-		Modal
+		Modal,
+		Search
 	} from 'carbon-components-svelte'
 	import { user, isAuthenticated, auth } from '$stores'
 	import DocumentAdd from 'carbon-icons-svelte/lib/DocumentAdd.svelte'
@@ -73,10 +73,8 @@
 	}
 
 	const onPaginationUpdate = (e) => {
-		// Computes new start index
 		meta.start = meta.count * (meta.currentPage - 1)
-
-		// Fetch new data
+		if (meta.start === 0) meta.start = 1
 		fetchData()
 	}
 
@@ -86,6 +84,12 @@
 		} else {
 			affaireModalOpened = true
 		}
+	}
+
+	const onSearchKeyDown = (e) => {
+		if (e.key !== 'Enter') return
+		console.log(searchQuery)
+		fetchData()
 	}
 
 	const rowOnClick = (row) => {
@@ -167,7 +171,7 @@
 					<Button icon={Save}>Exporter les fiches</Button>
 				</ToolbarBatchActions>
 				<ToolbarContent>
-					<ToolbarSearch expanded={true} persistent={true} bind:value={searchQuery} />
+					<Search expanded={true} bind:value={searchQuery} on:keydown={onSearchKeyDown} />
 					<ToolbarMenu>
 						<ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
 						<ToolbarMenuItem href="https://cloud.ibm.com/docs/loadbalancer-service"

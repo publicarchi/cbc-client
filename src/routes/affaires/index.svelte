@@ -1,11 +1,11 @@
 <script context="module" lang="ts">
 	export async function load({ fetch }) {
-		let data = await fetch('http://127.0.0.1:8984/cbc/affaires')
+		let data = await fetch('http://127.0.0.1:8984/cbc/affairs')
 			.then((res) => res.json())
 			.catch((err) => console.log(err))
 		return {
 			props: {
-				affaires: data.content,
+				affairs: data.content,
 				meta: data.meta
 			}
 		}
@@ -31,32 +31,40 @@
 	import Launch from 'carbon-icons-svelte/lib/Launch.svelte'
 	import { ExpandedRow } from '$components'
 	import expandedRowOptions from './_expandedRowOptions'
-	import type { Affair } from '$lib/types/cbc'
+	import type { Affair, PaginationType } from '$lib/types/cbc'
 
-	export let affaires: Affair[]
-	export let meta
+	export let affairs: Affair[]
+	export let meta: PaginationType
 
 	let searchQuery
 
 	let selectedRowIds = []
 	let expandedRowIds = []
 
-	$: (meta) => {
-		fetch('http://127.0.0.1:8984/cbc/affaires')
-			.then((res) => res.json())
-			.then((data) => {
-				meta = data.meta
+	const fetchData = async () => {
+		let url = new URL('http://127.0.0.1:8984/cbc/affairs')
+		url.searchParams.append('start', meta.start.toString())
+		url.searchParams.append('count', meta.count.toString())
 
-				// new ids for affairs and deliberation count
-				affaires = data.content.map((a) => ({
-					...a,
-					deliberationCount: a.deliberations.length
-				}))
-			})
-			.catch((err) => console.log(err))
+		const res = await fetch(url.toString())
+
+		if (res.ok) {
+			const data = await res.json()
+			affairs = data.content
+			meta = {
+				...meta,
+				start: parseInt(data.meta.start),
+				count: parseInt(data.meta.count),
+				totalItems: data.meta.totalItems
+			}
+		}
 	}
 
-	const onPaginationUpdate = () => null
+	const onPaginationUpdate = (e) => {
+		meta.start = meta.count * (meta.currentPage - 1)
+		if (meta.start === 0) meta.start = 1
+		fetchData()
+	}
 
 	const rowOnClick = (row) => {
 		if (expandedRowIds.includes(row.detail.id)) {
@@ -80,6 +88,7 @@
 			on:click:row={rowOnClick}
 			title="Liste des affaires"
 			expandable
+			sortable
 			bind:selectedRowIds
 			bind:expandedRowIds
 			headers={[
@@ -91,7 +100,7 @@
 				{ key: 'localisation.region', value: 'Région' },
 				{ key: 'id', empty: true }
 			]}
-			rows={affaires}
+			rows={affairs}
 		>
 			<svelte:fragment slot="cell" let:cell let:row>
 				{#if cell.key === 'id'}
@@ -102,7 +111,7 @@
 			</svelte:fragment>
 
 			<svelte:fragment slot="expanded-row" let:row>
-				<ExpandedRow data={affaires.find((a) => a.id === row.id)} options={expandedRowOptions} />
+				<ExpandedRow data={affairs.find((a) => a.id === row.id)} options={expandedRowOptions} />
 			</svelte:fragment>
 
 			<Toolbar>
@@ -134,7 +143,7 @@
 				bind:totalItems={meta.totalItems}
 			/>
 
-			{#if affaires.length === 0}
+			{#if affairs.length === 0}
 				<Loading />
 			{/if}
 		</DataTable>

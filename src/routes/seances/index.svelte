@@ -18,17 +18,12 @@
 	export let meta: PaginationType
 
 	let expandedRowIds = []
-	let currentPage = 1
 
 	const fetchData = async () => {
 		let url = new URL('http://127.0.0.1:8984/cbc/meetings')
 		url.searchParams.append('start', meta.start.toString())
 		url.searchParams.append('count', meta.count.toString())
 
-		console.log('fetching...', url.toString())
-
-		// This uses the sveltekit's fetch function?
-		// Function doesnt allow URL object as parameter -> needs type string
 		const res = await fetch(url.toString())
 
 		if (res.ok) {
@@ -44,10 +39,8 @@
 	}
 
 	const onPaginationUpdate = (e) => {
-		// Computes new start index
-		meta.start = meta.count * (currentPage - 1)
-
-		// Fetch new data
+		meta.start = meta.count * (meta.currentPage - 1)
+		if (meta.start === 0) meta.start = 1
 		fetchData()
 	}
 
@@ -75,6 +68,7 @@
 			bind:expandedRowIds
 			on:click:row={rowOnClick}
 			expandable
+			sortable
 			rows={meetings}
 			headers={[
 				{ key: 'title', value: 'Titre' },
@@ -117,7 +111,7 @@
 				forwardText="Page suivante"
 				itemsPerPageText="Fiches par page :"
 				pageSizes={[20, 50, 100, 250, 500]}
-				bind:page={currentPage}
+				bind:page={meta.currentPage}
 				bind:pageSize={meta.count}
 				totalItems={meta.totalItems}
 			/>
