@@ -23,9 +23,11 @@
 	import { validateSchema, warnSchema, type schemaType } from './_validators'
 	import { CustomInput, ToastNotification, Gallery } from '$components'
 	import Select from 'svelte-select'
-	import { user, isAuthenticated, auth } from '$stores'
+	import { user, isAuthenticated, auth, notificationState } from '$stores'
 	import type { Deliberation } from '$lib/types/cbc'
 	import { onMount } from 'svelte'
+	import { goto } from '$app/navigation'
+	import { page } from '$app/stores'
 
 	export let deliberation: Deliberation
 
@@ -72,6 +74,12 @@
 				.then((res) => res.json())
 				.then((data) => (response = data))
 				.catch((err) => {
+					notificationState.set({
+						url: $page.url.pathname,
+						title: 'Une erreur est survenue',
+						msg: err.message,
+						kind: 'error'
+					})
 					throw new Error(err.message)
 				})
 
@@ -79,9 +87,13 @@
 		},
 		onSuccess: (response, context) => {
 			// toggleForm()
-			console.log('form submitted')
-			console.log('response', response)
-			submited = true
+			goto($page.url.href)
+			notificationState.set({
+				url: $page.url.pathname,
+				title: 'Mise à jour effectuée',
+				msg: 'Les modifications ont bien été prises en comptes.',
+				kind: 'success'
+			})
 		},
 		onError: (err, context) => {
 			// Do something with the error thrown from `onSubmit`.
@@ -102,6 +114,8 @@
 <svelte:head>
 	<title>Délibération</title>
 </svelte:head>
+
+<ToastNotification />
 
 <div class="cbc-container-grid">
 	<div class="cbc-aside">
@@ -204,7 +218,6 @@
 <Modal
 	bind:open={modalOpened}
 	size="sm"
-	hasForm
 	formId="deliberation-form"
 	modalHeading={`Modifier la fiche : ${
 		deliberation.title ? deliberation.title : deliberation.altTitle
@@ -267,18 +280,6 @@
 			<CustomInput type="area" name="recommendation" label="Recommandation" />
 		</div>
 	</form>
-
-	{#if submited}
-		{#if postStatus}
-			<InlineNotification title="Succès" kind="success" subtitle={postResponse.message} />
-		{:else}
-			<InlineNotification
-				title="Erreur lors de l'envoi du formulaire"
-				kind="error"
-				subtitle={postResponse.message}
-			/>
-		{/if}
-	{/if}
 </Modal>
 
 <style>

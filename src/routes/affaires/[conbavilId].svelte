@@ -14,13 +14,14 @@
 
 <script lang="ts">
 	import { Button, Link, Modal } from 'carbon-components-svelte'
-	import { onMount } from 'svelte'
+	import { goto } from '$app/navigation'
+	import { page } from '$app/stores'
 	import { createForm } from 'felte'
 	import { validator } from '@felte/validator-yup'
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type validateSchemaType } from './_validators'
 	import { CustomInput, ToastNotification, Gallery } from '$components'
-	import { user, isAuthenticated, auth } from '$stores'
+	import { user, isAuthenticated, auth, notificationState } from '$stores'
 	import type { Affair } from '$lib/types/cbc'
 
 	export let affaire: Affair
@@ -29,14 +30,6 @@
 	let types: string[] = []
 
 	let modalOpened = false
-	let updated = false
-
-	onMount(async () => {
-		;[types, categories] = await Promise.all([
-			fetch('http://127.0.0.1:8984/cbc/types').then((res) => res.json()),
-			fetch('http://127.0.0.1:8984/cbc/categories').then((res) => res.json())
-		])
-	})
 
 	const modifyDocument = () => {
 		if (!$isAuthenticated) $auth.login()
@@ -56,6 +49,8 @@
 				when: new Date().toISOString()
 			})
 
+			modalOpened = false
+
 			// Post form data
 			const res = await fetch('http://127.0.0.1:8984/cbc/affaires/post', {
 				method: 'POST',
@@ -64,14 +59,25 @@
 					affaire: values
 				})
 			})
+
 			if (res.status === 500) {
+				notificationState.set({
+					url: $page.url.pathname,
+					title: 'Une erreur est survenue',
+					msg: 'Suite à une erreur, la modification n a pas eu lieu',
+					kind: 'error'
+				})
 				throw new Error('La modification n a pas eu lieu')
 			}
 		},
 		onSuccess: (response, context) => {
-			// Do something with the returned value from `onSubmit`.
-			modalOpened = false
-			updated = true
+			goto($page.url.href)
+			notificationState.set({
+				url: $page.url.pathname,
+				title: 'Mise à jour effectuée',
+				msg: 'Les modifications ont bien été prises en comptes.',
+				kind: 'success'
+			})
 		},
 		onError: (err, context) => {
 			// Do something with the error thrown from `onSubmit`.
@@ -84,22 +90,16 @@
 		]
 	})
 
-	$: console.log({ $errors, $warnings, $isValid })
+	console.log($page)
+
+	// $: console.log({ $errors, $warnings, $isValid })
 </script>
 
 <svelte:head>
 	<title>Affaire</title>
 </svelte:head>
 
-{#if updated}
-	<ToastNotification
-		lowContrast
-		kind="success"
-		title="Mise à jour effectuée"
-		subtitle="Merci de recharger la page pour que les modifications soient apparentes."
-		caption={new Date().toLocaleString()}
-	/>
-{/if}
+<ToastNotification />
 
 <div class="cbc-container-grid">
 	<div class="cbc-aside">
@@ -154,12 +154,11 @@
 	on:click:button--secondary={() => (modalOpened = false)}
 	bind:modalHeading={affaire.title}
 	size="sm"
-	hasForm
 	formId="affair-form"
 	primaryButtonText="Soumettre les modifications"
+	secondaryButtonText="Annuler"
 	primaryButtonDisabled={!$isValid}
 	shouldSubmitOnEnter={false}
-	secondaryButtonText="Annuler"
 >
 	<form use:form id="affair-form">
 		<div class="invisible">
