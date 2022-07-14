@@ -34,7 +34,7 @@
 			<HeaderNavItem href="/seances" text="Séances" />
 			<HeaderNavItem href="/deliberations" text="Délibérations" />
 			<HeaderNavItem href="/affaires" text="Affaires" />
-			<HeaderNavItem href="/blogs" text="Blog" />
+			<HeaderNavItem href="/blog" text="Blog" />
 		</HeaderNav>
 		<HeaderUtilities>
 			{#if $isAuthenticated}

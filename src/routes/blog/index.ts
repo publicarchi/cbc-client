@@ -6,19 +6,19 @@ export async function get() {
   const allPosts = await Promise.all(
     iterablePostFiles.map(async ([path, resolver]) => {
       const { metadata } = await resolver()
-      const postPath = path.slice(5,-3)
+      const fname = path.split('/').pop().split('.')[0]
 
       return {
-        meta: metadata,
-        path: postPath,
+        metadata,
+        fname,
       }
     })
   )
 
-  const sortedPosts = allPosts.sort((a, b) =>  new Date(b.meta.date) - new Date(a.meta.date))
+  // const sortedPosts = allPosts.sort((a, b) => b.meta.date - a.meta.date)
 
   // @todo add an error msg
   return {
-    body: sortedPosts
+    body: { posts: allPosts }
   }
 };

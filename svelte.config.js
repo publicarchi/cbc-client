@@ -1,12 +1,10 @@
-import path from 'path';
-import preprocess from 'svelte-preprocess';
+import path from 'path'
+import preprocess from 'svelte-preprocess'
+import { mdsvex } from 'mdsvex'
 
+import { optimizeImports } from 'carbon-preprocess-svelte'
 
-import { mdsvex } from 'mdsvex';
-
-import { optimizeImports } from 'carbon-preprocess-svelte';
-
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-auto'
 // import adapter from '@sveltejs/adapter-static';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -16,10 +14,10 @@ const config = {
 	extensions: ['.svelte', '.md', '.svx'],
 	preprocess: [
 		mdsvex({
-			extensions: ['.md'],
+			extensions: ['.md']
 		}),
 		preprocess(),
-		optimizeImports(),
+		optimizeImports()
 		// elements()
 	],
 
@@ -40,6 +38,6 @@ const config = {
 			}
 		}
 	}
-};
+}
 
-export default config;
+export default config
