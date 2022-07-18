@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from 'carbon-components-svelte'
+	import { Button } from 'carbon-components-svelte/src/Button'
 </script>
 
 <svelte:head>
@@ -35,3 +35,13 @@
 		<Button href="deliberations">Consulter les délibérations</Button>
 	</div>
 </div>
+
+<style>
+	h1 {
+		margin-bottom: 1.5rem;
+	}
+
+	p {
+		margin-bottom: 1rem;
+	}
+</style>
