@@ -29,9 +29,23 @@
 
 	let modalOpened = false
 
+	let formSubmited = false
+	let toastTitle = ''
+	let toastMsg = ''
+	let toastKind: 'success' | 'warning' | 'error' | 'info' | 'info-square' | 'warning-alt' =
+		'success'
+
 	const modifyDocument = () => {
 		if (!$isAuthenticated) $auth.login()
-		else modalOpened = true
+		else {
+			modalOpened = true
+			formSubmited = false
+		}
+	}
+
+	const update = async () => {
+		const res = await fetch(`http://127.0.0.1:8984/cbc/affaires/${affaire.id}`)
+		affaire = await res.json()
 	}
 
 	const { form, errors, warnings, isValid } = createForm<validateSchemaType>({
@@ -59,23 +73,20 @@
 			})
 
 			if (res.status === 500) {
-				notificationState.set({
-					url: $page.url.pathname,
-					title: 'Une erreur est survenue',
-					msg: 'Suite à une erreur, la modification n a pas eu lieu',
-					kind: 'error'
-				})
+				toastTitle = 'Une erreur est survenue'
+				toastMsg = 'Suite à une erreur, la modification n a pas eu lieu'
+				toastKind = 'error'
+				formSubmited = true
+				update()
 				throw new Error('La modification n a pas eu lieu')
 			}
 		},
 		onSuccess: (response, context) => {
-			goto($page.url.href)
-			notificationState.set({
-				url: $page.url.pathname,
-				title: 'Mise à jour effectuée',
-				msg: 'Les modifications ont bien été prises en comptes.',
-				kind: 'success'
-			})
+			toastTitle = 'Mise à jour effectuée'
+			toastMsg = 'Les modifications ont bien été prises en comptes.'
+			toastKind = 'success'
+			formSubmited = true
+			update()
 		},
 		onError: (err, context) => {
 			// Do something with the error thrown from `onSubmit`.
@@ -88,7 +99,6 @@
 		]
 	})
 
-	console.log($page)
 
 	// $: console.log({ $errors, $warnings, $isValid })
 </script>
@@ -97,7 +107,7 @@
 	<title>Affaire</title>
 </svelte:head>
 
-<ToastNotification />
+<ToastNotification title={toastTitle} subtitle={toastMsg} kind={toastKind} show={formSubmited} />
 
 <div class="cbc-container-grid">
 	<div class="cbc-aside">
@@ -151,7 +161,6 @@
 	on:close={() => (modalOpened = false)}
 	on:click:button--secondary={() => (modalOpened = false)}
 	bind:modalHeading={affaire.title}
-	size="sm"
 	formId="affair-form"
 	primaryButtonText="Soumettre les modifications"
 	secondaryButtonText="Annuler"

@@ -19,17 +19,17 @@
 	import { user, isAuthenticated, auth, notificationState } from '$stores'
 	import type { Deliberation } from '$lib/types/cbc'
 	import { onMount } from 'svelte'
-	import { goto } from '$app/navigation'
-	import { page } from '$app/stores'
 
 	export let deliberation: Deliberation
 
 	let modalOpened = false
-	let postResponse = { message: '' }
-	let postStatus = false
-	let submited = false
-	let datalists
+	let formSubmited = false
+	let toastTitle = ''
+	let toastMsg = ''
+	let toastKind: 'success' | 'warning' | 'error' | 'info' | 'info-square' | 'warning-alt' =
+		'success'
 
+	let datalists
 	type SelectType = { value: string; label: string }[]
 	let selectedBuildingTypes: SelectType = []
 	let selectedProjectGenres: SelectType = []
@@ -46,7 +46,12 @@
 		else modalOpened = true
 	}
 
-	const { form, errors, warnings, isValid } = createForm<schemaType>({
+	const update = async () => {
+		const res = await fetch(`http://127.0.0.1:8984/cbc/deliberations/${deliberation.id}`)
+		deliberation = await res.json()
+	}
+
+	const { form, isValid } = createForm<schemaType>({
 		initialValues: deliberation,
 		onSubmit: (values, context) => {
 			let m = {
@@ -67,26 +72,22 @@
 				.then((res) => res.json())
 				.then((data) => (response = data))
 				.catch((err) => {
-					notificationState.set({
-						url: $page.url.pathname,
-						title: 'Une erreur est survenue',
-						msg: err.message,
-						kind: 'error'
-					})
+					toastTitle = 'Une erreur est survenue'
+					toastMsg = 'Suite à une erreur, la modification n a pas eu lieu'
+					toastKind = 'error'
+					formSubmited = true
+					update()
 					throw new Error(err.message)
 				})
 
 			return response
 		},
 		onSuccess: (response, context) => {
-			// toggleForm()
-			goto($page.url.href)
-			notificationState.set({
-				url: $page.url.pathname,
-				title: 'Mise à jour effectuée',
-				msg: 'Les modifications ont bien été prises en comptes.',
-				kind: 'success'
-			})
+			toastTitle = 'Mise à jour effectuée'
+			toastMsg = 'Les modifications ont bien été prises en comptes.'
+			toastKind = 'success'
+			formSubmited = true
+			update()
 		},
 		onError: (err, context) => {
 			// Do something with the error thrown from `onSubmit`.
@@ -100,15 +101,15 @@
 	})
 	const toggleForm = () => (modalOpened = !modalOpened)
 
-	$: console.log('for is valid:', $isValid)
-	$: console.log(datalists)
+	// $: console.log('for is valid:', $isValid)
+	// $: console.log(datalists)
 </script>
 
 <svelte:head>
 	<title>Délibération</title>
 </svelte:head>
 
-<ToastNotification />
+<ToastNotification title={toastTitle} subtitle={toastMsg} kind={toastKind} show={formSubmited} />
 
 <div class="cbc-container-grid">
 	<div class="cbc-aside">
@@ -210,7 +211,6 @@
 
 <Modal
 	bind:open={modalOpened}
-	size="sm"
 	formId="deliberation-form"
 	modalHeading={`Modifier la fiche : ${
 		deliberation.title ? deliberation.title : deliberation.altTitle
@@ -250,7 +250,6 @@
 			<CustomInput
 				label="Types de l'édifices"
 				type="multi"
-				listOpen
 				items={datalists ? datalists.buildingType : []}
 				bind:value={selectedBuildingTypes}
 			/>
@@ -276,10 +275,6 @@
 </Modal>
 
 <style>
-	h5 {
-		font-size: small;
-	}
-
 	.invisible {
 		visibility: hidden;
 		height: 0;

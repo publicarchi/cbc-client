@@ -104,7 +104,7 @@
 		>
 			<svelte:fragment slot="cell" let:cell let:row>
 				{#if cell.key === 'id'}
-					<Link icon={Launch} href="/affaires/{cell.value}" target="_blank" />
+					<Link icon={Launch} href="/affaires/{cell.value}" />
 				{:else}
 					{cell.value}
 				{/if}
