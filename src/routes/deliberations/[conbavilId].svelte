@@ -9,19 +9,12 @@
 </script>
 
 <script lang="ts">
-	import {
-		Button,
-		Modal,
-		TextInput,
-		InlineNotification,
-		Link,
-		Search
-	} from 'carbon-components-svelte'
+	import { Button, TextInput, Link } from 'carbon-components-svelte'
 	import { createForm } from 'felte'
 	import { validator } from '@felte/validator-yup'
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type schemaType } from './_validators'
-	import { CustomInput, ToastNotification, Gallery } from '$components'
+	import { CustomInput, ToastNotification, Gallery, Modal } from '$components'
 	import Select from 'svelte-select'
 	import { user, isAuthenticated, auth, notificationState } from '$stores'
 	import type { Deliberation } from '$lib/types/cbc'

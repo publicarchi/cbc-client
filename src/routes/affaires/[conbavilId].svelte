@@ -13,14 +13,12 @@
 </script>
 
 <script lang="ts">
-	import { Button, Link, Modal } from 'carbon-components-svelte'
-	import { goto } from '$app/navigation'
-	import { page } from '$app/stores'
+	import { Button, Link } from 'carbon-components-svelte'
 	import { createForm } from 'felte'
 	import { validator } from '@felte/validator-yup'
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type validateSchemaType } from './_validators'
-	import { CustomInput, ToastNotification, Gallery } from '$components'
+	import { CustomInput, ToastNotification, Gallery, Modal } from '$components'
 	import { user, isAuthenticated, auth, notificationState } from '$stores'
 	import type { Affair } from '$lib/types/cbc'
 
