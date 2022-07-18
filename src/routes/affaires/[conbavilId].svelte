@@ -140,7 +140,7 @@
 			<ul>
 				{#each affaire.deliberations as d}
 					<li>
-						<Link href="http://127.0.0.1:3000/deliberations/{d.id}"
+						<Link href="/deliberations/{d.id}"
 							>{d.title ? d.title : d.altTitle}</Link
 						>
 					</li>

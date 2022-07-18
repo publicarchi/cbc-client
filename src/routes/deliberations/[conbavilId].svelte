@@ -139,7 +139,7 @@
 		<div class="cbc-aside-field">
 			<span class="cbc-aside-field-label">ID affaire</span>
 			<span class="cbc-aside-field-value">
-				<Link href={`http://127.0.0.1:3000/affaires/${deliberation.affairId}`}>
+				<Link href={`/affaires/${deliberation.affairId}`}>
 					{deliberation.affairId}
 				</Link>
 			</span>
