@@ -32,7 +32,7 @@ export const deliberationSchema = object({
     altTitle: string(),
     localisation: localisationSchema,
     buildingTypes: array(string()),
-    buildingCategories: array(string()),
+    projectGenres: array(string()),
     administrativeObjects: array(string()),
     report: string(),
     recommandation: string(),
@@ -44,7 +44,9 @@ export const affairSchema = object({
     id: string().required(),
     title: string(),
     localisation: localisationSchema,
-    types: array(string()),
+    buildingTypes: array(string()),
+    projectGenres: array(string()),
+    administrativeObjects: array(string()),
     deliberations: array(deliberationSchema),
     meta: array(metaSchema)
 })

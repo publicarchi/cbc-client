@@ -9,18 +9,18 @@
 </script>
 
 <script lang="ts">
-	import { Button, TextInput, Link } from 'carbon-components-svelte'
+	import { Button, TextInput, Link, MultiSelect } from 'carbon-components-svelte'
 	import { createForm } from 'felte'
 	import { validator } from '@felte/validator-yup'
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type schemaType } from './_validators'
 	import { CustomInput, ToastNotification, Gallery, Modal } from '$components'
-	import Select from 'svelte-select'
-	import { user, isAuthenticated, auth, notificationState } from '$stores'
+	import { user, isAuthenticated, auth } from '$stores'
 	import type { Deliberation } from '$lib/types/cbc'
 	import { onMount } from 'svelte'
 
 	export let deliberation: Deliberation
+	console.log(deliberation)
 
 	let modalOpened = false
 	let formSubmited = false
@@ -29,16 +29,37 @@
 	let toastKind: 'success' | 'warning' | 'error' | 'info' | 'info-square' | 'warning-alt' =
 		'success'
 
-	let datalists
-	type SelectType = { value: string; label: string }[]
-	let selectedBuildingTypes: SelectType = []
-	let selectedProjectGenres: SelectType = []
-	let selectedAdministrativeObjects: SelectType = []
+	type SelectItem = {
+		id: number
+		text: string
+		checked?: boolean
+	}
+
+	let datalists: { [k: string]: SelectItem[] } = null
+	let selected: { [k: string]: SelectItem[] } = null
 
 	onMount(async () => {
 		const res = await fetch('http://127.0.0.1:8984/cbc/facets')
-		datalists = await res.json()
-		datalists = datalists
+		const data = await res.json()
+
+		datalists = {}
+		Object.keys(data).map((k) => {
+			datalists[k] = data[k].map((l: string, i: number) => ({ id: i.toString(), text: l }))
+		})
+
+		selected = {}
+		Object.keys(datalists).forEach((k) => {
+			if (!Array.isArray(deliberation[k])) return
+
+			selected[k] = deliberation[k].map((v) => {
+				console.log('found something:', v)
+				let item = datalists[k].find((elt) => elt.text === v)
+
+				console.log('item added:', item)
+
+				return item
+			})
+		})
 	})
 
 	const modifyDocument = () => {
@@ -51,9 +72,10 @@
 		deliberation = await res.json()
 	}
 
-	const { form, isValid } = createForm<schemaType>({
+	const { form, isValid, errors, warnings } = createForm<schemaType>({
 		initialValues: deliberation,
-		onSubmit: (values, context) => {
+		onSubmit: async (values, context) => {
+			// Update meta
 			let m = {
 				who: $user.email,
 				type: 'modification',
@@ -61,26 +83,30 @@
 			}
 			values.meta ? values.meta.push(m) : (values.meta = [m])
 
-			let response
-			fetch('http://127.0.0.1:8984/cbc/deliberations/post', {
+			// Update multiSelect values
+			Object.keys(selected).forEach((k) => (values[k] = selected[k].map((e) => e.text)))
+
+			console.log(values)
+
+			modalOpened = false
+
+			const res = await fetch('http://127.0.0.1:8984/cbc/deliberations/post', {
 				method: 'POST',
 				body: JSON.stringify({
 					type: 'modification',
 					deliberation: values
 				})
 			})
-				.then((res) => res.json())
-				.then((data) => (response = data))
-				.catch((err) => {
-					toastTitle = 'Une erreur est survenue'
-					toastMsg = 'Suite à une erreur, la modification n a pas eu lieu'
-					toastKind = 'error'
-					formSubmited = true
-					update()
-					throw new Error(err.message)
-				})
 
-			return response
+			if (res.status === 200) return
+			else if (res.status === 500) {
+				toastTitle = 'Une erreur est survenue'
+				toastMsg = 'Suite à une erreur, la modification n a pas eu lieu'
+				toastKind = 'error'
+				formSubmited = true
+				update()
+				throw new Error('La modification n a pas eu lieu')
+			}
 		},
 		onSuccess: (response, context) => {
 			toastTitle = 'Mise à jour effectuée'
@@ -99,10 +125,14 @@
 			validator({ schema: warnSchema, level: 'warning' })
 		]
 	})
-	const toggleForm = () => (modalOpened = !modalOpened)
 
 	// $: console.log('for is valid:', $isValid)
-	// $: console.log(datalists)
+	// $: console.log({
+	// 	$isValid,
+	// 	$errors,
+	// 	$warnings
+	// })
+	$: console.log(selected)
 </script>
 
 <svelte:head>
@@ -153,8 +183,8 @@
 		<div class="cbc-separator" />
 
 		<div class="cbc-aside-field">
-			<span class="cbc-aside-field-label">Catégories de l'édifice</span>
-			<span class="cbc-aside-field-value">{deliberation.buildingCategories}</span>
+			<span class="cbc-aside-field-label">Catégories du projet</span>
+			<span class="cbc-aside-field-value">{deliberation.projectGenres}</span>
 		</div>
 		<div class="cbc-separator" />
 
@@ -205,20 +235,23 @@
 	</div>
 
 	<div class="cbc-content">
+		<div>{JSON.stringify(selected)}</div>
 		<Gallery min={0} max={4} />
 	</div>
 </div>
 
 <Modal
-	bind:open={modalOpened}
 	formId="deliberation-form"
+	bind:open={modalOpened}
 	modalHeading={`Modifier la fiche : ${
 		deliberation.title ? deliberation.title : deliberation.altTitle
 	}`}
-	primaryButtonText="Soumettre les modifications"
-	secondaryButtonText="Annuler"
 	on:click:button--secondary={() => (modalOpened = false)}
 	on:close={() => (modalOpened = false)}
+	primaryButtonText="Soumettre les modifications"
+	primaryButtonDisabled={!$isValid}
+	secondaryButtonText="Annuler"
+	shouldSubmitOnEnter={false}
 >
 	<form use:form id="deliberation-form">
 		<div class="invisible">
@@ -230,11 +263,11 @@
 		</div>
 
 		<div class="form-section">
-			<h4>Identification de l'édifice</h4>
+			<h4 class="cbc-form-header">Identification de l'édifice</h4>
 			<CustomInput name="title" label="Titre" />
 		</div>
 		<div class="form-section">
-			<h4>Localisation de l'édifice</h4>
+			<h4 class="cbc-form-header">Localisation de l'édifice</h4>
 			<CustomInput name="localisation.commune" label="Commune" />
 			<CustomInput name="localisation.departement" label="Département" />
 			<CustomInput
@@ -245,29 +278,31 @@
 			<CustomInput name="localisation.region" label="Région" />
 		</div>
 		<div class="form-section">
-			<h4>Caractéristiques de l'édifice</h4>
+			<h4 class="cbc-form-header">Caractéristiques de l'édifice</h4>
 			<!-- <CustomInput type="multi" name="buildingTypes" label="Types de l'édifice" /> -->
-			<CustomInput
-				label="Types de l'édifices"
-				type="multi"
-				items={datalists ? datalists.buildingType : []}
-				bind:value={selectedBuildingTypes}
-			/>
-			<CustomInput
-				label="Genres du projet"
-				type="multi"
-				items={datalists ? datalists.projectGenre : []}
-				bind:value={selectedProjectGenres}
-			/>
-			<CustomInput
-				label="Objets administratifs"
-				type="multi"
-				items={datalists ? datalists.administrativeObject : []}
-				bind:value={selectedAdministrativeObjects}
-			/>
+			{#if datalists && selected}
+				<CustomInput
+					label="Types de l'édifices"
+					type="multi"
+					items={datalists ? datalists.buildingTypes : []}
+					bind:value={selected.buildingTypes}
+				/>
+				<CustomInput
+					label="Genres du projet"
+					type="multi"
+					items={datalists ? datalists.projectGenres : []}
+					bind:value={selected.projectGenres}
+				/>
+				<CustomInput
+					label="Objets administratifs"
+					type="multi"
+					items={datalists ? datalists.administrativeObjects : []}
+					bind:value={selected.administrativeObjects}
+				/>
+			{/if}
 		</div>
 		<div class="form-section">
-			<h4>Délibération</h4>
+			<h4 class="cbc-form-header">Délibération</h4>
 			<CustomInput name="advice" label="Avis" />
 			<CustomInput type="area" name="recommendation" label="Recommandation" />
 		</div>

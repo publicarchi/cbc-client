@@ -19,7 +19,7 @@
 	import { reporter } from '@felte/reporter-svelte'
 	import { validateSchema, warnSchema, type validateSchemaType } from './_validators'
 	import { CustomInput, ToastNotification, Gallery, Modal } from '$components'
-	import { user, isAuthenticated, auth, notificationState } from '$stores'
+	import { user, isAuthenticated, auth } from '$stores'
 	import type { Affair } from '$lib/types/cbc'
 
 	export let affaire: Affair
@@ -48,12 +48,9 @@
 		affaire = await res.json()
 	}
 
-	const { form, errors, warnings, isValid } = createForm<validateSchemaType>({
+	const { form, isValid } = createForm<validateSchemaType>({
 		initialValues: affaire,
 		onSubmit: async (values, context) => {
-			console.log('Submitting !!')
-			console.log(values)
-
 			// Update meta
 			values.meta.push({
 				who: $user.email,
@@ -72,7 +69,8 @@
 				})
 			})
 
-			if (res.status === 500) {
+			if (res.status === 200) return
+			else if (res.status === 500) {
 				toastTitle = 'Une erreur est survenue'
 				toastMsg = 'Suite à une erreur, la modification n a pas eu lieu'
 				toastKind = 'error'
@@ -98,7 +96,6 @@
 			validator({ schema: validateSchema })
 		]
 	})
-
 
 	// $: console.log({ $errors, $warnings, $isValid })
 </script>
@@ -140,9 +137,7 @@
 			<ul>
 				{#each affaire.deliberations as d}
 					<li>
-						<Link href="/deliberations/{d.id}"
-							>{d.title ? d.title : d.altTitle}</Link
-						>
+						<Link href="/deliberations/{d.id}">{d.title ? d.title : d.altTitle}</Link>
 					</li>
 				{/each}
 			</ul>
@@ -157,14 +152,14 @@
 </div>
 
 <Modal
+	formId="affair-form"
 	bind:open={modalOpened}
+	bind:modalHeading={affaire.title}
 	on:close={() => (modalOpened = false)}
 	on:click:button--secondary={() => (modalOpened = false)}
-	bind:modalHeading={affaire.title}
-	formId="affair-form"
 	primaryButtonText="Soumettre les modifications"
-	secondaryButtonText="Annuler"
 	primaryButtonDisabled={!$isValid}
+	secondaryButtonText="Annuler"
 	shouldSubmitOnEnter={false}
 >
 	<form use:form id="affair-form">

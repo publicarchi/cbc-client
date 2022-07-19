@@ -114,6 +114,10 @@
 		margin-bottom: 1rem;
 	}
 
+	:global(.cbc-form-header) {
+		margin-bottom: 0.5rem;
+	}
+
 	footer {
 		height: 20vh;
 		background: black;
