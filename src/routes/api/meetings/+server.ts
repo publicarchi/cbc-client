@@ -1,13 +1,14 @@
 import { BASEX_URI } from '$env/static/private';
-import { RequestHandler } from '@sveltejs/kit';
+import { type RequestHandler, json } from '@sveltejs/kit';
+import { MAX_AGE } from '$lib/utils/cache';
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, setHeaders }) => {
 	const response = await fetch(BASEX_URI + '/meetings' + url.search);
 	const data = await response.json();
 
-	return new Response(JSON.stringify(data), {
-		headers: {
-			'Content-Type': 'application/json'
-		}
+	setHeaders({
+		'cache-control': 'max-age=' + MAX_AGE
 	});
+
+	return json(data);
 };
