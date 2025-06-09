@@ -7,8 +7,7 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		alias: {
-			lib: './src/lib/',
-			components: './src/lib/components/index.ts'
+			lib: './src/lib/'
 		}
 	},
 	extensions: ['.svelte', '.svx']
