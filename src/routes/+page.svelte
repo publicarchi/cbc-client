@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
 	import { get } from '$lib/utils/api';
+	import { PageHeader } from '$lib/components';
 
 	let { data } = $props();
 	let content = $state(data.content);
@@ -15,3 +15,22 @@
 			.then((d) => (content = d));
 	};
 </script>
+
+<PageHeader>
+	{#snippet suptitle()}
+		L'institution
+	{/snippet}
+	{#snippet title()}
+		Base de données Z1J
+	{/snippet}
+</PageHeader>
+
+<section class="base_txt txt">
+	<p>
+		Depuis le Moyen Âge et probablement plus tôt, les autorités publiques confient à des personnes
+		qu’elles estiment et qualifient compétentes l’action d’émettre un avis sur le savoir technique
+		et scientifique, que ce soit dans le domaine gracieux comme contentieux. Depuis le Moyen Âge et
+		probablement plus tôt, les autorités publiques confient à des personnes.
+	</p>
+	<p><a href="#">En savoir plus sur la base de données</a></p>
+</section>

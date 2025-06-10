@@ -4,7 +4,7 @@
 	let { children } = $props();
 </script>
 
-<header id="header" class="header wrapper" role="banner">
+<header id="header" class="header wrapper">
 	<div class="header_inner">
 		<a class="header_logo bg" href="index.php" rel="home"
 			>Experts et expertises du bâtiment à Paris, 1690-1790</a
