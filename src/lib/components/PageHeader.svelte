@@ -2,10 +2,10 @@
 	import type { Snippet } from 'svelte';
 	import { getPrettyRoute } from '$lib/stores/stores.svelte';
 
-	let { title, suptitle }: { title: Snippet; suptitle: Snippet } = $props();
+	let { title, suptitle }: { title: Snippet; suptitle: Snippet } =
+		$props();
 
 	const prettyRouteItems = getPrettyRoute();
-	$inspect(prettyRouteItems);
 </script>
 
 <header class="page_header pHeader">
@@ -29,9 +29,21 @@
 					viewBox="0 0 85 102"
 					fill="none"
 				>
-					<line vector-effect="non-scaling-stroke" x1="42.5" y1="2.18557e-08" x2="42.5" y2="101" />
-					<path vector-effect="non-scaling-stroke" d="M1 59.7485L42.7515 101.5" />
-					<path vector-effect="non-scaling-stroke" d="M84 59.7485L42.2485 101.5" /></svg
+					<line
+						vector-effect="non-scaling-stroke"
+						x1="42.5"
+						y1="2.18557e-08"
+						x2="42.5"
+						y2="101"
+					/>
+					<path
+						vector-effect="non-scaling-stroke"
+						d="M1 59.7485L42.7515 101.5"
+					/>
+					<path
+						vector-effect="non-scaling-stroke"
+						d="M84 59.7485L42.2485 101.5"
+					/></svg
 				><span class="srOnly">Aller au contenu de la page</span></a
 			>
 		</p>

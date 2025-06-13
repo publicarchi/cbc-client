@@ -4,3 +4,7 @@ export { default as NavSettings } from './NavSettings.svelte';
 export { default as NavSubButton } from './NavSubButton.svelte';
 export { default as NavResponsive } from './NavResponsive.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
+export { default as Table } from './Table.svelte';
+export { default as TableRows } from './TableRows.svelte';
+export { default as TableCards } from './TableCards.svelte';
+export { default as TableGeneric } from './TableGeneric.svelte';

@@ -1,7 +1,15 @@
 <script lang="ts">
 	import { Nav } from '$lib/components';
 	import '$lib/style/style.css';
+	import { trackDomMutations } from '$lib/utils/debug';
+
 	let { children } = $props();
+	/*
+ 	$effect(() => {
+		const observer = trackDomMutations();
+		return () => observer.disconnect();
+	});
+ */
 </script>
 
 <header id="header" class="header wrapper">

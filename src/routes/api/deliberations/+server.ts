@@ -9,6 +9,5 @@ export const GET: RequestHandler = async ({ url, setHeaders }) => {
 	setHeaders({
 		'cache-control': 'max-age=' + MAX_AGE
 	});
-
 	return json(data);
 };
